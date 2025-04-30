@@ -40,8 +40,10 @@ Important: **Do not merge directly into the `main` branch.**
 
 - **Feature Branches**  
   Format: `feature/<issue_number>-<short_description>`
+
   Example:  `feature/1-add-10-sample-texts`
 
 - **Bugfix Branches**  
 Format: `bugfix/<issue_number>-<short_description>`
-Example: `bugfix/42-fix-translation-error`
+
+    Example: `bugfix/42-fix-translation-error`
