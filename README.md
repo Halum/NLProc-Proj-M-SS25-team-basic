@@ -15,3 +15,33 @@ This repository hosts the code for a semester-long project on building and exper
 3. Install dependencies: `pip install -r ../requirements.txt`
 
 ## Teams & Tracks
+
+## 🛠 Development Guidelines
+
+To maintain a clean and collaborative development workflow, please follow the guidelines below.
+
+### Task Flow
+
+1. **Create an Issue**  
+   Open an issue **before starting any new task** to track progress and discussion.
+
+2. **Create a Pull Request**  
+   Submit all work as a pull request (PR) targeting the `develop` branch.  
+
+---
+
+### Branching Strategy
+
+- **Target Branch for Marge:** `develop`
+
+Important: **Do not merge directly into the `main` branch.**
+
+#### Branch Naming Conventions
+
+- **Feature Branches**  
+  Format: `feature/<issue_number>-<short_description>`
+  Example:  `feature/1-add-10-sample-texts`
+
+- **Bugfix Branches**  
+Format: `bugfix/<issue_number>-<short_description>`
+Example: `bugfix/42-fix-translation-error`
