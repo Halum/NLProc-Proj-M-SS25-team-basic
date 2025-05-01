@@ -1,5 +1,18 @@
 # RAG Project – Summer Semester 2025
 
+## Table of Contents
+- [RAG Project – Summer Semester 2025](#rag-project--summer-semester-2025)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Structure](#structure)
+  - [Environment Setup with Conda](#environment-setup-with-conda)
+  - [🛠 Development Guidelines](#-development-guidelines)
+    - [Task Flow](#task-flow)
+    - [Branching Strategy](#branching-strategy)
+      - [Branch Naming Conventions](#branch-naming-conventions)
+      - [Commit Message Conventions](#commit-message-conventions)
+    - [Coding Guideline](#coding-guideline)
+
 ## Overview
 This repository hosts the code for a semester-long project on building and experimenting with Retrieval-Augmented Generation (RAG) systems. Students start with a shared baseline and then explore specialized variations in teams.
 
@@ -9,12 +22,29 @@ This repository hosts the code for a semester-long project on building and exper
 - `evaluation/`: Common tools for comparing results
 - `utils/`: Helper functions shared across code
 
-## Getting Started
-1. Clone the repo
-2. `cd baseline/`
-3. Install dependencies: `pip install -r ../requirements.txt`
+## Environment Setup with Conda
 
-## Teams & Tracks
+For a more controlled environment, we recommend using Conda:
+
+1. **Install Miniconda**
+   - Download Miniconda from [https://docs.conda.io/en/latest/miniconda.html](https://docs.conda.io/en/latest/miniconda.html)
+   - Follow the installation instructions for your operating system
+
+2. **Create a Conda Environment**
+   ```bash
+   conda create -n rag-project python=3.13
+   conda activate rag-project
+   ```
+
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Environment Management**
+   - Activate environment: `conda activate rag-project`
+   - Deactivate environment: `conda deactivate`
+   - List environments: `conda env list`
 
 ## 🛠 Development Guidelines
 
@@ -47,3 +77,18 @@ Important: **Do not merge directly into the `main` branch.**
 Format: `bugfix/<issue_number>-<short_description>`
 
     Example: `bugfix/42-fix-translation-error`
+
+#### Commit Message Conventions
+
+- Format: `#-<issue_number> <Message in present tense>`
+   
+   Example: `#3 - Update .gitignore to ignore vscode configs`
+- Try to do incremental and modular commit. Do not dump all changes into a single commit.
+
+---
+
+### Coding Guideline
+
+   - Do not use hardcoded values in code. Put them in `config`
+   - Ensure decoupled function or pure functions so that most of the configuration are passed as argument and it becomes reusable.
+   - Focus more on readable code than efficiency.
