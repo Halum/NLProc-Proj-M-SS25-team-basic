@@ -11,6 +11,7 @@
     - [Branching Strategy](#branching-strategy)
       - [Branch Naming Conventions](#branch-naming-conventions)
       - [Commit Message Conventions](#commit-message-conventions)
+    - [Coding Guideline](#coding-guideline)
 
 ## Overview
 This repository hosts the code for a semester-long project on building and experimenting with Retrieval-Augmented Generation (RAG) systems. Students start with a shared baseline and then explore specialized variations in teams.
@@ -82,3 +83,12 @@ Format: `bugfix/<issue_number>-<short_description>`
 - Format: `#-<issue_number> <Message in present tense>`
    
    Example: `#3 - Update .gitignore to ignore vscode configs`
+- Try to do incremental and modular commit. Do not dump all changes into a single commit.
+
+---
+
+### Coding Guideline
+
+   - Do not use hardcoded values in code. Put them in `config`
+   - Ensure decoupled function or pure functions so that most of the configuration are passed as argument and it becomes reusable.
+   - Focus more on readable code than efficiency.
