@@ -53,14 +53,14 @@ def get_qna_tuples(df):
 
 def run_and_evaluate_answer(db, file_chunks, qna_tuples):
     """Run the LLM and evaluate the answers."""
-    execution_times = []
-    chunk_ratings = []
-    evaluation_Scores = []
+    all_execution_times = []
+    all_chunk_ratings = []
+    all_evaluation_Scores = []
     
     for topic_wise_qna in qna_tuples:
-        chunk_ratings = {}
+        topic_chunk_ratings = {}
         topic_execution_times = []
-        answer_scores = []
+        topic_answer_scores = []
         
         
         for q, a in topic_wise_qna:
@@ -69,7 +69,7 @@ def run_and_evaluate_answer(db, file_chunks, qna_tuples):
             retrieved_chunks = get_retrieved_chunks(indices, file_chunks)
             answering_prompt = generate_answering_prompt(retrieved_chunks, q)
             
-            chunk_ratings = rank_chunks_by_ratings(retrieved_chunks, chunk_ratings)
+            rank_chunks_by_ratings(retrieved_chunks, topic_chunk_ratings)
             
             execution_time, answer = run_with_timer(invoke_llm, answering_prompt)
             topic_execution_times.append(execution_time)
@@ -79,16 +79,16 @@ def run_and_evaluate_answer(db, file_chunks, qna_tuples):
             # print(f"Expected Answer: {a}\n")
             feedback_prompt = generate_answer_evaluation_prompt(q, answer, a)
             accuracy_score = invoke_llm(feedback_prompt)
-            answer_scores.append(accuracy_score)
+            topic_answer_scores.append(accuracy_score)
             # print(f"Accuracy Score: {accuracy_score}\n")
             # print(f"Explaination: {explaination}\n")
             # print("-" * 50)
     
-        chunk_ratings.append(list(chunk_ratings.values()))
-        execution_times.append(topic_execution_times)
-        evaluation_Scores.append(answer_scores)
+        all_chunk_ratings.append(list(topic_chunk_ratings.values()))
+        all_execution_times.append(topic_execution_times)
+        all_evaluation_Scores.append(topic_answer_scores)
         
-    return execution_times, chunk_ratings, evaluation_Scores
+    return all_execution_times, all_chunk_ratings, all_evaluation_Scores
 
 def main():
     """Main function to orchestrate the document processing and visualization workflow."""
@@ -99,7 +99,7 @@ def main():
     file_chunks = [chunk for content in file_contents for chunk in chunk_text(content, CHUNK_SIZE)]
     
     # Visualize results
-    visualize_topic_embeddings(file_contents, file_names)
+    # visualize_topic_embeddings(file_contents, file_names)
  
     
     # Store embeddings in a database, this needs to be a single dimensional array
