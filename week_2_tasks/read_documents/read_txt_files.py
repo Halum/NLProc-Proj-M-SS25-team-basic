@@ -9,10 +9,12 @@ def get_text_chunks_from_directory(directory, chunk_size=200):
         
         if filename.endswith('.txt') and os.path.isfile(full_path):
             with open(full_path, 'r', encoding='utf-8') as file:
+                print(f"Reading file: {filename}")
                 text = file.read()
         
-            chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
-            file_chunks.append(chunks)
-            sample_names.append(filename)
+                chunks = [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
+                
+                file_chunks += chunks
+                sample_names.append(filename)
     
     return file_chunks, sample_names
