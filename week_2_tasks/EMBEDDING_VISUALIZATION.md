@@ -1,5 +1,15 @@
 # Embedding Visualization
 
+## Index
+- [Embedding Visualization](#embedding-visualization)
+  - [Index](#index)
+  - [1. Cosine Similarity Heatmap](#1-cosine-similarity-heatmap)
+    - [Insights:](#insights)
+  - [2. PCA Embeddings Visualization](#2-pca-embeddings-visualization)
+    - [Insights:](#insights-1)
+  - [3. t-SNE Embeddings Visualization](#3-t-sne-embeddings-visualization)
+    - [Insights:](#insights-2)
+
 ## 1. Cosine Similarity Heatmap
 
 ![Cosine similarity heatmap](images/cosine_similarity.png)

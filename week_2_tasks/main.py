@@ -51,6 +51,13 @@ def get_qna_tuples(df):
         
     return qna_tuples
 
+def print_chunks(file_chunks):
+    """Print the chunks of text."""
+    for i, chunk in enumerate(file_chunks):
+        print(f"Chunk {i+1}:")
+        print(chunk)
+        print("-" * 50)
+
 def run_and_evaluate_answer(db, file_chunks, qna_tuples):
     """Run the LLM and evaluate the answers."""
     all_execution_times = []
@@ -69,6 +76,8 @@ def run_and_evaluate_answer(db, file_chunks, qna_tuples):
             retrieved_chunks = get_retrieved_chunks(indices, file_chunks)
             answering_prompt = generate_answering_prompt(retrieved_chunks, q)
             
+            print_chunks(retrieved_chunks)
+            
             rank_chunks_by_ratings(retrieved_chunks, topic_chunk_ratings)
             
             execution_time, answer = run_with_timer(invoke_llm, answering_prompt)
@@ -83,7 +92,7 @@ def run_and_evaluate_answer(db, file_chunks, qna_tuples):
             # print(f"Accuracy Score: {accuracy_score}\n")
             # print(f"Explaination: {explaination}\n")
             # print("-" * 50)
-    
+        
         all_chunk_ratings.append(list(topic_chunk_ratings.values()))
         all_execution_times.append(topic_execution_times)
         all_evaluation_Scores.append(topic_answer_scores)
@@ -99,7 +108,7 @@ def main():
     file_chunks = [chunk for content in file_contents for chunk in chunk_text(content, CHUNK_SIZE)]
     
     # Visualize results
-    # visualize_topic_embeddings(file_contents, file_names)
+    visualize_topic_embeddings(file_contents, file_names)
  
     
     # Store embeddings in a database, this needs to be a single dimensional array
