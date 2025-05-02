@@ -58,6 +58,22 @@ For a more controlled environment, we recommend using Conda:
    - Deactivate environment: `conda deactivate`
    - List environments: `conda env list`
 
+5. **Running the Application**
+   - Navigate to the week_2_tasks folder:
+     ```bash
+     cd week_2_tasks
+     ```
+   - Run the main script:
+     ```bash
+     python main.py
+     ```
+   - This will:
+     - Process sample texts from CSV files
+     - Generate embeddings for text chunks
+     - Visualize embeddings using PCA, t-SNE, and cosine similarity
+     - Run question-answering tests using the RAG system
+     - Evaluate the answers and report execution times
+
 ## 🛠 Development Guidelines
 
 To maintain a clean and collaborative development workflow, please follow the guidelines below.
