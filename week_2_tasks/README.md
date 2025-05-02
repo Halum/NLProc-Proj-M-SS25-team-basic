@@ -1,5 +1,12 @@
 # Textual explanation of embeddings and retrieval
 
+## Index
+- [Embeddings](#embeddings)
+- [Retrieval](#retrieval)
+- [The Workflow of Query Retrieval](#the-workflow-of-query-retrieval)
+  - [Explanation of the Workflow](#explanation-of-the-workflow)
+- [How Vector Search Works](#how-vector-search-works)
+
 ## Embeddings
 
 Embeddings are numerical representations of data—typically text—that capture the semantic meaning of words, phrases, or entire documents in a way that computers can process. Instead of relying on exact word matching, embeddings convert text into high-dimensional vectors (lists of numbers), where similar meanings are positioned close together in this vector space. For example, the words "king" and "queen" will have embeddings that are closer together than "king" and "banana." These vector representations are generated using models like Word2Vec, GloVe, or more advanced ones like BERT or OpenAI's embedding models. The key advantage of embeddings is their ability to represent similarity based on context and meaning rather than just exact text matches.

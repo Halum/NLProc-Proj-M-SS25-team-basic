@@ -1,6 +1,3 @@
-from tkinter import TOP
-
-
 CHUNK_SIZE = 200
 EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
 INPUT_FILE_PATH = 'data/sample_texts.csv'
