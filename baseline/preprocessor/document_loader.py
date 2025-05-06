@@ -23,6 +23,14 @@ class PDFDocumentLoader(DocumentLoader):
                 text += page.extract_text()
         return text
     
+class TextDocumentLoader(DocumentLoader):
+    """Loader for text documents."""
+
+    def load(self, file_path: str) -> str:
+        """Load a text document."""
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return file.read()
+
 class DocumentLoaderFactory:
     """
     Factory class to create appropriate DocumentLoader instances based on file type.
@@ -40,7 +48,9 @@ class DocumentLoaderFactory:
             DocumentLoader: An instance of a subclass of DocumentLoader.
         """
         extension = Path(file_path).suffix.lower()
-        if extension == '.pdf':
+        if extension == '.txt':
+            return TextDocumentLoader()
+        elif extension == '.pdf':
             return PDFDocumentLoader()
 
         else:
