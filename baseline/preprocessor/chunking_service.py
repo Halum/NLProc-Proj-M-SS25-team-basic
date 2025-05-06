@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from langchain.text_splitter import (
+    CharacterTextSplitter
+)
 
 class ChunkingStrategy(ABC):
     """
@@ -37,3 +40,37 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
             list: A list of text chunks.
         """
         return [text[i:i + self.chunk_size] for i in range(0, len(text), self.chunk_size)]
+    
+    
+class SlidingWindowChunkingStrategy(ChunkingStrategy):
+    """
+    Chunking strategy that uses a sliding window approach.
+    """
+
+    def __init__(self, chunk_size: int, overlap: int):
+        """
+        Initialize the sliding window chunking strategy.
+
+        Args:
+            chunk_size (int): The size of each chunk in characters.
+            overlap (int): The number of overlapping characters between chunks.
+        """
+        self.chunk_size = chunk_size
+        self.overlap = overlap
+        
+    def chunk(self, text: str) -> list:
+        """
+        Chunk the text using a sliding window approach.
+        
+        Args:
+            text (str): The text to be chunked.
+            
+        Returns:
+            list: A list of text chunks.
+        """
+        splitter = CharacterTextSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.overlap
+        ).split_text(text)
+        
+        return splitter
