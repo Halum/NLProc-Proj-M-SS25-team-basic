@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from langchain.text_splitter import (
     CharacterTextSplitter
 )
+from nltk.tokenize import sent_tokenize
+import nltk
+nltk.download('punkt_tab', quiet=True)
 
 class ChunkingStrategy(ABC):
     """
@@ -74,3 +77,43 @@ class SlidingWindowChunkingStrategy(ChunkingStrategy):
         ).split_text(text)
         
         return splitter
+
+class SentenceBasedChunkingStrategy(ChunkingStrategy):
+    """
+    Chunking strategy that splits text into sentences.
+    """
+    
+    def __init__(self, chunk_size: int = 1000):
+        """
+        Initialize the sentence chunking strategy.
+
+        Args:
+            chunk_size (int): The size of each chunk in characters.
+        """
+        self.chunk_size = chunk_size
+
+    def chunk(self, text: str) -> list:
+        """
+        Chunk the text into sentences.
+        
+        Args:
+            text (str): The text to be chunked.
+            
+        Returns:
+            list: A list of text chunks.
+        """
+        sentences = sent_tokenize(text)
+        chunks = []
+        current_chunk = ""
+
+        for sentence in sentences:
+            if len(current_chunk) + len(sentence) + 1 <= self.chunk_size:
+                current_chunk += (" " if current_chunk else "") + sentence
+            else:
+                chunks.append(current_chunk)
+                current_chunk = sentence
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        return chunks
