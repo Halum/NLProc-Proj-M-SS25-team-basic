@@ -2,7 +2,7 @@ import os
 import sys
 from preprocessor.document_loader import load_document
 
-#
+# Set the path to the config directory
 config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(config_path)
 
