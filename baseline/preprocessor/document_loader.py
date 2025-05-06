@@ -1,1 +1,92 @@
-# Document loading from various sources
+import os
+from abc import ABC, abstractmethod
+import PyPDF2
+from pathlib import Path
+import docx
+
+
+class DocumentLoader(ABC):
+    """Abstract base class for document loaders."""
+
+    @abstractmethod
+    def load(self, file_path: str) -> str:
+        """Load a document from the given path."""
+        pass
+
+
+class PDFDocumentLoader(DocumentLoader):
+    """Loader for PDF documents."""
+
+    def load(self, file_path: str) -> str:
+        """Load a PDF document."""
+        with open(file_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            text = ""
+            for page in reader.pages:
+                text += page.extract_text()
+        return text
+
+
+class TextDocumentLoader(DocumentLoader):
+    """Loader for text documents."""
+
+    def load(self, file_path: str) -> str:
+        """Load a text document."""
+        with open(file_path, "r", encoding="utf-8") as file:
+            return file.read()
+
+
+class DocxDocumentLoader(DocumentLoader):
+    """Loader for DOCX documents."""
+
+    def load(self, file_path: str) -> str:
+        """Load a DOCX or Word document."""
+        doc = docx.Document(file_path)
+        text = ""
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + "\n"
+        return text
+
+
+class DocumentLoaderFactory:
+    """
+    Factory class to create appropriate DocumentLoader instances based on file type.
+    """
+
+    @staticmethod
+    def get_loader(file_path: str) -> DocumentLoader:
+        """
+        Get the appropriate loader for the given file type.
+
+        Args:
+            file_path (str): Path to the document file.
+
+        Returns:
+            DocumentLoader: An instance of a subclass of DocumentLoader.
+        """
+        extension = Path(file_path).suffix.lower()
+        if extension == ".txt" or extension == ".md":
+            return TextDocumentLoader()
+        elif extension == ".pdf":
+            return PDFDocumentLoader()
+        elif extension == ".docx":
+            return DocxDocumentLoader()
+        else:
+            raise ValueError(f"Unsupported file type: {extension}")
+
+
+def load_document(file_path: str) -> str:
+    """
+    Load the content of a document using the appropriate loader.
+
+    Args:
+        file_path (str): Path to the document file.
+
+    Returns:
+        str: Content of the document as a string.
+    """
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+
+    loader = DocumentLoaderFactory.get_loader(file_path)
+    return loader.load(file_path)
