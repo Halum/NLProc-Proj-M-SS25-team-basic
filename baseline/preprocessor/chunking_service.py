@@ -117,3 +117,43 @@ class SentenceBasedChunkingStrategy(ChunkingStrategy):
             chunks.append(current_chunk)
 
         return chunks
+    
+class ParagraphBasedChunkingStrategy(ChunkingStrategy):
+    """
+    Chunking strategy that splits text into paragraphs.
+    """
+
+    def __init__(self, chunk_size: int = 1000):
+        """
+        Initialize the paragraph-based chunking strategy.
+
+        Args:
+            chunk_size (int): The size of each chunk in characters.
+        """
+        self.chunk_size = chunk_size
+
+    def chunk(self, text: str) -> list:
+        """
+        Chunk the text into paragraphs.
+
+        Args:
+            text (str): The text to be chunked.
+
+        Returns:
+            list: A list of text chunks.
+        """
+        paragraphs = text.split("\n\n")
+        chunks = []
+        current_chunk = ""
+
+        for paragraph in paragraphs:
+            if len(current_chunk) + len(paragraph) + 1 <= self.chunk_size:
+                current_chunk += ("\n\n" if current_chunk else "") + paragraph
+            else:
+                chunks.append(current_chunk)
+                current_chunk = paragraph
+
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        return chunks
