@@ -1,1 +1,1 @@
-# put the code that calls all the different components here
+# use this as the application entry point
