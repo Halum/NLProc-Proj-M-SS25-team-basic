@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from langchain.text_splitter import (
-    CharacterTextSplitter
+    CharacterTextSplitter,
+    RecursiveCharacterTextSplitter,
 )
 from nltk.tokenize import sent_tokenize
 import nltk
-nltk.download('punkt_tab', quiet=True)
+
+nltk.download("punkt_tab", quiet=True)
+
 
 class ChunkingStrategy(ABC):
     """
@@ -17,7 +20,8 @@ class ChunkingStrategy(ABC):
         Chunk the given text into smaller pieces.
         """
         pass
-    
+
+
 class FixedSizeChunkingStrategy(ChunkingStrategy):
     """
     Chunking strategy that splits text into fixed-size chunks.
@@ -35,16 +39,18 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
     def chunk(self, text: str) -> list:
         """
         Chunk the text into fixed-size pieces.
-        
+
         Args:
             text (str): The text to be chunked.
-            
+
         Returns:
             list: A list of text chunks.
         """
-        return [text[i:i + self.chunk_size] for i in range(0, len(text), self.chunk_size)]
-    
-    
+        return [
+            text[i : i + self.chunk_size] for i in range(0, len(text), self.chunk_size)
+        ]
+
+
 class SlidingWindowChunkingStrategy(ChunkingStrategy):
     """
     Chunking strategy that uses a sliding window approach.
@@ -60,29 +66,29 @@ class SlidingWindowChunkingStrategy(ChunkingStrategy):
         """
         self.chunk_size = chunk_size
         self.overlap = overlap
-        
+
     def chunk(self, text: str) -> list:
         """
         Chunk the text using a sliding window approach.
-        
+
         Args:
             text (str): The text to be chunked.
-            
+
         Returns:
             list: A list of text chunks.
         """
         splitter = CharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.overlap
+            chunk_size=self.chunk_size, chunk_overlap=self.overlap
         ).split_text(text)
-        
+
         return splitter
+
 
 class SentenceBasedChunkingStrategy(ChunkingStrategy):
     """
     Chunking strategy that splits text into sentences.
     """
-    
+
     def __init__(self, chunk_size: int = 1000):
         """
         Initialize the sentence chunking strategy.
@@ -95,10 +101,10 @@ class SentenceBasedChunkingStrategy(ChunkingStrategy):
     def chunk(self, text: str) -> list:
         """
         Chunk the text into sentences.
-        
+
         Args:
             text (str): The text to be chunked.
-            
+
         Returns:
             list: A list of text chunks.
         """
@@ -117,7 +123,8 @@ class SentenceBasedChunkingStrategy(ChunkingStrategy):
             chunks.append(current_chunk)
 
         return chunks
-    
+
+
 class ParagraphBasedChunkingStrategy(ChunkingStrategy):
     """
     Chunking strategy that splits text into paragraphs.
@@ -157,3 +164,36 @@ class ParagraphBasedChunkingStrategy(ChunkingStrategy):
             chunks.append(current_chunk)
 
         return chunks
+
+
+class SemanticChunkingStrategy(ChunkingStrategy):
+    """
+    Chunking strategy that uses a recursive approach to split text into smaller pieces.
+    """
+
+    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+        """
+        Initialize the recursive chunking strategy.
+
+        Args:
+            chunk_size (int): The size of each chunk in characters.
+            chunk_overlap (int): The number of overlapping characters between chunks.
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+
+    def chunk(self, text: str) -> list:
+        """
+        Chunk the text using a recursive approach.
+
+        Args:
+            text (str): The text to be chunked.
+
+        Returns:
+            list: A list of text chunks.
+        """
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
+        ).split_text(text)
+
+        return splitter
