@@ -65,7 +65,7 @@ class DocumentLoaderFactory:
             DocumentLoader: An instance of a subclass of DocumentLoader.
         """
         extension = Path(file_path).suffix.lower()
-        if extension == ".txt":
+        if extension == ".txt" or extension == ".md":
             return TextDocumentLoader()
         elif extension == ".pdf":
             return PDFDocumentLoader()
@@ -73,3 +73,20 @@ class DocumentLoaderFactory:
             return DocxDocumentLoader()
         else:
             raise ValueError(f"Unsupported file type: {extension}")
+
+
+def load_document(file_path: str) -> str:
+    """
+    Load the content of a document using the appropriate loader.
+
+    Args:
+        file_path (str): Path to the document file.
+
+    Returns:
+        str: Content of the document as a string.
+    """
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+
+    loader = DocumentLoaderFactory.get_loader(file_path)
+    return loader.load(file_path)
