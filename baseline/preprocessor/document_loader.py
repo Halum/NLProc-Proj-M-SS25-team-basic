@@ -2,6 +2,8 @@ import os
 from abc import ABC, abstractmethod
 import PyPDF2
 from pathlib import Path
+import docx
+
 
 class DocumentLoader(ABC):
     """Abstract base class for document loaders."""
@@ -11,25 +13,40 @@ class DocumentLoader(ABC):
         """Load a document from the given path."""
         pass
 
+
 class PDFDocumentLoader(DocumentLoader):
     """Loader for PDF documents."""
 
     def load(self, file_path: str) -> str:
         """Load a PDF document."""
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             reader = PyPDF2.PdfReader(file)
-            text = ''
+            text = ""
             for page in reader.pages:
                 text += page.extract_text()
         return text
-    
+
+
 class TextDocumentLoader(DocumentLoader):
     """Loader for text documents."""
 
     def load(self, file_path: str) -> str:
         """Load a text document."""
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, "r", encoding="utf-8") as file:
             return file.read()
+
+
+class DocxDocumentLoader(DocumentLoader):
+    """Loader for DOCX documents."""
+
+    def load(self, file_path: str) -> str:
+        """Load a DOCX or Word document."""
+        doc = docx.Document(file_path)
+        text = ""
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + "\n"
+        return text
+
 
 class DocumentLoaderFactory:
     """
@@ -48,10 +65,11 @@ class DocumentLoaderFactory:
             DocumentLoader: An instance of a subclass of DocumentLoader.
         """
         extension = Path(file_path).suffix.lower()
-        if extension == '.txt':
+        if extension == ".txt":
             return TextDocumentLoader()
-        elif extension == '.pdf':
+        elif extension == ".pdf":
             return PDFDocumentLoader()
-
+        elif extension == ".docx":
+            return DocxDocumentLoader()
         else:
             raise ValueError(f"Unsupported file type: {extension}")
