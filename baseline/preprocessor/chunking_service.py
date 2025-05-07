@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 from langchain_text_splitters import (
     CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
+    MarkdownHeaderTextSplitter,
 )
-
+from typing import List, Tuple
 from nltk.tokenize import sent_tokenize
 import nltk
 
@@ -199,3 +200,44 @@ class SemanticChunkingStrategy(ChunkingStrategy):
         ).split_text(text)
 
         return splitter
+
+
+class MarkdownHeaderChunkingStrategy(ChunkingStrategy):
+    """
+    Chunking strategy that splits Markdown text based on header structure.
+    """
+    def __init__(self, headers_to_split_on: List[Tuple[str, str]] = None):
+        """
+        Initialize the markdown header chunking strategy.
+
+        Args:
+            headers_to_split_on (List[Tuple[str, str]]): A list of tuples specifying
+                the markdown headers to split on and their corresponding metadata keys.
+                Example: [("#", "Header1"), ("##", "Header2")]
+        """
+        if headers_to_split_on is None:
+            headers_to_split_on = [
+                ("#", "Header1"),
+                ("##", "Header2"),
+                ("###", "Header3"),
+                ("####", "Header4"),
+                ("#####", "Header5"),
+                ("######", "Header6"),
+            ]
+        self.splitter = MarkdownHeaderTextSplitter(
+            headers_to_split_on=headers_to_split_on
+        )
+
+    def chunk(self, text: str) -> List[str]:
+        """
+        Chunk the markdown text into sections based on headers.
+
+        Args:
+            text (str): The markdown text to be chunked.
+
+        Returns:
+            List[str]: A list of markdown chunks as strings.
+        """
+        documents = self.splitter.split_text(text)
+        chunks = [doc.page_content for doc in documents]
+        return chunks

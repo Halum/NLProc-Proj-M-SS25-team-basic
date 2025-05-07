@@ -7,6 +7,7 @@ from preprocessor.chunking_service import (
     SentenceBasedChunkingStrategy,
     ParagraphBasedChunkingStrategy,
     SemanticChunkingStrategy,
+    MarkdownHeaderChunkingStrategy
 )
 
 # Set the path to the config directory
@@ -36,7 +37,8 @@ def add_documents(folder_path: str) -> None:
                 # chunker = SlidingWindowChunkingStrategy(chunk_size=100, overlap=20)
                 # chunker = SentenceBasedChunkingStrategy(chunk_size=1000)
                 # chunker = ParagraphBasedChunkingStrategy(chunk_size=500)
-                chunker = SemanticChunkingStrategy(chunk_size=1000, chunk_overlap=200)
+                # chunker = SemanticChunkingStrategy(chunk_size=1000, chunk_overlap=200)
+                chunker = MarkdownHeaderChunkingStrategy()
                 chunks = chunker.chunk(content)
 
                 for i, chunk in enumerate(chunks):
