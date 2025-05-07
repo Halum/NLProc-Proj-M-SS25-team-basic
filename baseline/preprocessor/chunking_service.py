@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from langchain.text_splitter import (
+from langchain_text_splitters import (
     CharacterTextSplitter,
-    RecursiveCharacterTextSplitter
+    RecursiveCharacterTextSplitter,
 )
+
 from nltk.tokenize import sent_tokenize
 import nltk
 
