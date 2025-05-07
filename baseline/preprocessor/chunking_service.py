@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from langchain.text_splitter import (
     CharacterTextSplitter,
-    RecursiveCharacterTextSplitter,
+    RecursiveCharacterTextSplitter
 )
 from nltk.tokenize import sent_tokenize
 import nltk
@@ -46,9 +46,10 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        return [
-            text[i : i + self.chunk_size] for i in range(0, len(text), self.chunk_size)
-        ]
+        splitter = CharacterTextSplitter(
+            chunk_size=self.chunk_size, chunk_overlap=0
+        ).split_text(text)
+        return splitter
 
 
 class SlidingWindowChunkingStrategy(ChunkingStrategy):
