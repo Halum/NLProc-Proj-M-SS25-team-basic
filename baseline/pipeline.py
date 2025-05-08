@@ -11,6 +11,8 @@ from preprocessor.chunking_service import (
 from config.config import DOCUMENT_FOLDER_PATH
 from evaluation.answer_verifier import AnswerVerifier
 from evaluation.insight_generator import InsightGenerator
+from evaluation.embedding_analyzer import analyze_embeddings
+from evaluation.document_similarity_heatmap import analyze_heatmap
 
 def print_chunks(chunks):
     """
@@ -85,6 +87,9 @@ def main():
         
     insight_generator.save_insight('chunking_strategy_insights.csv')
     print("Pipeline completed successfully.")
+    # for embedding visualization
+    # analyze_embeddings()
+    # analyze_heatmap()
 
 
 if __name__ == "__main__":
