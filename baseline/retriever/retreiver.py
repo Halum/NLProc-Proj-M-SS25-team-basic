@@ -8,15 +8,18 @@ from preprocessor.chunking_service import (
     MarkdownHeaderChunkingStrategy
 )
 from generator.llm import LLM
+from retreiver.vector_store import VectorStoreFaiss
 
 class Retriever:
     def __init__(self, chunking_strategy):
         self.__documents = []
         self.chunking_strategy = chunking_strategy
         self.__chunks = []
+        self.__vector_store = VectorStoreFaiss(LLM.embedding_dimensions())
         
     def __reset__(self):
-        self.__chunks = []        
+        self.__chunks = []
+        self.__vector_store.cleanup()
     
     def add_document(self, document_path, is_directory=False):        
         if is_directory:
@@ -35,10 +38,11 @@ class Retriever:
     
     def save(self):
         embeddings = LLM.generate_embedding(self.__chunks)
+        self.__vector_store.add_embeddings(embeddings)
         
         return embeddings
     
-    def load(self, path):
+    def load(self):
         for document in self.__documents:
             chunks = self.chunking_strategy.chunk(document)
             self.__chunks.extend(chunks)
