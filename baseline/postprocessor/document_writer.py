@@ -1,4 +1,9 @@
 class DocumentWriter:
+    """
+    Utility class for writing documents and data to various file formats.
+    Provides static methods for common file output operations.
+    """
+    
     @staticmethod
     def df_to_csv(df, directory, file_name):
         """

@@ -99,6 +99,15 @@ class DocumentReader:
 
     @staticmethod
     def read_documents_in_dir(directory: str) -> list:
+        """
+        Read all documents in the specified directory.
+        
+        Args:
+            directory (str): Path to the directory containing documents.
+            
+        Returns:
+            list: List of document content strings from all successfully processed files.
+        """
         documents = []    
         
         for filename in os.listdir(directory):
@@ -112,4 +121,3 @@ class DocumentReader:
                     print(f"[ERROR] Failed to process '{filename}': {e}")
         
         return documents
-    

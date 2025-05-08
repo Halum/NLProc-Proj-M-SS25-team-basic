@@ -6,8 +6,19 @@ labeled_data = {
 
 
 class AnswerVerifier:
+    """
+    Class for verifying and evaluating the correctness of generated answers
+    by comparing them with labeled data and context.
+    """
+    
     @staticmethod
     def get_sample_labeled_data():
+        """
+        Retrieve sample labeled data for testing and evaluation purposes.
+        
+        Returns:
+            dict: A dictionary containing query, expected answer and context.
+        """
         return labeled_data
     
     @staticmethod
