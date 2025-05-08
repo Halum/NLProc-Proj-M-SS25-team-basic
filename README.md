@@ -35,7 +35,7 @@ For a more controlled environment, we recommend using Conda:
 
 2. **Create a Conda Environment**
    ```bash
-   conda create -n rag-project python=3.13
+   conda create -n rag-project python=3.12
    conda activate rag-project
    ```
 
