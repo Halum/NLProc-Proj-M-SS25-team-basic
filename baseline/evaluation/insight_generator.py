@@ -10,7 +10,7 @@ class InsightGenerator:
         """
         self.insight_df = pd.DataFrame(columns=["chunk_strategy", "number_of_chunks", "retrieved_chunk_rank", "correct_answer"])
         
-    def update_insight(self, chunk_strategy, number_of_chunks, retrieved_chunk_rank, correct_answer):
+    def update_insight(self, chunk_strategy, number_of_chunks, retrieved_chunk_rank, correct_answer, ):
         """
         Update the insight DataFrame with the results of the query.
         Args:

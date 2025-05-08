@@ -105,7 +105,7 @@ class Retriever:
         distances, indices = self.__vector_store.search(query_embedding)
         retrieved_chunks = self.__get_relevant_chunks(indices)
         
-        return retrieved_chunks
+        return retrieved_chunks, distances
     
     def query(self, query, relevant_chunks):
         """

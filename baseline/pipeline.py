@@ -47,11 +47,11 @@ def main():
     """
     chunking_stratigies = [
         FixedSizeChunkingStrategy(chunk_size=1000),
-        # SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
-        # SentenceBasedChunkingStrategy(chunk_size=1000),
-        # ParagraphBasedChunkingStrategy(chunk_size=1000),
-        # SemanticChunkingStrategy(),
-        # MarkdownHeaderChunkingStrategy()
+        SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
+        SentenceBasedChunkingStrategy(chunk_size=1000),
+        ParagraphBasedChunkingStrategy(chunk_size=1000),
+        SemanticChunkingStrategy(),
+        MarkdownHeaderChunkingStrategy()
     ]
     insight_generator = InsightGenerator()
     
@@ -69,34 +69,36 @@ def main():
         print(f"Number of chunks generated: {len(chunks)}")
         retriever.save()
         
-        labeled_date = AnswerVerifier.get_sample_labeled_data()
+        labeled_date_list = AnswerVerifier.get_sample_labeled_data()
         
-        retrieved_chunks = retriever.load(labeled_date["query"])
-        generated_answer = retriever.query(labeled_date["query"], retrieved_chunks)
+        for labeled_date in labeled_date_list:
         
-        
-        print(f"Query: {labeled_date['query']}")
-        print(f"Expected answer: {labeled_date['answer']}")
-        print(f"Generated answer: {generated_answer}")
-        print(f"Context: {labeled_date['context']}")
-        
-        expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, labeled_date["context"])
-        if expected_chunk_index != -1:
-            print(f"Context found in chunk: {expected_chunk_index}")
-        else:
-            print("Expected chunk not found in retrieved chunks.")
+            retrieved_chunks, distances = retriever.load(labeled_date["query"])
+            generated_answer = retriever.query(labeled_date["query"], retrieved_chunks)
             
-        feedback = human_feedback(labeled_date["answer"], generated_answer)
-        insight_generator.update_insight(
-            chunk_strategy=retriever.chunking_strategy.__class__.__name__,
-            number_of_chunks=len(chunks),
-            retrieved_chunk_rank=expected_chunk_index,
-            correct_answer=feedback
-        )
-        
-        print("-"*50)
-        # print(f"Retrieved chunks:")
-        # print_chunks(retrieved_chunks)
+            print(f"Query: {labeled_date['query']}")
+            print(f"Expected answer: {labeled_date['answer']}")
+            print(f"Generated answer: {generated_answer}")
+            print(f"Context: {labeled_date['context']}")
+            
+            expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, labeled_date["context"])
+            if expected_chunk_index != -1:
+                print(f"Context found in chunk: {expected_chunk_index}")
+            else:
+                print("Expected chunk not found in retrieved chunks.")
+                
+            feedback = human_feedback(labeled_date["answer"], generated_answer)
+            insight_generator.update_insight(
+                chunk_strategy=retriever.chunking_strategy.__class__.__name__,
+                number_of_chunks=len(chunks),
+                retrieved_chunk_rank=expected_chunk_index,
+                correct_answer=feedback
+            )
+            
+            print("-"*50)
+            # print(f"Retrieved chunks:")
+            # print_chunks(retrieved_chunks)
+            break
         
     insight_generator.save_insight('chunking_strategy_insights.csv')
     print("Pipeline completed successfully.")

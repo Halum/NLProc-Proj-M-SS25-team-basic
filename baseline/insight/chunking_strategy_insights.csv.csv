@@ -1,2 +1,7 @@
 chunk_strategy,number_of_chunks,retrieved_chunk_rank,correct_answer
 FixedSizeChunkingStrategy,188,2,True
+SlidingWindowChunkingStrategy,267,0,False
+SentenceBasedChunkingStrategy,206,2,True
+ParagraphBasedChunkingStrategy,121,0,False
+SemanticChunkingStrategy,83,1,False
+MarkdownHeaderChunkingStrategy,5,0,False
