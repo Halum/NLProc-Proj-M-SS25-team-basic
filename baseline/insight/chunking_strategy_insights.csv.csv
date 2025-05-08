@@ -1,0 +1,2 @@
+chunk_strategy,number_of_chunks,retrieved_chunk_rank,correct_answer
+FixedSizeChunkingStrategy,188,2,True

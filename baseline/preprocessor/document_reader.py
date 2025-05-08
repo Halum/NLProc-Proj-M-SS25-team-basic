@@ -112,3 +112,4 @@ class DocumentReader:
                     print(f"[ERROR] Failed to process '{filename}': {e}")
         
         return documents
+    

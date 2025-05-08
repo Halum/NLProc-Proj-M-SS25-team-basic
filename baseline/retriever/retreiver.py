@@ -1,12 +1,5 @@
 from preprocessor.document_reader import DocumentReader
-from preprocessor.chunking_service import (
-    FixedSizeChunkingStrategy,
-    SlidingWindowChunkingStrategy,
-    SentenceBasedChunkingStrategy,
-    ParagraphBasedChunkingStrategy,
-    SemanticChunkingStrategy,
-    MarkdownHeaderChunkingStrategy
-)
+
 from generator.llm import LLM
 from retriever.vector_store import VectorStoreFaiss
 

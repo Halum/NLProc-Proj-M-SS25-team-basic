@@ -8,9 +8,9 @@ from preprocessor.chunking_service import (
     MarkdownHeaderChunkingStrategy
 )
 
-
 from config.config import DOCUMENT_FOLDER_PATH
 from evaluation.answer_verifier import AnswerVerifier
+from evaluation.insight_generator import InsightGenerator
 
 def print_chunks(chunks):
     """
@@ -23,6 +23,23 @@ def print_chunks(chunks):
         print(f"Chunk {i+1}:")
         print(chunk)
         print("-" * 50)
+        
+def human_feedback(expected_answer, generated_answer):
+    """
+    Function to simulate human feedback on the generated answer.
+    
+    Args:
+        expected_answer (str): The expected answer.
+        generated_answer (str): The generated answer.
+        
+    Returns:
+        bool: True if the generated answer is correct, False otherwise.
+    """
+    print("Is the answer correct? (y/n)")
+    feedback = input().strip().lower()
+    
+    return feedback == 'y' 
+    
 
 def main():
     """
@@ -30,12 +47,13 @@ def main():
     """
     chunking_stratigies = [
         FixedSizeChunkingStrategy(chunk_size=1000),
-        SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
-        SentenceBasedChunkingStrategy(chunk_size=1000),
-        ParagraphBasedChunkingStrategy(chunk_size=1000),
-        SemanticChunkingStrategy(),
-        MarkdownHeaderChunkingStrategy()
+        # SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
+        # SentenceBasedChunkingStrategy(chunk_size=1000),
+        # ParagraphBasedChunkingStrategy(chunk_size=1000),
+        # SemanticChunkingStrategy(),
+        # MarkdownHeaderChunkingStrategy()
     ]
+    insight_generator = InsightGenerator()
     
     retrievers = []
     for strategy in chunking_stratigies:
@@ -58,20 +76,29 @@ def main():
         
         
         print(f"Query: {labeled_date['query']}")
-        print(f"Generated answer: {generated_answer}")
         print(f"Expected answer: {labeled_date['answer']}")
+        print(f"Generated answer: {generated_answer}")
         print(f"Context: {labeled_date['context']}")
         
         expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, labeled_date["context"])
-        if expected_chunk_index is not None:
+        if expected_chunk_index != -1:
             print(f"Context found in chunk: {expected_chunk_index}")
         else:
             print("Expected chunk not found in retrieved chunks.")
+            
+        feedback = human_feedback(labeled_date["answer"], generated_answer)
+        insight_generator.update_insight(
+            chunk_strategy=retriever.chunking_strategy.__class__.__name__,
+            number_of_chunks=len(chunks),
+            retrieved_chunk_rank=expected_chunk_index,
+            correct_answer=feedback
+        )
+        
         print("-"*50)
-        print(f"Retrieved chunks:")
-        print_chunks(retrieved_chunks)
+        # print(f"Retrieved chunks:")
+        # print_chunks(retrieved_chunks)
         
-        
+    insight_generator.save_insight('chunking_strategy_insights.csv')
     print("Pipeline completed successfully.")
 
 

@@ -26,4 +26,4 @@ class AnswerVerifier:
             if context in chunk:
                 return i, chunk
         
-        return None, None
+        return -1, None
