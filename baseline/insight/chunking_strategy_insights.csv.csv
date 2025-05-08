@@ -1,7 +1,26 @@
-chunk_strategy,number_of_chunks,retrieved_chunk_rank,correct_answer
-FixedSizeChunkingStrategy,188,2,True
-SlidingWindowChunkingStrategy,267,0,False
-SentenceBasedChunkingStrategy,206,2,True
-ParagraphBasedChunkingStrategy,121,0,False
-SemanticChunkingStrategy,83,1,False
-MarkdownHeaderChunkingStrategy,5,0,False
+chunk_strategy,number_of_chunks,retrieved_chunk_rank,correct_answer,similarity_scores
+FixedSizeChunkingStrategy,188,2,True,[1.085279  1.166163  1.1976032 1.2202762 1.2398171]
+FixedSizeChunkingStrategy,188,1,False,[0.6578897  0.72248673 0.84895265 0.97177064 1.0311728 ]
+FixedSizeChunkingStrategy,188,0,False,[0.5114153 0.5269428 0.6252909 0.6600706 0.6658007]
+FixedSizeChunkingStrategy,188,-1,False,[0.5979097  0.7049973  0.74846077 0.8100251  0.8144801 ]
+FixedSizeChunkingStrategy,188,-1,True,[0.5973687  0.6069388  0.63683194 0.64331543 0.66133803]
+SlidingWindowChunkingStrategy,267,0,False,[1.0819881 1.0999404 1.138799  1.1400185 1.2265298]
+SlidingWindowChunkingStrategy,267,1,False,[0.5740601 0.6391598 0.8003117 0.9934635 1.0178807]
+SlidingWindowChunkingStrategy,267,2,False,[0.3439961  0.46969473 0.5615109  0.5714012  0.66307294]
+SlidingWindowChunkingStrategy,267,-1,False,[0.53516626 0.60185945 0.7839787  0.7919421  0.81959045]
+SlidingWindowChunkingStrategy,267,-1,True,[0.45693362 0.58736193 0.6089435  0.6718699  0.6847912 ]
+SentenceBasedChunkingStrategy,206,2,True,[0.99627805 1.0002793  1.1591896  1.1817249  1.1825845 ]
+SentenceBasedChunkingStrategy,206,0,False,[0.6560357 0.8343737 0.9065192 0.9297017 1.0107805]
+SentenceBasedChunkingStrategy,206,1,True,[0.5458162  0.57424605 0.6039106  0.70363855 0.7226882 ]
+SentenceBasedChunkingStrategy,206,-1,False,[0.6062704  0.65701556 0.7917348  0.79382896 0.8624873 ]
+SentenceBasedChunkingStrategy,206,-1,True,[0.6098081 0.6278006 0.6797831 0.6935568 0.723344 ]
+ParagraphBasedChunkingStrategy,121,0,False,[1.0819881 1.138799  1.1400185 1.2095028 1.2265298]
+ParagraphBasedChunkingStrategy,121,0,False,[0.63877594 0.8093245  1.0254433  1.0287602  1.0385177 ]
+ParagraphBasedChunkingStrategy,121,1,True,[0.3439961  0.53183115 0.69053954 0.7107662  0.75206584]
+ParagraphBasedChunkingStrategy,121,-1,True,[0.60185945 0.7839787  0.791942   0.8563701  0.89969385]
+ParagraphBasedChunkingStrategy,121,-1,True,[0.45693362 0.6412362  0.6847912  0.7308934  0.7504715 ]
+SemanticChunkingStrategy,83,1,False,[1.1339538 1.2679226 1.313844  1.4573923 1.4648193]
+SemanticChunkingStrategy,83,0,False,[0.65024155 0.8847904  1.0879145  1.1488565  1.1696504 ]
+SemanticChunkingStrategy,83,2,False,[0.6603966 0.9119599 0.9175808 0.9820483 1.0774394]
+SemanticChunkingStrategy,83,-1,False,[0.7770095  0.82849944 0.9737963  0.976504   1.010586  ]
+SemanticChunkingStrategy,83,-1,False,[0.70367616 0.9322815  0.95290565 1.0036113  1.1402528 ]

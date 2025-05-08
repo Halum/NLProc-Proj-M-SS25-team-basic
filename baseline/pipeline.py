@@ -22,24 +22,7 @@ def print_chunks(chunks):
     for i, chunk in enumerate(chunks):
         print(f"Chunk {i+1}:")
         print(chunk)
-        print("-" * 50)
-        
-def human_feedback(expected_answer, generated_answer):
-    """
-    Function to simulate human feedback on the generated answer.
-    
-    Args:
-        expected_answer (str): The expected answer.
-        generated_answer (str): The generated answer.
-        
-    Returns:
-        bool: True if the generated answer is correct, False otherwise.
-    """
-    print("Is the answer correct? (y/n)")
-    feedback = input().strip().lower()
-    
-    return feedback == 'y' 
-    
+        print("-" * 50)    
 
 def main():
     """
@@ -87,18 +70,18 @@ def main():
             else:
                 print("Expected chunk not found in retrieved chunks.")
                 
-            feedback = human_feedback(labeled_date["answer"], generated_answer)
+            feedback = InsightGenerator.human_feedback(labeled_date["answer"], generated_answer)
             insight_generator.update_insight(
                 chunk_strategy=retriever.chunking_strategy.__class__.__name__,
                 number_of_chunks=len(chunks),
                 retrieved_chunk_rank=expected_chunk_index,
-                correct_answer=feedback
+                correct_answer=feedback,
+                similarity_scores=distances[0]
             )
             
             print("-"*50)
-            # print(f"Retrieved chunks:")
-            # print_chunks(retrieved_chunks)
-            break
+            print(f"Retrieved chunks:")
+            print_chunks(retrieved_chunks)
         
     insight_generator.save_insight('chunking_strategy_insights.csv')
     print("Pipeline completed successfully.")

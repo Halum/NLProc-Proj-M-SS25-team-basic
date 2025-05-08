@@ -87,3 +87,19 @@ It either returns a perfect score (5) consistently or echoes part of the generat
   - Design a clearer evaluation prompt, only return the score as a number.
 
 Observation regarding cosine similarity comparison with visualization can be found in [EMBEDDING_VISUALIZATION.md](../../week_2_tasks/EMBEDDING_VISUALIZATION.md)
+
+## Running the Application
+- Navigate to the week_2_tasks folder:
+  ```bash
+  cd week_2_tasks
+  ```
+- Run the main script:
+  ```bash
+  python main.py
+  ```
+- This will:
+  - Process sample texts from CSV files
+  - Generate embeddings for text chunks
+  - Visualize embeddings using PCA, t-SNE, and cosine similarity
+  - Run question-answering tests using the RAG system
+  - Evaluate the answers and report execution times

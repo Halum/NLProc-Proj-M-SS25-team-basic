@@ -49,21 +49,17 @@ For a more controlled environment, we recommend using Conda:
    - Deactivate environment: `conda deactivate`
    - List environments: `conda env list`
 
-5. **Running the Application**
-   - Navigate to the week_2_tasks folder:
-     ```bash
-     cd week_2_tasks
-     ```
-   - Run the main script:
-     ```bash
-     python main.py
-     ```
-   - This will:
-     - Process sample texts from CSV files
-     - Generate embeddings for text chunks
-     - Visualize embeddings using PCA, t-SNE, and cosine similarity
-     - Run question-answering tests using the RAG system
-     - Evaluate the answers and report execution times
+5. **Running the Baseline Pipeline**
+   ```bash
+   python baseline/pipeline.py
+   ```
+
+6. **Managing Dependencies**
+   - Whenever you install a new package, update requirements.txt:
+   ```bash
+   pip-chill > requirements.txt
+   ```
+   - This ensures that only direct dependencies (not sub-dependencies) are listed in requirements.txt
 
 ## 🛠 Development Guidelines
 
