@@ -5,7 +5,7 @@ from pathlib import Path
 import docx
 
 
-class DocumentLoader(ABC):
+class DocumentLoaderAbs(ABC):
     """Abstract base class for document loaders."""
 
     @abstractmethod
@@ -14,7 +14,7 @@ class DocumentLoader(ABC):
         pass
 
 
-class PDFDocumentLoader(DocumentLoader):
+class PDFDocumentLoader(DocumentLoaderAbs):
     """Loader for PDF documents."""
 
     def load(self, file_path: str) -> str:
@@ -27,7 +27,7 @@ class PDFDocumentLoader(DocumentLoader):
         return text
 
 
-class TextDocumentLoader(DocumentLoader):
+class TextDocumentLoader(DocumentLoaderAbs):
     """Loader for text documents."""
 
     def load(self, file_path: str) -> str:
@@ -36,7 +36,7 @@ class TextDocumentLoader(DocumentLoader):
             return file.read()
 
 
-class DocxDocumentLoader(DocumentLoader):
+class DocxDocumentLoader(DocumentLoaderAbs):
     """Loader for DOCX documents."""
 
     def load(self, file_path: str) -> str:
@@ -54,7 +54,7 @@ class DocumentLoaderFactory:
     """
 
     @staticmethod
-    def get_loader(file_path: str) -> DocumentLoader:
+    def get_loader(file_path: str) -> DocumentLoaderAbs:
         """
         Get the appropriate loader for the given file type.
 
@@ -62,7 +62,7 @@ class DocumentLoaderFactory:
             file_path (str): Path to the document file.
 
         Returns:
-            DocumentLoader: An instance of a subclass of DocumentLoader.
+            DocumentLoaderAbs: An instance of a subclass of DocumentLoaderAbs.
         """
         extension = Path(file_path).suffix.lower()
         if extension == ".txt" or extension == ".md":
@@ -75,18 +75,40 @@ class DocumentLoaderFactory:
             raise ValueError(f"Unsupported file type: {extension}")
 
 
-def load_document(file_path: str) -> str:
-    """
-    Load the content of a document using the appropriate loader.
+class DocumentReader:
+    @staticmethod
+    def read_document(file_path: str) -> str:
+        """
+        Load the content of a document using the appropriate loader.
 
-    Args:
-        file_path (str): Path to the document file.
+        Args:
+            file_path (str): Path to the document file.
 
-    Returns:
-        str: Content of the document as a string.
-    """
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"The file '{file_path}' does not exist.")
+        Returns:
+            str: Content of the document as a string.
+        """
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"The file '{file_path}' does not exist.")
 
-    loader = DocumentLoaderFactory.get_loader(file_path)
-    return loader.load(file_path)
+        loader = DocumentLoaderFactory.get_loader(file_path)
+        
+        document = loader.load(file_path)
+        
+        return document
+
+
+    @staticmethod
+    def read_documents_in_dir(directory: str) -> list:
+        documents = []    
+        
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            
+            if os.path.isfile(file_path):
+                try:
+                    file_content = DocumentReader.read_document(file_path)
+                    documents.append(file_content)
+                except Exception as e:
+                    print(f"[ERROR] Failed to process '{filename}': {e}")
+        
+        return documents
