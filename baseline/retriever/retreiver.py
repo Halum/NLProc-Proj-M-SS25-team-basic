@@ -8,7 +8,7 @@ from preprocessor.chunking_service import (
     MarkdownHeaderChunkingStrategy
 )
 from generator.llm import LLM
-from retreiver.vector_store import VectorStoreFaiss
+from retriever.vector_store import VectorStoreFaiss
 
 class Retriever:
     def __init__(self, chunking_strategy):
@@ -20,6 +20,13 @@ class Retriever:
     def __reset__(self):
         self.__chunks = []
         self.__vector_store.cleanup()
+        
+    def __get_relevant_chunks(self, indices):
+        relevant_chunks = []
+        
+        for i in indices[0]:
+            relevant_chunks.append(self.__chunks[i])
+        return relevant_chunks
     
     def add_document(self, document_path, is_directory=False):        
         if is_directory:
@@ -33,18 +40,28 @@ class Retriever:
         
         return self.__documents
     
-    def query(self, query):
-        pass
-    
     def save(self):
         embeddings = LLM.generate_embedding(self.__chunks)
-        self.__vector_store.add_embeddings(embeddings)
+        self.__vector_store.add(embeddings)
         
         return embeddings
     
-    def load(self):
+    def preprocess(self):
         for document in self.__documents:
             chunks = self.chunking_strategy.chunk(document)
             self.__chunks.extend(chunks)
             
         return self.__chunks
+    
+    def load(self, query):
+        query_embedding = LLM.generate_embedding([query])
+        distances, indices = self.__vector_store.search(query_embedding)
+        retrieved_chunks = self.__get_relevant_chunks(indices)
+        
+        return retrieved_chunks
+    
+    def query(self, query, relevant_chunks):
+        answering_prompt = LLM.generate_answering_prompt(query, relevant_chunks)
+        answer = LLM.invoke_llm(answering_prompt)
+        
+        return answer

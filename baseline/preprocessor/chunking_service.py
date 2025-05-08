@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from langchain_text_splitters import (
-    CharacterTextSplitter,
     RecursiveCharacterTextSplitter,
     MarkdownHeaderTextSplitter,
 )
+from generator.llm import LLM
+from langchain_experimental.text_splitter import SemanticChunker
 from typing import List, Tuple
 from nltk.tokenize import sent_tokenize
 import nltk
@@ -48,10 +49,13 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        splitter = CharacterTextSplitter(
-            chunk_size=self.chunk_size, chunk_overlap=0
-        ).split_text(text)
-        return splitter
+        
+        chunks = []
+        for i in range(0, len(text), self.chunk_size):
+            chunk = text[i:i + self.chunk_size]
+            chunks.append(chunk)
+        
+        return chunks
 
 
 class SlidingWindowChunkingStrategy(ChunkingStrategy):
@@ -80,11 +84,11 @@ class SlidingWindowChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        splitter = CharacterTextSplitter(
+        chunks = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size, chunk_overlap=self.overlap
         ).split_text(text)
 
-        return splitter
+        return chunks
 
 
 class SentenceBasedChunkingStrategy(ChunkingStrategy):
@@ -174,17 +178,6 @@ class SemanticChunkingStrategy(ChunkingStrategy):
     Chunking strategy that uses a recursive approach to split text into smaller pieces.
     """
 
-    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
-        """
-        Initialize the recursive chunking strategy.
-
-        Args:
-            chunk_size (int): The size of each chunk in characters.
-            chunk_overlap (int): The number of overlapping characters between chunks.
-        """
-        self.chunk_size = chunk_size
-        self.chunk_overlap = chunk_overlap
-
     def chunk(self, text: str) -> list:
         """
         Chunk the text using a recursive approach.
@@ -195,11 +188,15 @@ class SemanticChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
-        ).split_text(text)
+        embedding_model = LLM.embedding_model()
+        splitter = SemanticChunker(
+            embeddings=embedding_model,
+            breakpoint_threshold_type='percentile'
+        )
+        
+        chunks = splitter.split_text(text)    
 
-        return splitter
+        return chunks
 
 
 class MarkdownHeaderChunkingStrategy(ChunkingStrategy):

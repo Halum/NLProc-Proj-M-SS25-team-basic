@@ -1,3 +1,4 @@
+import dis
 import faiss
 import numpy as np
 
@@ -12,4 +13,6 @@ class VectorStoreFaiss:
         self.__db.reset()
         
     def search(self, query_embedding, k=5):
-        pass
+        distances, indices = self.__db.search(np.array(query_embedding), k=k)
+        
+        return distances, indices
