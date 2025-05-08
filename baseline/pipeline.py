@@ -1,6 +1,6 @@
 import os
 import sys
-from baseline.retriever import retreiver
+from baseline.retriever import Retriever
 # from baseline.preprocessor.document_reader import load_document
 from preprocessor.chunking_service import (
     FixedSizeChunkingStrategy,
@@ -12,8 +12,8 @@ from preprocessor.chunking_service import (
 )
 
 # Set the path to the config directory
-config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(config_path)
+# config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# sys.path.append(config_path)
 
 from config.config import DOCUMENT_FOLDER_PATH
 
