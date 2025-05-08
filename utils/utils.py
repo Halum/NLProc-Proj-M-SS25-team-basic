@@ -1,1 +1,2 @@
-#implement utility functions here
+class Utils:
+    pass
