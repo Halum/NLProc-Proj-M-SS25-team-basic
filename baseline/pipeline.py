@@ -1,6 +1,4 @@
-import os
-import sys
-from preprocessor.document_loader import load_document
+from retriever.retreiver import Retriever
 from preprocessor.chunking_service import (
     FixedSizeChunkingStrategy,
     SlidingWindowChunkingStrategy,
@@ -10,50 +8,88 @@ from preprocessor.chunking_service import (
     MarkdownHeaderChunkingStrategy
 )
 
-# Set the path to the config directory
-config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(config_path)
-
 from config.config import DOCUMENT_FOLDER_PATH
+from evaluation.answer_verifier import AnswerVerifier
+from evaluation.insight_generator import InsightGenerator
+from evaluation.embedding_analyzer import analyze_embeddings
+from evaluation.document_similarity_heatmap import analyze_heatmap
 
-
-def add_documents(folder_path: str) -> None:
+def print_chunks(chunks):
     """
-    Processes all readable documents in the specified folder.
-
+    Print the chunks in a formatted manner.
+    
     Args:
-        folder_path (str): Path to the directory containing document files.
+        chunks (list): List of chunks to print.
     """
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
-
-        if os.path.isfile(file_path):
-            try:
-                content = load_document(file_path)
-                # print(
-                #     f"\n--- {filename} ---\n{content[:500]}\n"
-                # )  # Print first 500 characters
-                # chunker = FixedSizeChunkingStrategy(chunk_size=500)
-                # chunker = SlidingWindowChunkingStrategy(chunk_size=100, overlap=20)
-                # chunker = SentenceBasedChunkingStrategy(chunk_size=1000)
-                # chunker = ParagraphBasedChunkingStrategy(chunk_size=500)
-                # chunker = SemanticChunkingStrategy(chunk_size=1000, chunk_overlap=200)
-                chunker = MarkdownHeaderChunkingStrategy()
-                chunks = chunker.chunk(content)
-
-                for i, chunk in enumerate(chunks):
-                    print(f"\n--- Chunk {i+1} ---\n{chunk[:100]}")
-                    if i == 1:
-                        break
-            except Exception as e:
-                print(f"[ERROR] Failed to process '{filename}': {e}")
-
+    for i, chunk in enumerate(chunks):
+        print(f"Chunk {i+1}:")
+        print(chunk)
+        print("-" * 50)    
 
 def main():
     """
     Main function to execute the document processing pipeline.
     """
-    add_documents(DOCUMENT_FOLDER_PATH)
+    chunking_stratigies = [
+        FixedSizeChunkingStrategy(chunk_size=1000),
+        SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
+        SentenceBasedChunkingStrategy(chunk_size=1000),
+        ParagraphBasedChunkingStrategy(chunk_size=1000),
+        SemanticChunkingStrategy(),
+        MarkdownHeaderChunkingStrategy()
+    ]
+    insight_generator = InsightGenerator()
+    
+    retrievers = []
+    for strategy in chunking_stratigies:
+        print(f"Using strategy: {strategy.__class__.__name__}")
+        retriever = Retriever(strategy)
+        retrievers.append(retriever)
+        
+    for retriever in retrievers:
+        print(f"Processing documents with strategy: {retriever.chunking_strategy.__class__.__name__}")
+        retriever.add_document(DOCUMENT_FOLDER_PATH, is_directory=True)
+        
+        chunks = retriever.preprocess()
+        print(f"Number of chunks generated: {len(chunks)}")
+        retriever.save()
+        
+        labeled_date_list = AnswerVerifier.get_sample_labeled_data()
+        
+        for labeled_date in labeled_date_list:
+        
+            retrieved_chunks, distances = retriever.load(labeled_date["query"])
+            generated_answer = retriever.query(labeled_date["query"], retrieved_chunks)
+            
+            print(f"Query: {labeled_date['query']}")
+            print(f"Expected answer: {labeled_date['answer']}")
+            print(f"Generated answer: {generated_answer}")
+            print(f"Context: {labeled_date['context']}")
+            
+            expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, labeled_date["context"])
+            if expected_chunk_index != -1:
+                print(f"Context found in chunk: {expected_chunk_index}")
+            else:
+                print("Expected chunk not found in retrieved chunks.")
+                
+            feedback = InsightGenerator.human_feedback(labeled_date["answer"], generated_answer)
+            insight_generator.update_insight(
+                chunk_strategy=retriever.chunking_strategy.__class__.__name__,
+                number_of_chunks=len(chunks),
+                retrieved_chunk_rank=expected_chunk_index,
+                correct_answer=feedback,
+                similarity_scores=distances[0]
+            )
+            
+            print("-"*50)
+            print(f"Retrieved chunks:")
+            print_chunks(retrieved_chunks)
+        
+    insight_generator.save_insight('chunking_strategy_insights.csv')
+    print("Pipeline completed successfully.")
+    # for embedding visualization
+    # analyze_embeddings()
+    # analyze_heatmap()
 
 
 if __name__ == "__main__":
