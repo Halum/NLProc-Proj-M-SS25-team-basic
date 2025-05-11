@@ -83,7 +83,7 @@ def main():
             print("Retrieved chunks:")
             print_chunks(retrieved_chunks)
         
-    insight_generator.save_insight('chunking_strategy_insights.csv')
+    insight_generator.save_insight('chunking_strategy_insights')
     print("Pipeline completed successfully.")
     # for embedding visualization
     # analyze_embeddings()

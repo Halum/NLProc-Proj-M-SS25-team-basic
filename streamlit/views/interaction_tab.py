@@ -87,8 +87,9 @@ def get_available_strategies():
         if st.session_state.is_processing:
             st.info("Processing documents... Interaction tab will be updated when finished.")
             
-        # Debug information
-        print(f"Available strategies with retrievers: {available_strategies}")
+        # If we've processed before and switched tabs, restore the success message
+        elif st.session_state.has_processed_once:
+            st.success(f"Document processing completed with {len(valid_strategies)} strategies. You can now ask questions.")
     else:
         # No strategies available yet or retrievers missing
         available_strategies = []

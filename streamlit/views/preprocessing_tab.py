@@ -18,6 +18,69 @@ from baseline.preprocessor.chunking_service import (
 from baseline.retriever.retreiver import Retriever
 from baseline.config.config import DOCUMENT_FOLDER_PATH
 
+def show_processing_charts(chunk_counts, processing_times):
+    """
+    Display chunk count and processing time charts
+    
+    Args:
+        chunk_counts (dict): Dictionary mapping strategy names to chunk counts
+        processing_times (dict): Dictionary mapping strategy names to processing times
+    """
+    # Create and display the bar charts side by side
+    if chunk_counts and processing_times:
+        st.subheader("Processing Results")
+        
+        # Create two columns for side-by-side charts
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Convert data to DataFrame for chunk count plot
+            df_chunks = pd.DataFrame({
+                'Strategy': list(chunk_counts.keys()),
+                'Chunk Count': list(chunk_counts.values())
+            })
+            
+            # Create chunk count chart
+            fig1, ax1 = plt.subplots(figsize=(6, 4))
+            bars = ax1.bar(df_chunks['Strategy'], df_chunks['Chunk Count'], color='skyblue')
+            
+            # Add data labels on top of bars
+            for bar in bars:
+                height = bar.get_height()
+                ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                        f'{int(height)}', ha='center', va='bottom')
+            
+            ax1.set_title('Number of Chunks by Strategy')
+            ax1.set_xlabel('Chunking Strategy')
+            ax1.set_ylabel('Number of Chunks')
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            st.pyplot(fig1)
+        
+        with col2:
+            # Convert data to DataFrame for processing time plot
+            df_times = pd.DataFrame({
+                'Strategy': list(processing_times.keys()),
+                'Processing Time (ms)': list(processing_times.values())
+            })
+            
+            # Create processing time chart
+            fig2, ax2 = plt.subplots(figsize=(6, 4))
+            bars = ax2.bar(df_times['Strategy'], df_times['Processing Time (ms)'], color='lightgreen')
+            
+            # Add data labels on top of bars
+            for bar in bars:
+                height = bar.get_height()
+                ax2.text(bar.get_x() + bar.get_width()/2., height + 0.1,
+                        f'{int(height)}ms', ha='center', va='bottom')
+            
+            ax2.set_title('Processing Time by Strategy')
+            ax2.set_xlabel('Chunking Strategy')
+            ax2.set_ylabel('Processing Time (ms)')
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            st.pyplot(fig2)
+
 def render_processing_ui(selected_strategies):
     """Render the initial UI for the processing tab"""
     st.header("Document Preprocessing")
@@ -28,6 +91,15 @@ def render_processing_ui(selected_strategies):
     else:
         st.write("This section allows you to preprocess documents using different chunking strategies.")
         st.write("Select a chunking strategy from the sidebar and click 'Process Documents' to begin.")
+    
+    # If we've processed documents before, show the success message
+    if st.session_state.has_processed_once and st.session_state.processed_strategies:
+        st.success(f"Document processing completed with strategies: {', '.join(st.session_state.processed_strategies)}! You can now use the Interaction tab to ask questions.")
+        
+        # Display stored processing results if available
+        if st.session_state.processing_results:
+            chunk_counts, processing_times = st.session_state.processing_results
+            show_processing_charts(chunk_counts, processing_times)
         
     # Display information about selected strategies
     st.subheader("Selected Strategies Information")
@@ -137,67 +209,13 @@ def display_processing_results(tab, results):
         # Unpack the results
         chunk_counts, processing_times = results
         
-        # Create and display the bar charts side by side
-        if chunk_counts and processing_times:
-            st.subheader("Processing Results")
-            
-            # Create two columns for side-by-side charts
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                # Convert data to DataFrame for chunk count plot
-                df_chunks = pd.DataFrame({
-                    'Strategy': list(chunk_counts.keys()),
-                    'Chunk Count': list(chunk_counts.values())
-                })
-                
-                # Create the chunk count bar chart
-                fig1, ax1 = plt.subplots(figsize=(6, 4))
-                bars1 = ax1.bar(df_chunks['Strategy'], df_chunks['Chunk Count'], color='skyblue')
-                
-                # Add labels and title
-                ax1.set_xlabel('Chunking Strategy')
-                ax1.set_ylabel('Number of Chunks')
-                ax1.set_title('Number of Chunks Created by Strategy')
-                
-                # Add values on top of the bars
-                for bar in bars1:
-                    height = bar.get_height()
-                    ax1.text(bar.get_x() + bar.get_width()/2., height + 0.1,
-                            f'{int(height)}', ha='center', va='bottom')
-                
-                # Rotate x-axis labels for better readability
-                plt.xticks(rotation=45, ha='right')
-                plt.tight_layout()
-                
-                # Display the chart in Streamlit
-                st.pyplot(fig1)
-            
-            with col2:
-                # Convert data to DataFrame for processing time plot
-                df_times = pd.DataFrame({
-                    'Strategy': list(processing_times.keys()),
-                    'Processing Time (ms)': list(processing_times.values())
-                })
-                
-                # Create the processing time bar chart
-                fig2, ax2 = plt.subplots(figsize=(6, 4))
-                bars2 = ax2.bar(df_times['Strategy'], df_times['Processing Time (ms)'], color='lightgreen')
-                
-                # Add labels and title
-                ax2.set_xlabel('Chunking Strategy')
-                ax2.set_ylabel('Time (milliseconds)')
-                ax2.set_title('Processing Time by Strategy')
-                
-                # Add values on top of the bars
-                for bar in bars2:
-                    height = bar.get_height()
-                    ax2.text(bar.get_x() + bar.get_width()/2., height + 0.1,
-                            f'{int(height)}ms', ha='center', va='bottom')
-                
-                # Rotate x-axis labels for better readability
-                plt.xticks(rotation=45, ha='right')
-                plt.tight_layout()
-                
-                # Display the chart in Streamlit
-                st.pyplot(fig2)
+        # Store results in session state for persistence
+        st.session_state.processing_results = results
+        st.session_state.chunk_counts = chunk_counts
+        
+        # Store results in session state for persistence
+        st.session_state.processing_results = results
+        st.session_state.chunk_counts = chunk_counts
+        
+        # Use the show_processing_charts function to display the charts
+        show_processing_charts(chunk_counts, processing_times)

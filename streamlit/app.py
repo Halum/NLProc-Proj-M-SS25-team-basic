@@ -69,6 +69,10 @@ def main():
     with interaction_tab:
         ask_button, query_data, selected_interaction_strategies, _, has_insights = render_interaction_ui()
         
+        # If we've processed documents before, make sure we have consistent state
+        if st.session_state.has_processed_once and not has_insights:
+            has_insights = bool(st.session_state.processed_strategies)
+        
         # Process query when ask button is clicked
         if ask_button and has_insights and query_data and selected_interaction_strategies:
             # Double check that we have processed strategies available

@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
+import numpy as np
 
 def render_insights_ui():
     """
@@ -22,6 +23,10 @@ def render_insights_ui():
     
     # Display insights if available
     if insights_df is not None:
+        # Display chunking strategy comparison table
+        display_chunking_comparison_table(insights_df)
+        
+        # Display visualizations
         display_insights(insights_df)
     else:
         st.warning("No insights data available. Process documents in the Preprocessing tab first.")
@@ -37,22 +42,102 @@ def load_insights_data():
         insight_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
                                 "baseline", "insight")
         
-        # Define possible insight file paths
+        # Define insight file path
         insight_path = os.path.join(insight_dir, "chunking_strategy_insights.csv")
-        alternative_path = os.path.join(insight_dir, "chunking_strategy_insights.csv.csv")
         
         # Try to load the insights file
         if os.path.exists(insight_path):
             insights_df = pd.read_csv(insight_path)
             st.session_state.insights_loaded = True
-        elif os.path.exists(alternative_path):
-            insights_df = pd.read_csv(alternative_path)
-            st.session_state.insights_loaded = True
+            
+        # Convert similarity scores from string to list
+        if insights_df is not None and 'similarity_scores' in insights_df.columns:
+            # Safer approach to convert string representations to actual lists
+            def safe_convert(x):
+                if not isinstance(x, str):
+                    return x
+                try:
+                    # Clean up the string representation before conversion
+                    clean_str = x.strip().replace('  ', ' ')
+                    return np.array([float(val) for val in clean_str.strip('[]').split()])
+                except Exception:
+                    return np.array([0.0])
+                    
+            insights_df['similarity_scores'] = insights_df['similarity_scores'].apply(safe_convert)
+                
     except Exception as e:
         st.warning(f"Could not load insights file: {str(e)}")
         st.session_state.insights_loaded = False
     
     return insights_df
+
+
+def display_chunking_comparison_table(insights_df):
+    """Display chunking strategy comparison table similar to the one in the homework README"""
+    st.markdown("### Chunking Strategy Comparison Table")
+    
+    # Process the data to match the table format in the README
+    if insights_df is not None:
+        # Calculate metrics per chunking strategy
+        strategy_stats = []
+        
+        # Group by chunking strategy
+        for strategy, group in insights_df.groupby('chunk_strategy'):
+            # Get the number of chunks (should be consistent per strategy)
+            total_chunks = group['number_of_chunks'].iloc[0]
+            
+            # Count correct and incorrect answers
+            correct_answers = group['correct_answer'].sum()
+            total_answers = len(group)
+            incorrect_answers = total_answers - correct_answers
+            
+            # Calculate accuracy
+            accuracy = correct_answers / total_answers * 100
+            
+            # Calculate average similarity scores
+            avg_sim_correct = np.nan
+            avg_sim_incorrect = np.nan
+            
+            # Get first similarity score for each entry
+            if 'similarity_scores' in group.columns:
+                try:
+                    # Extract first similarity score from each row's similarity_scores array
+                    def get_first_score(scores):
+                        if hasattr(scores, '__len__') and len(scores) > 0:
+                            return float(scores[0])
+                        return np.nan
+                    
+                    group['first_sim_score'] = group['similarity_scores'].apply(get_first_score)
+                    
+                    # Calculate average for correct and incorrect separately
+                    correct_mask = group['correct_answer']
+                    if correct_mask.any():
+                        avg_sim_correct = group.loc[correct_mask, 'first_sim_score'].mean()
+                    
+                    incorrect_mask = ~group['correct_answer']
+                    if incorrect_mask.any():
+                        avg_sim_incorrect = group.loc[incorrect_mask, 'first_sim_score'].mean()
+                except Exception as e:
+                    st.error(f"Error processing similarity scores: {e}")
+            
+            strategy_stats.append({
+                'Chunking Strategy': strategy,
+                'Total Chunks': total_chunks,
+                'Correct Answers': correct_answers,
+                'Incorrect Answers': incorrect_answers,
+                'Accuracy': f"{accuracy:.0f}%",
+                'Avg Similarity Score (Correct)': f"{avg_sim_correct:.2f}" if not pd.isna(avg_sim_correct) else "N/A",
+                'Avg Similarity Score (Incorrect)': f"{avg_sim_incorrect:.2f}" if not pd.isna(avg_sim_incorrect) else "N/A"
+            })
+        
+        # Create a DataFrame from the statistics
+        stats_df = pd.DataFrame(strategy_stats)
+        
+        # Display the comparison table
+        st.table(stats_df)
+        
+        # Add explanatory note
+        st.markdown("*Note: Average similarity scores are calculated from the first value in the similarity scores array for each entry.*")
 
 
 def display_insights(insights_df):

@@ -18,7 +18,9 @@ def initialize_session_state(chunking_strategies):
         'selected_interaction_strategies': [],
         'has_processed_once': False,
         'processing_times': {},
-        'strategy_retrievers': {}  # Store retrievers for each strategy
+        'strategy_retrievers': {},  # Store retrievers for each strategy
+        'processing_results': None,  # Store processing results for persistent display
+        'chunk_counts': {}  # Store chunk counts for each strategy
     }
     
     # Initialize any missing session state values with defaults
