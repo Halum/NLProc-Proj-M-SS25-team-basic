@@ -107,17 +107,12 @@ def load_insights_data():
 
 def get_available_strategies(insights_df):
     """Determine which strategies are available for interaction"""
-    # Get both session-tracked processed strategies and those from insights file
+    # Only use strategies directly processed in the current session
     processed_from_session = st.session_state.processed_strategies
-    file_strategies = []
-    if insights_df is not None:
-        file_strategies = insights_df['chunk_strategy'].unique().tolist()
     
-    # Combine both sources to get available strategies
-    if processed_from_session or file_strategies:
-        # Use strategies from either source
-        combined_strategies = list(set(processed_from_session + file_strategies))
-        available_strategies = sorted(combined_strategies)
+    # Check if we have any processed strategies
+    if processed_from_session:
+        available_strategies = sorted(processed_from_session)
         has_insights = True
         
         # If we're actively processing, update the UI
@@ -161,7 +156,7 @@ def render_query_selector(container, sample_queries):
 
 
 def render_strategy_selector(container, available_strategies):
-    """Render the strategy selection dropdown"""
+    """Render the strategy selection as checkboxes"""
     with container:
         # Make sure we have a valid selection if strategies are available
         if available_strategies:
@@ -180,30 +175,56 @@ def render_strategy_selector(container, available_strategies):
                     
                 st.session_state.selected_interaction_strategies = valid_selections
         
-        # Define a callback for interaction strategy selection
-        def on_interaction_strategy_select():
-            # This approach prevents the double-click issue
-            pass  # The session state is updated automatically via the key parameter
+        # Display additional info about processed strategies
+        if st.session_state.selected_strategies and not st.session_state.processed_strategies:
+            st.info("Please click 'Process Documents' in the sidebar to make strategies available for interaction")
         
-        # Create a multiselect for strategies (only show used strategies)
+        # Define a callback for the "Select All" checkbox
+        def on_select_all_interaction_strategies():
+            # Update all strategy checkboxes based on the "Select All" checkbox
+            for strategy in available_strategies:
+                st.session_state[f"interaction_strategy_{strategy}"] = st.session_state.select_all_interaction_strategies
+            
+            # Update the selected strategies list
+            st.session_state.selected_interaction_strategies = available_strategies.copy() if st.session_state.select_all_interaction_strategies else []
+        
+        # Create checkboxes for strategies (only show used strategies)
         if available_strategies:
-            # Show a more helpful message when no strategies are processed
-            selected_interaction_strategies = st.multiselect(
-                "Select Strategies", 
-                available_strategies,
-                default=st.session_state.selected_interaction_strategies,
-                key="selected_interaction_strategies",  # Direct link to session_state
-                on_change=on_interaction_strategy_select
+            # Show a note about processed strategies
+            st.write("**Select from processed strategies:**")
+            
+            # Add a "Select All" checkbox
+            st.checkbox(
+                "Select All Strategies",
+                key="select_all_interaction_strategies",
+                value=len(st.session_state.selected_interaction_strategies) == len(available_strategies),
+                on_change=on_select_all_interaction_strategies
             )
+            
+            # Create a checkbox for each strategy
+            selected_interaction_strategies = []
+            for strategy in available_strategies:
+                # Initialize checkbox state if not already in session state
+                if f"interaction_strategy_{strategy}" not in st.session_state:
+                    st.session_state[f"interaction_strategy_{strategy}"] = strategy in st.session_state.selected_interaction_strategies
+                
+                # Create the checkbox
+                is_selected = st.checkbox(
+                    strategy, 
+                    key=f"interaction_strategy_{strategy}",
+                    value=st.session_state[f"interaction_strategy_{strategy}"]
+                )
+                
+                # If selected, add to the list
+                if is_selected:
+                    selected_interaction_strategies.append(strategy)
+            
+            # Update the selected_interaction_strategies in session state
+            st.session_state.selected_interaction_strategies = selected_interaction_strategies
         else:
             # Display message to guide user
-            st.info("Process some chunking strategies in the sidebar first")
-            selected_interaction_strategies = st.multiselect(
-                "Select Strategies", 
-                ["No strategies available"], 
-                disabled=True,
-                key="interaction_strategy_multiselect_disabled"
-            )
+            st.info("Process documents with selected strategies in the sidebar first")
+            selected_interaction_strategies = []
             
         return selected_interaction_strategies
 

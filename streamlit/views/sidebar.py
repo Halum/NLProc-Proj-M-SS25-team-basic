@@ -21,14 +21,42 @@ def render_sidebar(chunking_strategies):
         if st.session_state.overlap > st.session_state.chunk_size - 50:
             st.session_state.overlap = max(0, st.session_state.chunk_size - 50)
     
-    # Use multiselect with default value from session state
-    selected_strategies = st.sidebar.multiselect(
-        "Select Chunking Strategies",
-        chunking_strategies,
-        default=st.session_state.selected_strategies,
-        key="selected_strategies",
-        on_change=on_strategy_select
+    def on_select_all_change():
+        # Update all strategy checkboxes based on the "Select All" checkbox
+        for strategy in chunking_strategies:
+            st.session_state[f"strategy_{strategy}"] = st.session_state.select_all_strategies
+        
+        # Update the selected strategies list
+        st.session_state.selected_strategies = chunking_strategies if st.session_state.select_all_strategies else []
+    
+    # Add a "Select All" checkbox
+    st.sidebar.checkbox(
+        "Select All Strategies",
+        key="select_all_strategies",
+        value=len(st.session_state.selected_strategies) == len(chunking_strategies),
+        on_change=on_select_all_change
     )
+    
+    # Create a checkbox for each strategy
+    selected_strategies = []
+    for strategy in chunking_strategies:
+        # Initialize checkbox state if not already in session state
+        if f"strategy_{strategy}" not in st.session_state:
+            st.session_state[f"strategy_{strategy}"] = strategy in st.session_state.selected_strategies
+        
+        # Create the checkbox
+        is_selected = st.sidebar.checkbox(
+            strategy, 
+            key=f"strategy_{strategy}",
+            value=st.session_state[f"strategy_{strategy}"]
+        )
+        
+        # If selected, add to the list
+        if is_selected:
+            selected_strategies.append(strategy)
+    
+    # Update the selected_strategies in session state
+    st.session_state.selected_strategies = selected_strategies
     
     # Handle case when no strategy is selected
     if not selected_strategies:
