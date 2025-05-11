@@ -65,10 +65,16 @@ def render_interaction_ui():
     # Find the matching query data
     query_data = None
     if selected_query:
-        for item in AnswerVerifier.get_sample_labeled_data():
-            if item["query"] == selected_query:
-                query_data = item
-                break
+        if selected_query == "All":
+            # For "All" option, we'll return a special marker
+            # The actual processing of all queries will be handled in app.py
+            query_data = "ALL_QUERIES"
+        else:
+            # Find the specific query data
+            for item in AnswerVerifier.get_sample_labeled_data():
+                if item["query"] == selected_query:
+                    query_data = item
+                    break
     
     return ask_button, query_data, selected_interaction_strategies, insights_df, has_insights
 
@@ -101,24 +107,15 @@ def load_insights_data():
 
 def get_available_strategies(insights_df):
     """Determine which strategies are available for interaction"""
-    # Prioritize retrievers stored in session state
-    retriever_strategies = []
-    if 'strategy_retrievers' in st.session_state and st.session_state.strategy_retrievers:
-        retriever_strategies = list(st.session_state.strategy_retrievers.keys())
-    
     # Get both session-tracked processed strategies and those from insights file
     processed_from_session = st.session_state.processed_strategies
     file_strategies = []
     if insights_df is not None:
         file_strategies = insights_df['chunk_strategy'].unique().tolist()
     
-    # Combine all sources to get available strategies, prioritizing retrievers
-    if retriever_strategies:
-        # Use strategies from retrievers first, as these are fully functional
-        available_strategies = sorted(retriever_strategies)
-        has_insights = True
-    elif processed_from_session or file_strategies:
-        # Use strategies from either source if no retrievers available
+    # Combine both sources to get available strategies
+    if processed_from_session or file_strategies:
+        # Use strategies from either source
         combined_strategies = list(set(processed_from_session + file_strategies))
         available_strategies = sorted(combined_strategies)
         has_insights = True
@@ -130,7 +127,7 @@ def get_available_strategies(insights_df):
         # No strategies available yet
         available_strategies = []
         has_insights = False
-        st.warning("Please process documents first using the Processing tab.")
+        st.warning("Please process documents first using the sidebar options.")
     
     return available_strategies, has_insights
 
@@ -138,11 +135,14 @@ def get_available_strategies(insights_df):
 def render_query_selector(container, sample_queries):
     """Render the query selection dropdown"""
     with container:
+        # Add "All" option to the beginning of the list
+        options = ["All"] + sample_queries
+        
         # Make sure selected query is initialized with valid value
-        if not st.session_state.selected_query and sample_queries:
-            st.session_state.selected_query = sample_queries[0]
-        elif st.session_state.selected_query not in sample_queries and sample_queries:
-            st.session_state.selected_query = sample_queries[0]
+        if not st.session_state.selected_query:
+            st.session_state.selected_query = options[0]  # Default to "All"
+        elif st.session_state.selected_query not in options:
+            st.session_state.selected_query = options[0]  # Reset to "All" if invalid
         
         # Define a callback that will be triggered when selection changes
         def on_query_change():
@@ -151,9 +151,9 @@ def render_query_selector(container, sample_queries):
         # Use selectbox with direct link to session state
         selected_query = st.selectbox(
             "Select a Query", 
-            sample_queries, 
+            options, 
             key="selected_query",  # Direct link to session state
-            index=sample_queries.index(st.session_state.selected_query) if st.session_state.selected_query in sample_queries else 0,
+            index=options.index(st.session_state.selected_query) if st.session_state.selected_query in options else 0,
             on_change=on_query_change
         )
         
@@ -215,97 +215,202 @@ def process_query(tab, query_data, selected_interaction_strategies):
         
         results_by_strategy = {}
         
-        # Process the query for each selected strategy
-        for selected_strategy in selected_interaction_strategies:
-            with st.spinner(f"Processing query with {selected_strategy}..."):
-                try:
-                    # Check if we have a pre-processed retriever for this strategy
-                    if 'strategy_retrievers' in st.session_state and selected_strategy in st.session_state.strategy_retrievers:
-                        # Use the existing retriever from session state
-                        retriever = st.session_state.strategy_retrievers[selected_strategy]
-                    else:
-                        # If not found, initialize the strategy and create a new retriever
-                        st.warning(f"No pre-processed data found for {selected_strategy}. Please process documents in the Preprocessing tab first.")
-                        
-                        # Initialize the strategy
-                        if selected_strategy == "FixedSizeChunkingStrategy":
-                            strategy = FixedSizeChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                        elif selected_strategy == "SlidingWindowChunkingStrategy":
-                            strategy = SlidingWindowChunkingStrategy(chunk_size=st.session_state.chunk_size, overlap=st.session_state.overlap)
-                        elif selected_strategy == "SentenceBasedChunkingStrategy":
-                            strategy = SentenceBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                        elif selected_strategy == "ParagraphBasedChunkingStrategy":
-                            strategy = ParagraphBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                        elif selected_strategy == "SemanticChunkingStrategy":
-                            strategy = SemanticChunkingStrategy()
-                        elif selected_strategy == "MarkdownHeaderChunkingStrategy":
-                            strategy = MarkdownHeaderChunkingStrategy()
-                        
-                        # Create retriever
-                        from baseline.config.config import DOCUMENT_FOLDER_PATH
-                        retriever = Retriever(strategy)
-                        retriever.add_document(DOCUMENT_FOLDER_PATH, is_directory=True)
-                        retriever.preprocess()
-                        retriever.save()
-                    
-                    # Load the processed chunks
-                    retrieved_chunks, distances = retriever.load(query_data["query"])
-                    
-                    # Generate answer
-                    generated_answer = retriever.query(query_data["query"], retrieved_chunks)
-                    
-                    # Find if the context is in retrieved chunks
-                    expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, context=query_data["context"])
-                    
-                    # Store results for this strategy
-                    results_by_strategy[selected_strategy] = {
-                        "generated_answer": generated_answer,
-                        "retrieved_chunks": retrieved_chunks,
-                        "expected_chunk_index": expected_chunk_index,
-                        "expected_chunk": expected_chunk,
-                        "distances": distances
-                    }
-                    
-                except Exception as e:
-                    st.error(f"Error processing query with {selected_strategy}: {str(e)}")
-        
-        # Display results if we have any
-        if results_by_strategy:
-            display_query_results(results_by_strategy, query_data)
+        # Handle "ALL_QUERIES" marker (All queries option)
+        if query_data == "ALL_QUERIES":
+            # Get all sample queries
+            all_sample_queries = AnswerVerifier.get_sample_labeled_data()
+            st.info(f"Processing all {len(all_sample_queries)} queries...")
             
+            # Create a progress bar
+            progress_bar = st.progress(0)
+            
+            # Process each query
+            for i, query_item in enumerate(all_sample_queries):
+                with st.expander(f"Query {i+1}: {query_item['query']}", expanded=True):
+                    query_results = process_single_query(query_item, selected_interaction_strategies)
+                    
+                    # Display results for this query - indicate we're inside an expander
+                    display_query_results(query_results, query_item, in_expander=True)
+                    
+                    # Store results for insights analysis
+                    for strategy, result in query_results.items():
+                        if strategy not in results_by_strategy:
+                            results_by_strategy[strategy] = []
+                        results_by_strategy[strategy].append(result)
+                
+                # Update progress bar
+                progress_bar.progress((i + 1) / len(all_sample_queries))
+            
+            # Display a summary
+            st.success(f"Processed all {len(all_sample_queries)} queries with {len(selected_interaction_strategies)} strategies")
+            
+        else:
+            # Process a single query
+            results_by_strategy = process_single_query(query_data, selected_interaction_strategies)
+            
+            # Display results if we have any
+            if results_by_strategy:
+                display_query_results(results_by_strategy, query_data)
+        
         return results_by_strategy
 
 
-def display_query_results(results_by_strategy, query_data):
-    """Display the query results in tabs for each strategy"""
+def process_single_query(query_data, selected_interaction_strategies, tab=None):
+    """Process a single query with selected strategies and display results if tab is provided"""
+    results_by_strategy = {}
+    container = tab if tab else st
+    
+    # Process the query for each selected strategy
+    for selected_strategy in selected_interaction_strategies:
+        with container.spinner(f"Processing query with {selected_strategy}..."):
+            try:
+                # Use the pre-processed retriever from session state if available
+                if 'strategy_retrievers' in st.session_state and selected_strategy in st.session_state.strategy_retrievers:
+                    # Use existing retriever that was stored during document processing
+                    retriever = st.session_state.strategy_retrievers[selected_strategy]
+                    container.info(f"Using pre-processed retriever for {selected_strategy}")
+                else:
+                    # Fall back to creating a new retriever if not found (should not happen normally)
+                    container.warning(f"No pre-processed data found for {selected_strategy}. Creating a new retriever...")
+                    
+                    # Initialize the strategy
+                    if selected_strategy == "FixedSizeChunkingStrategy":
+                        strategy = FixedSizeChunkingStrategy(chunk_size=st.session_state.chunk_size)
+                    elif selected_strategy == "SlidingWindowChunkingStrategy":
+                        strategy = SlidingWindowChunkingStrategy(chunk_size=st.session_state.chunk_size, overlap=st.session_state.overlap)
+                    elif selected_strategy == "SentenceBasedChunkingStrategy":
+                        strategy = SentenceBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
+                    elif selected_strategy == "ParagraphBasedChunkingStrategy":
+                        strategy = ParagraphBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
+                    elif selected_strategy == "SemanticChunkingStrategy":
+                        strategy = SemanticChunkingStrategy()
+                    elif selected_strategy == "MarkdownHeaderChunkingStrategy":
+                        strategy = MarkdownHeaderChunkingStrategy()
+                    
+                    # Create a new retriever and process documents
+                    retriever = Retriever(strategy)
+                    from baseline.config.config import DOCUMENT_FOLDER_PATH
+                    retriever.add_document(DOCUMENT_FOLDER_PATH, is_directory=True)
+                    retriever.preprocess()
+                    retriever.save()
+                
+                # Load the processed chunks
+                retrieved_chunks, distances = retriever.load(query_data["query"])
+                
+                # Generate answer
+                generated_answer = retriever.query(query_data["query"], retrieved_chunks)
+                
+                # Find if the context is in retrieved chunks
+                expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, context=query_data["context"])
+                
+                # Store results for this strategy
+                results_by_strategy[selected_strategy] = {
+                    "generated_answer": generated_answer,
+                    "retrieved_chunks": retrieved_chunks,
+                    "expected_chunk_index": expected_chunk_index,
+                    "expected_chunk": expected_chunk,
+                    "distances": distances
+                }
+                
+            except Exception as e:
+                container.error(f"Error processing query with {selected_strategy}: {str(e)}")
+    
+    return results_by_strategy
+
+
+def display_query_results(results_by_strategy, query_data, in_expander=False):
+    """Display the query results in tabs for each strategy
+    
+    Args:
+        results_by_strategy: Dictionary mapping strategy names to their results
+        query_data: Dictionary containing query, answer, and context
+        in_expander: Boolean indicating if we're already inside an expander
+    """
     # Get the expected answer and context
     expected_answer = query_data["answer"]
     context = query_data["context"]
     
+    # Check if we have a single result or multiple results
+    if not results_by_strategy:
+        st.warning("No results to display")
+        return
+        
     # Create tabs for each strategy
-    strategy_tabs = st.tabs(list(results_by_strategy.keys()))
-    
-    for i, (strategy_name, results) in enumerate(results_by_strategy.items()):
-        with strategy_tabs[i]:
-            results_col1, results_col2 = st.columns(2)
-            
-            with results_col1:
-                st.markdown("**Generated Answer:**")
-                st.write(results["generated_answer"])
-            
-            with results_col2:
-                st.markdown("**Expected Answer:**")
-                st.write(expected_answer)
-            
-            st.markdown("**Context:**")
-            st.write(context)
-            
-            if results["expected_chunk_index"] != -1:
-                st.success(f"Context found in chunk #{results['expected_chunk_index']+1}")
-            else:
-                st.error("Context not found in retrieved chunks")
-            
-            # Show retrieved chunks
+    if len(results_by_strategy) > 1:
+        # Multiple strategies - use tabs
+        strategy_tabs = st.tabs(list(results_by_strategy.keys()))
+        
+        # Display results in tabs
+        for i, (strategy_name, results) in enumerate(results_by_strategy.items()):
+            with strategy_tabs[i]:
+                results_col1, results_col2 = st.columns(2)
+                
+                with results_col1:
+                    st.markdown("**Generated Answer:**")
+                    st.write(results["generated_answer"])
+                
+                with results_col2:
+                    st.markdown("**Expected Answer:**")
+                    st.write(expected_answer)
+                
+                st.markdown("**Context:**")
+                st.write(context)
+                
+                if results["expected_chunk_index"] != -1:
+                    st.success(f"Context found in chunk #{results['expected_chunk_index']+1}")
+                else:
+                    st.error("Context not found in retrieved chunks")
+                
+                # Show retrieved chunks based on whether we're in an expander
+                if in_expander:
+                    st.markdown("**Retrieved Chunks:**")
+                    chunks_container = st.container()
+                    with chunks_container:
+                        for i, chunk in enumerate(results["retrieved_chunks"]):
+                            st.markdown(f"**Chunk {i+1}:**")
+                            st.text(chunk)
+                            st.markdown("---")
+                else:
+                    with st.expander("Retrieved Chunks"):
+                        for i, chunk in enumerate(results["retrieved_chunks"]):
+                            st.markdown(f"**Chunk {i+1}:**")
+                            st.text(chunk)
+                            st.markdown("---")
+    else:
+        # Just one strategy - no need for tabs
+        strategy_name = list(results_by_strategy.keys())[0]
+        results = results_by_strategy[strategy_name]
+        
+        st.subheader(f"Results using {strategy_name}")
+        results_col1, results_col2 = st.columns(2)
+        
+        with results_col1:
+            st.markdown("**Generated Answer:**")
+            st.write(results["generated_answer"])
+        
+        with results_col2:
+            st.markdown("**Expected Answer:**")
+            st.write(expected_answer)
+        
+        st.markdown("**Context:**")
+        st.write(context)
+        
+        if results["expected_chunk_index"] != -1:
+            st.success(f"Context found in chunk #{results['expected_chunk_index']+1}")
+        else:
+            st.error("Context not found in retrieved chunks")
+        
+        # Show retrieved chunks based on whether we're in an expander
+        if in_expander:
+            st.markdown("**Retrieved Chunks:**")
+            chunks_container = st.container()
+            with chunks_container:
+                for i, chunk in enumerate(results["retrieved_chunks"]):
+                    st.markdown(f"**Chunk {i+1}:**")
+                    st.text(chunk)
+                    st.markdown("---")
+        else:
+            # Regular case - use expander
             with st.expander("Retrieved Chunks"):
                 for i, chunk in enumerate(results["retrieved_chunks"]):
                     st.markdown(f"**Chunk {i+1}:**")
