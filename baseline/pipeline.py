@@ -11,8 +11,6 @@ from preprocessor.chunking_service import (
 from config.config import DOCUMENT_FOLDER_PATH
 from evaluation.answer_verifier import AnswerVerifier
 from evaluation.insight_generator import InsightGenerator
-from evaluation.embedding_analyzer import analyze_embeddings
-from evaluation.document_similarity_heatmap import analyze_heatmap
 
 def print_chunks(chunks):
     """
@@ -82,7 +80,7 @@ def main():
             )
             
             print("-"*50)
-            print(f"Retrieved chunks:")
+            print("Retrieved chunks:")
             print_chunks(retrieved_chunks)
         
     insight_generator.save_insight('chunking_strategy_insights.csv')
