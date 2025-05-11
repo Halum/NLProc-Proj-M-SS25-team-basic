@@ -19,11 +19,20 @@ This repository hosts the code for a semester-long project on building and exper
 
 ## Structure
 - `baseline/`: Common starter system (retriever + generator)
+  - `config/`: Configuration settings for the RAG system
+  - `data/`: Sample text files for testing
+  - `evaluation/`: Tools for evaluating retriever and generator performance
+  - `generator/`: Text generation components using LLMs
+  - `insight/`: Storage for analytics data from experiments
+  - `postprocessor/`: Output formatting and document writing tools
+  - `preprocessor/`: Document reading and text chunking services
+  - `retriever/`: Vector store and retrieval components
+  - `pipeline.py`: Main execution script for the RAG pipeline
 - `evaluation/`: Common tools for comparing results
+- `homeworks/`: Weekly assignment results and observations
+  - `week_2/`: Analysis of RAG system behavior with various questions
+  - `week_3/`: Comparison of different chunking strategies
 - `utils/`: Helper functions shared across code
-- `week_2_tasks/`: Week 2 assignment materials
-  - [README.md](week_2_tasks/README.md): Textual explanations of embeddings and retrieval concepts
-  - [EMBEDDING_VISUALIZATION.md](week_2_tasks/EMBEDDING_VISUALIZATION.md): Analysis of embedding visualization techniques
 
 ## Environment Setup with Conda
 
@@ -112,5 +121,9 @@ Format: `bugfix/<issue_number>-<short_description>`
 
 ## Homework Observations
 - [Week 2 Observations](homeworks/week_2/README.md) - Analysis of RAG system behavior and performance
-
-  - Observation regarding cosine similarity comparison with visualization can be found in [EMBEDDING_VISUALIZATION.md](week_2_tasks/EMBEDDING_VISUALIZATION.md)
+  - Observation regarding cosine similarity comparison with visualization can be found in [EMBEDDING_VISUALIZATION.md](homeworks/week_2/EMBEDDING_VISUALIZATION.md)
+  
+- [Week 3 Observations](homeworks/week_3/README.md) - Comparison of different chunking strategies for RAG
+  - Detailed analysis of how various chunking methods affect retrieval performance
+  - Evaluation of accuracy and similarity scores across chunking approaches
+  - Embedding visualizations and similarity analysis can be found in [EMBEDDING_VISUALIZATION.md](homeworks/week_3/EMBEDDING_VISUALIZATION.md)
