@@ -68,15 +68,22 @@ def main():
     
     # Render interaction tab
     with interaction_tab:
+        # Debug information to help trace state issues
+        retriever_keys = list(st.session_state.strategy_retrievers.keys()) if 'strategy_retrievers' in st.session_state else []
+        
         ask_button, query_data, selected_interaction_strategies, insights_df, has_insights = render_interaction_ui()
         
         # Process query when ask button is clicked
         if ask_button and has_insights and query_data and selected_interaction_strategies:
-            results_by_strategy = process_query(interaction_tab, query_data, selected_interaction_strategies)
-            
-            # Display insights charts if we have results and insights data
-            if results_by_strategy and insights_df is not None:
-                display_insights(insights_df)
+            # Double check that we have processed strategies available
+            if not st.session_state.processed_strategies:
+                st.error("No processed strategies found. Please process documents in the Preprocessing tab first.")
+            else:
+                results_by_strategy = process_query(interaction_tab, query_data, selected_interaction_strategies)
+                
+                # Display insights charts if we have results and insights data
+                if results_by_strategy and insights_df is not None:
+                    display_insights(insights_df)
     
     # Process documents if we're in processing state
     if st.session_state.is_processing and not process_button_clicked:
@@ -90,6 +97,10 @@ def main():
         # Display processing results if processing was successful
         if results is not None:
             display_processing_results(preprocessing_tab, results)
+            
+    # Load insights data for the interaction tab if processing was already done
+    if st.session_state.has_processed_once and not insights_df:
+        insights_df = load_insights_file()
 
 
 if __name__ == "__main__":

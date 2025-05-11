@@ -157,7 +157,14 @@ def display_processing_results(tab, results):
         # Reset processing state and mark that we've processed at least once
         st.session_state.is_processing = False
         st.session_state.has_processed_once = True
-        st.success("Document processing completed! You can now use the Interaction tab to ask questions.")
+        
+        # Make sure processed_strategies is properly saved in session state
+        if not st.session_state.processed_strategies:
+            print("Warning: No processed strategies found in session state")
+        else:
+            print(f"Processed strategies in session state: {st.session_state.processed_strategies}")
+            
+        st.success(f"Document processing completed with strategies: {', '.join(st.session_state.processed_strategies)}! You can now use the Interaction tab to ask questions.")
         
         # Unpack the results
         chunk_counts, processing_times = results

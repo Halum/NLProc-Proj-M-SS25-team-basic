@@ -7,15 +7,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from baseline.preprocessor.chunking_service import (
-    FixedSizeChunkingStrategy,
-    SlidingWindowChunkingStrategy,
-    SentenceBasedChunkingStrategy,
-    ParagraphBasedChunkingStrategy,
-    SemanticChunkingStrategy,
-    MarkdownHeaderChunkingStrategy
-)
-from baseline.retriever.retreiver import Retriever
 from baseline.evaluation.answer_verifier import AnswerVerifier
 
 def render_interaction_ui():
@@ -110,19 +101,38 @@ def get_available_strategies(insights_df):
     # Only use strategies directly processed in the current session
     processed_from_session = st.session_state.processed_strategies
     
-    # Check if we have any processed strategies
-    if processed_from_session:
-        available_strategies = sorted(processed_from_session)
+    # Check if we have retrievers stored in session state
+    retriever_keys = list(st.session_state.strategy_retrievers.keys()) if 'strategy_retrievers' in st.session_state else []
+    
+    # Make sure we only show strategies that have retrievers available
+    # In case they somehow got out of sync
+    valid_strategies = [s for s in processed_from_session if s in retriever_keys]
+    
+    # Check if we have any processed strategies with available retrievers
+    if valid_strategies:
+        available_strategies = sorted(valid_strategies)
         has_insights = True
         
         # If we're actively processing, update the UI
         if st.session_state.is_processing:
             st.info("Processing documents... Interaction tab will be updated when finished.")
+            
+        # Debug information
+        print(f"Available strategies with retrievers: {available_strategies}")
     else:
-        # No strategies available yet
+        # No strategies available yet or retrievers missing
         available_strategies = []
         has_insights = False
-        st.warning("Please process documents first using the sidebar options.")
+        
+        if processed_from_session and not valid_strategies:
+            # Strategies were processed but retrievers are missing - error state
+            st.error("Processed strategies exist but their retrievers are missing. Please reprocess the documents.")
+        elif st.session_state.selected_strategies and not st.session_state.is_processing:
+            # User has selected strategies but hasn't processed them
+            st.warning("You've selected strategies in the sidebar but haven't processed them yet. Please click 'Process Documents' button in the sidebar first.")
+        else:
+            # Generic message
+            st.warning("Please process documents first using the sidebar options.")
     
     return available_strategies, has_insights
 
@@ -285,35 +295,26 @@ def process_single_query(query_data, selected_interaction_strategies, tab=None):
     for selected_strategy in selected_interaction_strategies:
         with container.spinner(f"Processing query with {selected_strategy}..."):
             try:
+                # First check if the strategy has actually been processed
+                if selected_strategy not in st.session_state.processed_strategies:
+                    container.error(f"{selected_strategy} has not been processed. Please go to the Preprocessing tab and process this strategy first.")
+                    continue
+                
                 # Use the pre-processed retriever from session state if available
                 if 'strategy_retrievers' in st.session_state and selected_strategy in st.session_state.strategy_retrievers:
                     # Use existing retriever that was stored during document processing
                     retriever = st.session_state.strategy_retrievers[selected_strategy]
-                    container.info(f"Using pre-processed retriever for {selected_strategy}")
+                    
+                    # Check if the retriever is a valid object
+                    if retriever is not None:
+                        container.success(f"Using pre-processed retriever for {selected_strategy}")
+                    else:
+                        container.error(f"Retriever for {selected_strategy} appears to be invalid. Please reprocess the documents.")
+                        continue
                 else:
-                    # Fall back to creating a new retriever if not found (should not happen normally)
-                    container.warning(f"No pre-processed data found for {selected_strategy}. Creating a new retriever...")
-                    
-                    # Initialize the strategy
-                    if selected_strategy == "FixedSizeChunkingStrategy":
-                        strategy = FixedSizeChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                    elif selected_strategy == "SlidingWindowChunkingStrategy":
-                        strategy = SlidingWindowChunkingStrategy(chunk_size=st.session_state.chunk_size, overlap=st.session_state.overlap)
-                    elif selected_strategy == "SentenceBasedChunkingStrategy":
-                        strategy = SentenceBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                    elif selected_strategy == "ParagraphBasedChunkingStrategy":
-                        strategy = ParagraphBasedChunkingStrategy(chunk_size=st.session_state.chunk_size)
-                    elif selected_strategy == "SemanticChunkingStrategy":
-                        strategy = SemanticChunkingStrategy()
-                    elif selected_strategy == "MarkdownHeaderChunkingStrategy":
-                        strategy = MarkdownHeaderChunkingStrategy()
-                    
-                    # Create a new retriever and process documents
-                    retriever = Retriever(strategy)
-                    from baseline.config.config import DOCUMENT_FOLDER_PATH
-                    retriever.add_document(DOCUMENT_FOLDER_PATH, is_directory=True)
-                    retriever.preprocess()
-                    retriever.save()
+                    # If for some reason the retriever isn't available, show an error
+                    container.error(f"Pre-processed data for {selected_strategy} is missing. Please reprocess the documents.")
+                    continue
                 
                 # Load the processed chunks
                 retrieved_chunks, distances = retriever.load(query_data["query"])
