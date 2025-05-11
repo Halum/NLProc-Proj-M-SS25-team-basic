@@ -19,11 +19,10 @@ from views import (  # noqa: E402
     render_sidebar,
     render_processing_ui, 
     process_documents, 
-    load_insights_file, 
     display_processing_results,
     render_interaction_ui,
     process_query,
-    display_insights
+    render_insights_ui
 )
 
 def main():
@@ -59,8 +58,8 @@ def main():
     # Main content area
     st.title("RAG Chunking Strategies Explorer")
     
-    # Create tabs for Preprocessing and Interaction
-    preprocessing_tab, interaction_tab = st.tabs(["Preprocessing", "Interaction"])
+    # Create tabs for Preprocessing, Interaction, and Insights
+    preprocessing_tab, interaction_tab, insights_tab = st.tabs(["Preprocessing", "Interaction", "Insights"])
     
     # Render preprocessing tab
     with preprocessing_tab:
@@ -68,10 +67,7 @@ def main():
     
     # Render interaction tab
     with interaction_tab:
-        # Debug information to help trace state issues
-        retriever_keys = list(st.session_state.strategy_retrievers.keys()) if 'strategy_retrievers' in st.session_state else []
-        
-        ask_button, query_data, selected_interaction_strategies, insights_df, has_insights = render_interaction_ui()
+        ask_button, query_data, selected_interaction_strategies, _, has_insights = render_interaction_ui()
         
         # Process query when ask button is clicked
         if ask_button and has_insights and query_data and selected_interaction_strategies:
@@ -79,11 +75,11 @@ def main():
             if not st.session_state.processed_strategies:
                 st.error("No processed strategies found. Please process documents in the Preprocessing tab first.")
             else:
-                results_by_strategy = process_query(interaction_tab, query_data, selected_interaction_strategies)
-                
-                # Display insights charts if we have results and insights data
-                if results_by_strategy and insights_df is not None:
-                    display_insights(insights_df)
+                process_query(interaction_tab, query_data, selected_interaction_strategies)
+    
+    # Render insights tab
+    with insights_tab:
+        render_insights_ui()
     
     # Process documents if we're in processing state
     if st.session_state.is_processing and not process_button_clicked:
@@ -91,16 +87,9 @@ def main():
         # This prevents double-processing due to the rerun() call
         results = process_documents(preprocessing_tab, selected_strategies, chunk_size, overlap)
         
-        # Load insights file
-        insights_df = load_insights_file()
-        
         # Display processing results if processing was successful
         if results is not None:
             display_processing_results(preprocessing_tab, results)
-            
-    # Load insights data for the interaction tab if processing was already done
-    if st.session_state.has_processed_once and not insights_df:
-        insights_df = load_insights_file()
 
 
 if __name__ == "__main__":

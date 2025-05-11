@@ -118,38 +118,6 @@ def process_documents(tab, selected_strategies, chunk_size, overlap):
     return chunk_counts, processing_times
 
 
-def load_insights_file():
-    """Load insights file after processing"""
-    try:
-        # Get the directory where insight file should be stored
-        insight_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 
-                                "baseline", "insight")
-        
-        # Create insight directory if it doesn't exist
-        if not os.path.exists(insight_dir):
-            os.makedirs(insight_dir)
-        
-        # Check for both possible file name patterns
-        insight_paths = [
-            os.path.join(insight_dir, "chunking_strategy_insights.csv"),
-            os.path.join(insight_dir, "chunking_strategy_insights.csv.csv")
-        ]
-        
-        for path in insight_paths:
-            if os.path.exists(path):
-                # Actually load the data if it exists to update the app
-                try:
-                    insights_df = pd.read_csv(path)
-                    st.session_state.insights_loaded = True
-                    return insights_df
-                except Exception:
-                    pass
-    except Exception as e:
-        # Just log and continue even if reload fails
-        print(f"Note: Failed to reload insights file: {str(e)}")
-    
-    return None
-
 
 def display_processing_results(tab, results):
     """Display results after processing documents"""
