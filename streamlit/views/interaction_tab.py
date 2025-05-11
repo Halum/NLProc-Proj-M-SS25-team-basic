@@ -226,7 +226,7 @@ def process_query(tab, query_data, selected_interaction_strategies):
             
             # Process each query
             for i, query_item in enumerate(all_sample_queries):
-                with st.expander(f"Query {i+1}: {query_item['query']}", expanded=True):
+                with st.expander(f"Query {i+1}: {query_item['query']}", expanded=False):
                     query_results = process_single_query(query_item, selected_interaction_strategies)
                     
                     # Display results for this query - indicate we're inside an expander
@@ -368,13 +368,21 @@ def display_query_results(results_by_strategy, query_data, in_expander=False):
                     with chunks_container:
                         for i, chunk in enumerate(results["retrieved_chunks"]):
                             st.markdown(f"**Chunk {i+1}:**")
-                            st.text(chunk)
+                            # Use a container with CSS styling to wrap text
+                            st.markdown(
+                                f"<div style='white-space: pre-wrap; overflow-wrap: break-word; max-width: 100%;'>{chunk}</div>", 
+                                unsafe_allow_html=True
+                            )
                             st.markdown("---")
                 else:
-                    with st.expander("Retrieved Chunks"):
+                    with st.expander("Retrieved Chunks", expanded=False):
                         for i, chunk in enumerate(results["retrieved_chunks"]):
                             st.markdown(f"**Chunk {i+1}:**")
-                            st.text(chunk)
+                            # Use a container with CSS styling to wrap text
+                            st.markdown(
+                                f"<div style='white-space: pre-wrap; overflow-wrap: break-word; max-width: 100%;'>{chunk}</div>", 
+                                unsafe_allow_html=True
+                            )
                             st.markdown("---")
     else:
         # Just one strategy - no need for tabs
@@ -407,14 +415,22 @@ def display_query_results(results_by_strategy, query_data, in_expander=False):
             with chunks_container:
                 for i, chunk in enumerate(results["retrieved_chunks"]):
                     st.markdown(f"**Chunk {i+1}:**")
-                    st.text(chunk)
+                    # Use a container with CSS styling to wrap text
+                    st.markdown(
+                        f"<div style='white-space: pre-wrap; overflow-wrap: break-word; max-width: 100%;'>{chunk}</div>", 
+                        unsafe_allow_html=True
+                    )
                     st.markdown("---")
         else:
             # Regular case - use expander
-            with st.expander("Retrieved Chunks"):
+            with st.expander("Retrieved Chunks", expanded=False):
                 for i, chunk in enumerate(results["retrieved_chunks"]):
                     st.markdown(f"**Chunk {i+1}:**")
-                    st.text(chunk)
+                    # Use a container with CSS styling to wrap text
+                    st.markdown(
+                        f"<div style='white-space: pre-wrap; overflow-wrap: break-word; max-width: 100%;'>{chunk}</div>", 
+                        unsafe_allow_html=True
+                    )
                     st.markdown("---")
 
 
