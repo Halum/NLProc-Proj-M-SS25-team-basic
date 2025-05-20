@@ -1,3 +1,11 @@
+"""
+Module for LLM and embedding functionality.
+This file contains the LLM class that provides:
+1. Text embedding generation using HuggingFace models
+2. Language model invocation for generating text responses
+3. Utility methods for handling embedding dimensions and model instantiation
+"""
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch

@@ -1,4 +1,11 @@
-import time
+"""
+Module for generating insights from evaluation results.
+This file contains the InsightGenerator class that provides:
+1. Metrics collection and aggregation for system performance analysis
+2. Data persistence for evaluation results and performance measurements
+3. Structured logging of query, context, and answer performance
+"""
+
 import pandas as pd
 
 from config.config import INSIGHT_FOLDER_PATH, GROUP_ID

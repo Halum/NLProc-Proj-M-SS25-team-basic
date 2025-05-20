@@ -1,3 +1,11 @@
+"""
+Module for implementing answer generation components.
+This file contains the Generator class that provides functionality for:
+1. Building effective prompts for LLM-based answer generation
+2. Generating answers to user queries based on relevant retrieved context
+3. Interfacing with the LLM service to produce contextually accurate responses
+"""
+
 from generator.llm import LLM
 
 class Generator:

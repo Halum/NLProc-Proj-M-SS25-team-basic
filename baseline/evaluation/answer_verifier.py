@@ -1,3 +1,10 @@
+"""
+Module for answer verification and evaluation.
+This file contains the AnswerVerifier class that provides:
+1. Methods for comparing generated answers against ground truth
+2. Utilities for loading labeled test data from external sources
+"""
+
 from config.config import TEST_QUESTIONS_PATH
 import json
 
@@ -20,6 +27,7 @@ class AnswerVerifier:
             with open(TEST_QUESTIONS_PATH, 'r') as file:
                 labeled_data = json.load(file)
             return labeled_data
+            # return [labeled_data[0]]
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading test questions: {e}")
             return []

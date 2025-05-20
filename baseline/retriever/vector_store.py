@@ -1,3 +1,12 @@
+"""
+Module for vector database functionality.
+This file contains the VectorStoreFaiss class that provides:
+1. FAISS-based vector storage and retrieval operations
+2. Efficient similarity search for finding relevant documents
+3. Persistence capabilities to save and load vector indices
+4. Low-level vector operations for the retrieval pipeline
+"""
+
 import faiss
 import numpy as np
 

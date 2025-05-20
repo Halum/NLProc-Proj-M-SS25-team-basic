@@ -1,3 +1,12 @@
+"""
+Module for document loading and parsing functionality.
+This file contains a collection of classes that provide:
+1. Abstraction for loading different document formats (PDF, TXT, DOCX)
+2. A unified interface for extracting text from various file types
+3. Document content extraction and basic text preprocessing
+4. Directory traversal for batch document processing
+"""
+
 import os
 from abc import ABC, abstractmethod
 import PyPDF2

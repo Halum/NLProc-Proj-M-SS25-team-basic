@@ -1,3 +1,12 @@
+"""
+Main pipeline module for the NLP processing system.
+This file orchestrates the end-to-end pipeline by:
+1. Coordinating components from preprocessing to answer generation
+2. Providing command-line interface for system operation
+3. Implementing evaluation and verification workflows
+4. Supporting different chunking strategies and retrieval methods
+"""
+
 import argparse
 
 from retriever.retreiver import Retriever

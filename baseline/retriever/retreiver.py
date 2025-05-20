@@ -1,3 +1,12 @@
+"""
+Module for document retrieval functionality.
+This file contains the Retriever class that provides:
+1. Document processing and chunking based on configurable strategies
+2. Vector embedding generation and storage for text chunks
+3. Semantic search capabilities to find relevant context for queries
+4. Integration with vector stores for efficient similarity search
+"""
+
 from preprocessor.document_reader import DocumentReader
 
 from generator.llm import LLM

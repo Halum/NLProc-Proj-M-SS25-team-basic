@@ -1,7 +1,10 @@
 """
-Configuration file for the NLP processing pipeline.
-Contains paths, model names and other configuration parameters
-used throughout the application.
+Configuration module for the NLP processing pipeline.
+This file provides centralized configuration for:
+1. File paths for data, insights, and database storage
+2. Model selection for embeddings and language model components
+3. System-wide parameters used across different modules
+4. Environment and deployment identification settings
 """
 
 # Configuration management

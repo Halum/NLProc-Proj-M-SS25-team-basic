@@ -1,3 +1,12 @@
+"""
+Module for embedding analysis and visualization.
+This file provides functionality for:
+1. Reducing dimensionality of embedding vectors using PCA and t-SNE
+2. Visualizing embeddings and their relationships in lower dimensions
+3. Calculating similarity metrics between different embedding sets
+4. Analyzing the effectiveness of various chunking strategies
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt

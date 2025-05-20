@@ -1,3 +1,11 @@
+"""
+Module for file output and document saving functionality.
+This file contains the DocumentWriter class that provides:
+1. Utilities for saving processed data to various file formats
+2. File path handling and directory creation capabilities
+3. Standardized output formatting for consistent data storage
+"""
+
 class DocumentWriter:
     """
     Utility class for writing documents and data to various file formats.
