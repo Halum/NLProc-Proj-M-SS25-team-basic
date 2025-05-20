@@ -4,6 +4,7 @@ import PyPDF2
 from pathlib import Path
 import docx
 
+SUPPORTED_FILE_TYPES = ['txt', 'pdf', 'docx']
 
 class DocumentLoaderAbs(ABC):
     """Abstract base class for document loaders."""
@@ -111,6 +112,12 @@ class DocumentReader:
         documents = []    
         
         for filename in os.listdir(directory):
+            file_type = filename.split('.')[-1].lower()
+            
+            if file_type not in SUPPORTED_FILE_TYPES:
+                print(f"[WARNING] Unsupported file type '{file_type}' for file '{filename}'. Skipping.")
+                continue
+            
             file_path = os.path.join(directory, filename)
             
             if os.path.isfile(file_path):

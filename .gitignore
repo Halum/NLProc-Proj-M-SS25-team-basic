@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Ignore everything in data/db directory except .keep files
+baseline/data/db/*
+!baseline/data/db/.keep

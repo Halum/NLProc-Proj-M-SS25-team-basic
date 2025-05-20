@@ -2,6 +2,7 @@ from preprocessor.document_reader import DocumentReader
 
 from generator.llm import LLM
 from retriever.vector_store import VectorStoreFaiss
+from config.config import DB_INDEX_PATH
 
 class Retriever:
     """
@@ -47,6 +48,7 @@ class Retriever:
     def add_document(self, document_path, is_directory=False):
         """
         Add documents from a file or directory to the retriever.
+        Always call process() after adding documents to generate chunks and embeddings.
         
         Args:
             document_path (str): Path to the document file or directory.
@@ -66,21 +68,13 @@ class Retriever:
         
         return self.__documents
     
-    def save(self):
-        """
-        Generate embeddings for chunks and save them to vector store.
-        
-        Returns:
-            list: Generated embeddings.
-        """
-        embeddings = LLM.generate_embedding(self.__chunks)
-        self.__vector_store.add(embeddings)
-        
-        return embeddings
+    def save(self):        
+        index_path = DB_INDEX_PATH + self.chunking_strategy.__class__.__name__
+        self.__vector_store.save_index(index_path)
     
     def preprocess(self):
         """
-        Process documents to generate chunks using the specified chunking strategy.
+        Process documents to generate chunks using the specified chunking strategy, generate embeddings for chunks and save them to vector store.
         
         Returns:
             list: List of document chunks.
@@ -89,9 +83,12 @@ class Retriever:
             chunks = self.chunking_strategy.chunk(document)
             self.__chunks.extend(chunks)
             
+        embeddings = LLM.generate_embedding(self.__chunks)
+        self.__vector_store.add(embeddings)
+            
         return self.__chunks
     
-    def load(self, query):
+    def relevant_chunks(self, query):
         """
         Retrieve chunks relevant to the query using vector similarity search.
         
@@ -100,25 +97,42 @@ class Retriever:
             
         Returns:
             list: List of relevant chunks.
+            list: List of distances to the relevant chunks.
         """
         query_embedding = LLM.generate_embedding([query])
         distances, indices = self.__vector_store.search(query_embedding)
         retrieved_chunks = self.__get_relevant_chunks(indices)
         
         return retrieved_chunks, distances
-    
-    def query(self, query, relevant_chunks):
+
+    def query(self, query):
         """
         Generate an answer to the query using the relevant chunks as context.
         
         Args:
             query (str): The query to answer.
-            relevant_chunks (list): List of text chunks to use as context.
             
         Returns:
             str: Generated answer to the query.
+            list: List of relevant chunks.
+            list: List of distances to the relevant chunks.
         """
+        
+        relevant_chunks, distances = self.relevant_chunks(query)
+        
         answering_prompt = LLM.generate_answering_prompt(query, relevant_chunks)
         answer = LLM.invoke_llm(answering_prompt)
         
-        return answer
+        return answer, relevant_chunks, distances
+    
+    def load(self):
+        """Load the vector store index for the retriever.
+        
+        Args:
+            None
+        
+        Returns:
+            None
+        """
+        
+        self.__vector_store.load_index(DB_INDEX_PATH + self.chunking_strategy.__class__.__name__)
