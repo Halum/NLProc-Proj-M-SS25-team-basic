@@ -26,8 +26,8 @@ class AnswerVerifier:
         try:
             with open(TEST_QUESTIONS_PATH, 'r') as file:
                 labeled_data = json.load(file)
+            # return [labeled_data[0], labeled_data[1]]
             return labeled_data
-            # return [labeled_data[0]]
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading test questions: {e}")
             return []
@@ -44,8 +44,11 @@ class AnswerVerifier:
         Returns:
             tuple: (index, chunk) of the first matching chunk, or (None, None) if not found
         """
+        # TODO: Implement a more efficient search algorithm if needed
         for i, chunk in enumerate(retrieved_chunks):
             if context in chunk:
                 return i, chunk
         
         return -1, None
+    
+    

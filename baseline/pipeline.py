@@ -111,7 +111,8 @@ def main():
                 number_of_chunks=len(chunks),
                 retrieved_chunk_rank=expected_chunk_index,
                 is_correct_answer=feedback,
-                similarity_scores=distances[0]
+                similarity_scores=distances[0],
+                similarity_mean=distances[0].mean()
             )
             
             print("-"*50)

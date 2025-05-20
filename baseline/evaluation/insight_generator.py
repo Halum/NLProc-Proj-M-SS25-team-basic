@@ -19,7 +19,8 @@ class InsightGenerator:
         self.insight_df = pd.DataFrame(columns=["chunk_strategy", "number_of_chunks", "retrieved_chunk_rank", "correct_answer"])
         
     def update_insight(self, question, retrieved_chunks, prompt, generated_answer, chunk_strategy, 
-                       number_of_chunks, retrieved_chunk_rank, is_correct_answer, similarity_scores):
+                       number_of_chunks, retrieved_chunk_rank, is_correct_answer, similarity_scores,
+                       similarity_mean):
         """
         Update the insight DataFrame with the results of the query.
         Args:
@@ -46,6 +47,7 @@ class InsightGenerator:
             "retrieved_chunk_rank": [retrieved_chunk_rank],
             "correct_answer": [is_correct_answer],
             "similarity_scores": [similarity_scores],
+            "similarity_mean": [similarity_mean],
             "group_id": [GROUP_ID],
             "timestamp": pd.Timestamp.now()
         })

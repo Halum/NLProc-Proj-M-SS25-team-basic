@@ -62,7 +62,7 @@ class LLM:
         return embedding_model
     
     @staticmethod
-    def invoke_llm(prompt):
+    def invoke_llm(prompt, creativity=False):
         """
         Invoke the language model to generate a response to the given prompt.
         
@@ -77,9 +77,16 @@ class LLM:
         
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
         
+        num_beams = 1
+        do_sample = False
+        
+        if creativity:
+            num_beams = 2
+            do_sample = True
+        
         with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=100)
-            
+            outputs = model.generate(**inputs, max_new_tokens=128, num_beams=num_beams, do_sample=do_sample)
+
         answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         return answer
