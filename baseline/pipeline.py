@@ -92,11 +92,16 @@ def main():
                 print("Expected chunk not found in retrieved chunks.")
                 
             feedback = InsightGenerator.human_feedback(labeled_date["answer"], generated_answer)
+            
             insight_generator.update_insight(
+                question=labeled_date["query"],
+                retrieved_chunks=retrieved_chunks,
+                prompt=answering_prompt,
+                generated_answer=generated_answer,
                 chunk_strategy=retriever.chunking_strategy.__class__.__name__,
                 number_of_chunks=len(chunks),
                 retrieved_chunk_rank=expected_chunk_index,
-                correct_answer=feedback,
+                is_correct_answer=feedback,
                 similarity_scores=distances[0]
             )
             

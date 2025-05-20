@@ -22,7 +22,7 @@ class AnswerVerifier:
             return labeled_data
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading test questions: {e}")
-            return {}
+            return []
     
     @staticmethod
     def find_chunk_containing_context(retrieved_chunks, context):
