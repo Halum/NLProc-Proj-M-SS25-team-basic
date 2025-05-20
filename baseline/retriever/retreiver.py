@@ -68,7 +68,17 @@ class Retriever:
         
         return self.__documents
     
-    def save(self):        
+    def save(self):
+        """
+        Save the vector store index for the retriever.
+        
+        Args:
+            None
+            
+        Returns:
+            None
+        """
+        
         index_path = DB_INDEX_PATH + self.chunking_strategy.__class__.__name__
         self.__vector_store.save_index(index_path)
     
@@ -88,7 +98,7 @@ class Retriever:
             
         return self.__chunks
     
-    def relevant_chunks(self, query):
+    def query(self, query):
         """
         Retrieve chunks relevant to the query using vector similarity search.
         
@@ -104,26 +114,6 @@ class Retriever:
         retrieved_chunks = self.__get_relevant_chunks(indices)
         
         return retrieved_chunks, distances
-
-    def query(self, query):
-        """
-        Generate an answer to the query using the relevant chunks as context.
-        
-        Args:
-            query (str): The query to answer.
-            
-        Returns:
-            str: Generated answer to the query.
-            list: List of relevant chunks.
-            list: List of distances to the relevant chunks.
-        """
-        
-        relevant_chunks, distances = self.relevant_chunks(query)
-        
-        answering_prompt = LLM.generate_answering_prompt(query, relevant_chunks)
-        answer = LLM.invoke_llm(answering_prompt)
-        
-        return answer, relevant_chunks, distances
     
     def load(self):
         """Load the vector store index for the retriever.

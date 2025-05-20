@@ -13,6 +13,7 @@ from preprocessor.chunking_service import (
 from config.config import DOCUMENT_FOLDER_PATH
 from evaluation.answer_verifier import AnswerVerifier
 from evaluation.insight_generator import InsightGenerator
+from generator.generator import Generator
 
 def print_chunks(chunks):
     """
@@ -75,7 +76,9 @@ def main():
         
         
         for labeled_date in labeled_date_list:
-            generated_answer, retrieved_chunks, distances  = retriever.query(labeled_date["query"])
+            retrieved_chunks, distances  = retriever.query(labeled_date["query"])
+            answering_prompt = Generator.build_answering_prompt(labeled_date["query"], retrieved_chunks)
+            generated_answer = Generator.generate_answer(answering_prompt)
 
             print(f"Query: {labeled_date['query']}")
             print(f"Expected answer: {labeled_date['answer']}")
@@ -100,6 +103,8 @@ def main():
             print("-"*50)
             print("Retrieved chunks:")
             print_chunks(retrieved_chunks)
+            
+            # break
         
     insight_generator.save_insight('chunking_strategy_insights')
     print("Pipeline completed successfully.")
