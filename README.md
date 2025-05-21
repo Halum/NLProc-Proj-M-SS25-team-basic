@@ -5,6 +5,10 @@
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Overall Goal](#overall-goal)
+  - [Project Status: Working Components and Areas for Improvement](#project-status-working-components-and-areas-for-improvement)
+    - [What's Working Well](#whats-working-well)
+    - [Areas for Improvement](#areas-for-improvement)
+    - [Next Steps](#next-steps)
   - [Structure](#structure)
   - [Environment Setup with Conda](#environment-setup-with-conda)
   - [How to Use](#how-to-use)
@@ -25,6 +29,44 @@ This repository hosts the code for a semester-long project on building and exper
 The primary goal of this project is to develop and analyze various Retrieval-Augmented Generation (RAG) systems to understand how different chunking strategies and retrieval methods impact the performance and accuracy of AI assistants. By comparing approaches such as fixed-size chunking, sliding window, semantic chunking, and others, this project aims to identify optimal configurations for various document types and query scenarios.
 
 In later phase, extend the baseline RAG application to a certain specialization.
+
+
+## Project Status: Working Components and Areas for Improvement
+
+This section provides an overview of the current state of the RAG project, highlighting both the strengths and the areas that need further development.
+
+### What's Working Well
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **Document Loader** | ✅ | Support for multiple file formats (PDF, DOCX, TXT) is implemented and functioning well, though more extensive testing with diverse document structures is needed. |
+| **Chunking Strategies** | ✅ | Multiple chunking strategies are implemented and working effectively, including fixed-size, sliding window, sentence-based, paragraph-based, semantic, and markdown header-based approaches. |
+| **Response Generation** | ✅ | The model consistently generates responses for all questions using the retrieved context. |
+| **Automated Testing** | ✅ | The testing pipeline successfully processes documents, runs queries, and evaluates responses against labeled data. |
+| **Insight Generation** | ✅ | The system generates detailed logs and insights about performance metrics for analysis. |
+| **Analytical Visualization** | ✅ | Tools for visualizing embeddings, similarity scores, and performance metrics are implemented and working. |
+
+### Areas for Improvement
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **Context Matching** | ⚠️ | The current method for matching labeled context with retrieved chunks is rigid and inefficient. The `find_chunk_containing_context` function only checks for exact substring matches, which doesn't account for semantic similarity or partial matches. |
+| **Instruction Following** | ⚠️ | The current model struggles with complex instructions and chain-of-thought reasoning. Testing more advanced models or implementing specialized prompting techniques could improve performance. |
+| **Grounding Verification** | ⚠️ | There's no reliable mechanism to verify if the generated answer is actually grounded in the provided context, potentially allowing for hallucinations. |
+| **Answer Verification** | ⚠️ | Automated verification of generated answers remains a challenge, currently relying on human feedback which is not scalable for large-scale evaluation. |
+| **Reproducibility** | ⚠️ | System reproducibility hasn't been systematically tested to ensure consistent results across multiple runs with the same inputs. |
+| **Unknown Question Handling** | ⚠️ | The system lacks effective detection and handling of out-of-context questions, potentially leading to incorrect or misleading answers when information is not available in the source documents. |
+
+### Next Steps
+
+1. **Improve Context Matching**: Implement semantic similarity-based matching between labeled contexts and retrieved chunks.
+2. **Enhance Model Capabilities**: Test more advanced models or implement better prompting techniques to improve complex instruction handling and chain-of-thought reasoning.
+3. **Implement Grounding Verification**: Develop a mechanism to verify that generated answers are actually grounded in the provided context.
+4. **Automate Answer Verification**: Create an automated system for evaluating answer quality without human intervention.
+5. **Ensure Reproducibility**: Design and run tests to verify that the system produces consistent results across multiple runs.
+6. **Improve Unknown Question Handling**: Implement detection for questions that cannot be answered from the available context and craft appropriate responses.
+
+
 
 ## Structure
 - `baseline/`: Common starter system (retriever + generator)
@@ -184,4 +226,3 @@ Format: `bugfix/<issue_number>-<short_description>`
   - Detailed analysis of how various chunking methods affect retrieval performance
   - Evaluation of accuracy and similarity scores across chunking approaches
   - Embedding visualizations and similarity analysis can be found in [EMBEDDING_VISUALIZATION.md](homeworks/week_3/EMBEDDING_VISUALIZATION.md)
-
