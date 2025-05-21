@@ -10,6 +10,10 @@ def render_sidebar(chunking_strategies):
     Returns:
         tuple: (selected_strategies, chunk_size, overlap, process_button_clicked)
     """
+    # Create session state variable for button if it doesn't exist
+    if 'process_button_rendered' not in st.session_state:
+        st.session_state.process_button_rendered = False
+    
     st.sidebar.title("RAG Configuration")
 
     # Define callbacks for UI elements
@@ -44,11 +48,12 @@ def render_sidebar(chunking_strategies):
         if f"strategy_{strategy}" not in st.session_state:
             st.session_state[f"strategy_{strategy}"] = strategy in st.session_state.selected_strategies
         
-        # Create the checkbox
+        # Create the checkbox with an on_change callback to prevent replication issues
         is_selected = st.sidebar.checkbox(
             strategy, 
             key=f"strategy_{strategy}",
-            value=st.session_state[f"strategy_{strategy}"]
+            value=st.session_state[f"strategy_{strategy}"],
+            on_change=on_strategy_select
         )
         
         # If selected, add to the list
@@ -104,14 +109,17 @@ def render_sidebar(chunking_strategies):
     else:
         overlap = st.session_state.overlap
     
-    # Determine the button text based on whether documents have been processed before
-    process_button_text = "Process Documents Again" if st.session_state.has_processed_once else "Process Documents"
-    
-    # Add Process Documents button - disabled when processing is in progress
-    process_button = st.sidebar.button(
-        process_button_text, 
-        disabled=st.session_state.is_processing
-    )
+    # Use a form to ensure the button only appears once
+    with st.sidebar.form("process_documents_form"):
+        # Determine the button text based on whether documents have been processed before
+        process_button_text = "Process Documents Again" if st.session_state.has_processed_once else "Process Documents"
+        
+        # Add a submit button to the form
+        process_button = st.form_submit_button(
+            process_button_text, 
+            disabled=st.session_state.is_processing,
+            use_container_width=True  # Make button use full container width
+        )
     
     # Immediately set processing state to True if the button was clicked
     if process_button:

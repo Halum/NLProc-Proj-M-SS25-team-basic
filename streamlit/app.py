@@ -24,8 +24,7 @@ from views import (  # noqa: E402
     render_interaction_ui,
     process_query,
     render_insights_ui,
-    render_chat_ui,
-    process_chat_message
+    render_chat_ui
 )
 
 def main():
@@ -81,30 +80,7 @@ def main():
     with chat_tab:
         chat_ask_button, chat_message, selected_chat_strategies, chat_has_insights = render_chat_ui()
         
-        # Process chat message when ask button is clicked
-        if chat_ask_button and chat_has_insights and chat_message and selected_chat_strategies:
-            # Process the chat message
-            results_by_strategy = process_chat_message(chat_message, selected_chat_strategies)
-            
-            # Add the message and response to chat history
-            if results_by_strategy:
-                # Add user message to history
-                st.session_state.chat_history.append({
-                    "type": "user",
-                    "message": chat_message
-                })
-                
-                # Add system response to history
-                st.session_state.chat_history.append({
-                    "type": "system",
-                    "responses": results_by_strategy
-                })
-                
-                # Clear the input
-                st.session_state.chat_input = ""
-                
-                # Rerun to refresh UI
-                st.experimental_rerun()
+        # The chat message processing is now handled by a callback in chat_tab.py
     
     # Render insights tab
     with insights_tab:
