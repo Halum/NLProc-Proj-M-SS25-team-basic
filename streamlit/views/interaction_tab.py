@@ -4,6 +4,10 @@ Interaction tab view
 import streamlit as st
 
 from baseline.evaluation.answer_verifier import AnswerVerifier
+from baseline.generator.generator import Generator
+from baseline.evaluation.insight_generator import InsightGenerator
+
+INSIGHT_FLUSH_THRESHOLD = 1
 
 def render_interaction_ui():
     """
@@ -216,6 +220,7 @@ def process_query(tab, query_data, selected_interaction_strategies):
         st.subheader("Query Results")
         
         results_by_strategy = {}
+        insight_generator = InsightGenerator(flush_threshold=INSIGHT_FLUSH_THRESHOLD)
         
         # Handle "ALL_QUERIES" marker (All queries option)
         if query_data == "ALL_QUERIES":
@@ -229,7 +234,7 @@ def process_query(tab, query_data, selected_interaction_strategies):
             # Process each query
             for i, query_item in enumerate(all_sample_queries):
                 with st.expander(f"Query {i+1}: {query_item['query']}", expanded=False):
-                    query_results = process_single_query(query_item, selected_interaction_strategies)
+                    query_results = process_single_query(query_item, selected_interaction_strategies, insight_generator=insight_generator)
                     
                     # Display results for this query - indicate we're inside an expander
                     display_query_results(query_results, query_item, in_expander=True)
@@ -246,21 +251,33 @@ def process_query(tab, query_data, selected_interaction_strategies):
             # Display a summary
             st.success(f"Processed all {len(all_sample_queries)} queries with {len(selected_interaction_strategies)} strategies")
             
+            # Save the insights to a file
+            insight_generator.save_insight()
+            st.success("Insights saved to file")
+            
         else:
             # Process a single query
-            results_by_strategy = process_single_query(query_data, selected_interaction_strategies)
+            results_by_strategy = process_single_query(query_data, selected_interaction_strategies, insight_generator=insight_generator)
             
             # Display results if we have any
             if results_by_strategy:
                 display_query_results(results_by_strategy, query_data)
         
+        # Save the insights to a file
+        insight_generator.save_insight()
+        st.success("Insights saved to file")
+        
         return results_by_strategy
 
 
-def process_single_query(query_data, selected_interaction_strategies, tab=None):
+def process_single_query(query_data, selected_interaction_strategies, tab=None, insight_generator=None):
     """Process a single query with selected strategies and display results if tab is provided"""
     results_by_strategy = {}
     container = tab if tab else st
+    
+    # Create insight generator if not provided
+    if insight_generator is None:
+        insight_generator = InsightGenerator(flush_threshold=INSIGHT_FLUSH_THRESHOLD)
     
     # Process the query for each selected strategy
     for selected_strategy in selected_interaction_strategies:
@@ -288,13 +305,29 @@ def process_single_query(query_data, selected_interaction_strategies, tab=None):
                     continue
                 
                 # Load the processed chunks
-                retrieved_chunks, distances = retriever.load(query_data["query"])
+                retrieved_chunks, distances = retriever.query(query_data["query"])
                 
                 # Generate answer
-                generated_answer = retriever.query(query_data["query"], retrieved_chunks)
+                answering_prompt = Generator.build_answering_prompt(query_data["query"], retrieved_chunks)
+                generated_answer = Generator.generate_answer(answering_prompt)
                 
                 # Find if the context is in retrieved chunks
                 expected_chunk_index, expected_chunk = AnswerVerifier.find_chunk_containing_context(retrieved_chunks, context=query_data["context"])
+                
+                # Generate insights (skip human feedback as it has a default value)
+                # In the pipeline, they use feedback = InsightGenerator.human_feedback() but we'll use the default True value
+                insight_generator.update_insight(
+                    question=query_data["query"],
+                    retrieved_chunks=retrieved_chunks,
+                    prompt=answering_prompt,
+                    generated_answer=generated_answer,
+                    chunk_strategy=selected_strategy,
+                    number_of_chunks=st.session_state.chunk_counts.get(selected_strategy, 0) if hasattr(st.session_state, 'chunk_counts') else len(retriever.chunks),
+                    retrieved_chunk_rank=expected_chunk_index,
+                    is_correct_answer=True,  # Default value as specified in the prompt
+                    similarity_scores=distances[0],
+                    similarity_mean=distances[0].mean()
+                )
                 
                 # Store results for this strategy
                 results_by_strategy[selected_strategy] = {

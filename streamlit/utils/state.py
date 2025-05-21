@@ -16,6 +16,10 @@ def initialize_session_state(chunking_strategies):
         'overlap': 100,
         'selected_query': '',
         'selected_interaction_strategies': [],
+        'selected_chat_strategies': [],  # For chat tab
+        'chat_history': [],  # For chat tab
+        'pending_insights': [],  # For storing insights before saving in chat tab
+        'message_correctness': {},  # For tracking feedback on chat messages
         'has_processed_once': False,
         'processing_times': {},
         'strategy_retrievers': {},  # Store retrievers for each strategy

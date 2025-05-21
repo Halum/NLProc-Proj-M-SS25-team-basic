@@ -15,6 +15,7 @@ if baseline_dir not in sys.path:
 
 # Import views and utils modules
 from utils.state import initialize_session_state  # noqa: E402
+from utils.chunking_strategies import AVAILABLE_STRATEGIES  # noqa: E402
 from views import (  # noqa: E402
     render_sidebar,
     render_processing_ui, 
@@ -22,7 +23,9 @@ from views import (  # noqa: E402
     display_processing_results,
     render_interaction_ui,
     process_query,
-    render_insights_ui
+    render_insights_ui,
+    render_chat_ui,
+    process_chat_message
 )
 
 def main():
@@ -35,15 +38,8 @@ def main():
         layout="wide"
     )
 
-    # Define available chunking strategies
-    chunking_strategies = [
-        "FixedSizeChunkingStrategy",
-        "SlidingWindowChunkingStrategy",
-        "SentenceBasedChunkingStrategy", 
-        "ParagraphBasedChunkingStrategy",
-        "SemanticChunkingStrategy",
-        "MarkdownHeaderChunkingStrategy"
-    ]
+    # Use the centralized list of chunking strategies
+    chunking_strategies = AVAILABLE_STRATEGIES
     
     # Initialize session state
     initialize_session_state(chunking_strategies)
@@ -58,8 +54,8 @@ def main():
     # Main content area
     st.title("RAG Chunking Strategies Explorer")
     
-    # Create tabs for Preprocessing, Interaction, and Insights
-    preprocessing_tab, interaction_tab, insights_tab = st.tabs(["Preprocessing", "Interaction", "Insights"])
+    # Create tabs for Preprocessing, Interaction, Chat, and Insights
+    preprocessing_tab, interaction_tab, chat_tab, insights_tab = st.tabs(["Preprocessing", "Interaction", "Chat", "Insights"])
     
     # Render preprocessing tab
     with preprocessing_tab:
@@ -80,6 +76,35 @@ def main():
                 st.error("No processed strategies found. Please process documents in the Preprocessing tab first.")
             else:
                 process_query(interaction_tab, query_data, selected_interaction_strategies)
+    
+    # Render chat tab
+    with chat_tab:
+        chat_ask_button, chat_message, selected_chat_strategies, chat_has_insights = render_chat_ui()
+        
+        # Process chat message when ask button is clicked
+        if chat_ask_button and chat_has_insights and chat_message and selected_chat_strategies:
+            # Process the chat message
+            results_by_strategy = process_chat_message(chat_message, selected_chat_strategies)
+            
+            # Add the message and response to chat history
+            if results_by_strategy:
+                # Add user message to history
+                st.session_state.chat_history.append({
+                    "type": "user",
+                    "message": chat_message
+                })
+                
+                # Add system response to history
+                st.session_state.chat_history.append({
+                    "type": "system",
+                    "responses": results_by_strategy
+                })
+                
+                # Clear the input
+                st.session_state.chat_input = ""
+                
+                # Rerun to refresh UI
+                st.experimental_rerun()
     
     # Render insights tab
     with insights_tab:

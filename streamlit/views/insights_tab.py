@@ -7,6 +7,26 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 import numpy as np
+import sys
+
+# Add the src directory to the path to be able to import from baseline
+src_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if src_path not in sys.path:
+    sys.path.append(src_path)
+
+# Import configuration
+from baseline.config.config import INSIGHT_FOLDER_PATH, LOG_FILE_NAME
+
+# Set up path to import utils from project, not from streamlit package
+import sys
+from os.path import abspath, dirname, join
+# Append the streamlit directory to the path
+streamlit_dir = dirname(dirname(abspath(__file__)))
+if streamlit_dir not in sys.path:
+    sys.path.append(streamlit_dir)
+    
+# Import get_short_strategy_name function
+from utils.chunking_strategies import get_short_strategy_name
 
 def render_insights_ui():
     """
@@ -23,11 +43,44 @@ def render_insights_ui():
     
     # Display insights if available
     if insights_df is not None:
+        # Add a filter for chunking strategies
+        if 'chunk_strategy' in insights_df.columns:
+            available_strategies = insights_df['chunk_strategy'].unique().tolist()
+            selected_strategies = st.multiselect(
+                "Select chunking strategies to compare:",
+                options=available_strategies,
+                default=available_strategies
+            )
+            
+            # Filter insights by selected strategies
+            if selected_strategies:
+                filtered_insights_df = insights_df[insights_df['chunk_strategy'].isin(selected_strategies)]
+            else:
+                filtered_insights_df = insights_df
+                st.warning("No strategies selected. Showing all data.")
+        else:
+            filtered_insights_df = insights_df
+            st.warning("No chunking strategy information available in the insights data.")
+        
+        # Add group filtering if available
+        if 'group_id' in insights_df.columns:
+            available_groups = insights_df['group_id'].unique().tolist()
+            if len(available_groups) > 1:
+                selected_groups = st.multiselect(
+                    "Select teams to compare:",
+                    options=available_groups,
+                    default=available_groups
+                )
+                
+                # Filter insights by selected groups
+                if selected_groups:
+                    filtered_insights_df = filtered_insights_df[filtered_insights_df['group_id'].isin(selected_groups)]
+        
         # Display chunking strategy comparison table
-        display_chunking_comparison_table(insights_df)
+        display_chunking_comparison_table(filtered_insights_df)
         
         # Display visualizations
-        display_insights(insights_df)
+        display_insights(filtered_insights_df)
     else:
         st.warning("No insights data available. Process documents in the Preprocessing tab first.")
     
@@ -38,17 +91,24 @@ def load_insights_data():
     """Load insights data for visualization"""
     insights_df = None
     try:
-        # Get the directory where insight file should be stored
-        insight_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 
-                                "baseline", "insight")
+        # Create a more flexible path structure using project root
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         
-        # Define insight file path
-        insight_path = os.path.join(insight_dir, "chunking_strategy_insights.csv")
+        # Get path to insights file using config values
+        insight_path = os.path.join(project_root, INSIGHT_FOLDER_PATH, f"{LOG_FILE_NAME}.json")
+        st.info(f"Loading insights from: {insight_path}")
         
         # Try to load the insights file
         if os.path.exists(insight_path):
-            insights_df = pd.read_csv(insight_path)
-            st.session_state.insights_loaded = True
+            try:
+                insights_df = pd.read_json(insight_path)
+                st.session_state.insights_loaded = True
+                st.success(f"Successfully loaded insights from {os.path.basename(insight_path)}")
+            except Exception as load_err:
+                st.error(f"Error loading JSON file: {load_err}")
+        else:
+            st.warning(f"Insights file not found at: {insight_path}")
+            st.session_state.insights_loaded = False
             
         # Convert similarity scores from string to list
         if insights_df is not None and 'similarity_scores' in insights_df.columns:
@@ -59,8 +119,24 @@ def load_insights_data():
                 try:
                     # Clean up the string representation before conversion
                     clean_str = x.strip().replace('  ', ' ')
-                    return np.array([float(val) for val in clean_str.strip('[]').split()])
-                except Exception:
+                    # Handle array-like format
+                    if clean_str.startswith('[') and clean_str.endswith(']'):
+                        # Remove outer brackets and split by commas, handling potentially quoted values
+                        values_str = clean_str[1:-1].strip()
+                        # Handle nested list format that might come from the insight generator
+                        if values_str.startswith('[') and values_str.endswith(']'):
+                            values_str = values_str[1:-1].strip()
+                        # Split and convert to float
+                        if ',' in values_str:
+                            values = [float(val.strip(' "\'')) for val in values_str.split(',') if val.strip(' "\'')]
+                        else:
+                            values = [float(val.strip(' "\'')) for val in values_str.split() if val.strip(' "\'')]
+                        return np.array(values)
+                    else:
+                        # Handle space-separated list
+                        return np.array([float(val) for val in clean_str.split() if val.strip()])
+                except Exception as e:
+                    st.error(f"Error converting similarity scores: {e}")
                     return np.array([0.0])
                     
             insights_df['similarity_scores'] = insights_df['similarity_scores'].apply(safe_convert)
@@ -97,6 +173,7 @@ def display_chunking_comparison_table(insights_df):
             # Calculate average similarity scores
             avg_sim_correct = np.nan
             avg_sim_incorrect = np.nan
+            avg_sim_mean = np.nan
             
             # Get first similarity score for each entry
             if 'similarity_scores' in group.columns:
@@ -120,14 +197,25 @@ def display_chunking_comparison_table(insights_df):
                 except Exception as e:
                     st.error(f"Error processing similarity scores: {e}")
             
+            # Get average similarity mean if available
+            if 'similarity_mean' in group.columns:
+                avg_sim_mean = group['similarity_mean'].mean()
+            
+            # Get short name for the strategy
+            short_name = get_short_strategy_name(strategy)
+            
+            # Add a tooltip that shows the full name when hovering over the short name
+            strategy_display = f"{short_name} ({strategy})"
+            
             strategy_stats.append({
-                'Chunking Strategy': strategy,
+                'Chunking Strategy': strategy_display,
                 'Total Chunks': total_chunks,
                 'Correct Answers': correct_answers,
                 'Incorrect Answers': incorrect_answers,
                 'Accuracy': f"{accuracy:.0f}%",
                 'Avg Similarity Score (Correct)': f"{avg_sim_correct:.2f}" if not pd.isna(avg_sim_correct) else "N/A",
-                'Avg Similarity Score (Incorrect)': f"{avg_sim_incorrect:.2f}" if not pd.isna(avg_sim_incorrect) else "N/A"
+                'Avg Similarity Score (Incorrect)': f"{avg_sim_incorrect:.2f}" if not pd.isna(avg_sim_incorrect) else "N/A",
+                'Avg Similarity Mean': f"{avg_sim_mean:.2f}" if not pd.isna(avg_sim_mean) else "N/A"
             })
         
         # Create a DataFrame from the statistics
@@ -144,7 +232,16 @@ def display_insights(insights_df):
     """Display strategy insights visualizations"""
     if insights_df is not None:
         # Filter insights by strategy if needed
-        filtered_df = insights_df
+        filtered_df = insights_df.copy()
+        
+        # Create a mapping of original strategy names to short names
+        if 'chunk_strategy' in filtered_df.columns:
+            # Create a new column with short strategy names for display
+            filtered_df['strategy_short'] = filtered_df['chunk_strategy'].apply(get_short_strategy_name)
+            
+            # Create a mapping dictionary for reference
+            strategy_mapping = {original: get_short_strategy_name(original) 
+                              for original in filtered_df['chunk_strategy'].unique()}
         
         # Create visual insights with smaller graphs side by side
         col1, col2 = st.columns(2)
@@ -152,9 +249,9 @@ def display_insights(insights_df):
         with col1:
             # 1. Number of chunks by strategy
             st.markdown("### Number of Chunks")
-            chunks_by_strategy = filtered_df.groupby('chunk_strategy')['number_of_chunks'].mean().reset_index()
+            chunks_by_strategy = filtered_df.groupby('strategy_short')['number_of_chunks'].mean().reset_index()
             fig1, ax1 = plt.subplots(figsize=(5, 4))
-            sns.barplot(data=chunks_by_strategy, x='chunk_strategy', y='number_of_chunks', ax=ax1)
+            sns.barplot(data=chunks_by_strategy, x='strategy_short', y='number_of_chunks', ax=ax1)
             ax1.set_xlabel('Strategy')
             ax1.set_ylabel('Number of Chunks')
             plt.xticks(rotation=45, ha='right')
@@ -164,9 +261,9 @@ def display_insights(insights_df):
         with col2:
             # 2. Correct Answer Rate by Strategy
             st.markdown("### Correct Answer Rate")
-            correct_answer_rate = filtered_df.groupby('chunk_strategy')['correct_answer'].mean().reset_index()
+            correct_answer_rate = filtered_df.groupby('strategy_short')['correct_answer'].mean().reset_index()
             fig2, ax2 = plt.subplots(figsize=(5, 4))
-            bars = sns.barplot(data=correct_answer_rate, x='chunk_strategy', y='correct_answer', ax=ax2)
+            bars = sns.barplot(data=correct_answer_rate, x='strategy_short', y='correct_answer', ax=ax2)
             
             # Add percentage labels
             for i, bar in enumerate(bars.patches):
@@ -189,10 +286,10 @@ def display_insights(insights_df):
             st.markdown("### Context Found Rate")
             context_found_df = filtered_df.copy()
             context_found_df['context_found'] = context_found_df['retrieved_chunk_rank'] != -1
-            context_found_rate = context_found_df.groupby('chunk_strategy')['context_found'].mean().reset_index()
+            context_found_rate = context_found_df.groupby('strategy_short')['context_found'].mean().reset_index()
             
             fig3, ax3 = plt.subplots(figsize=(5, 4))
-            bars = sns.barplot(data=context_found_rate, x='chunk_strategy', y='context_found', ax=ax3)
+            bars = sns.barplot(data=context_found_rate, x='strategy_short', y='context_found', ax=ax3)
             
             # Add percentage labels
             for i, bar in enumerate(bars.patches):
@@ -208,7 +305,148 @@ def display_insights(insights_df):
             plt.tight_layout()
             st.pyplot(fig3)
         
-        # Show raw data in the other column
+        # Show similarity mean in the other column
         with col4:
-            st.markdown("### Raw Insights Data")
-            st.dataframe(filtered_df, height=300)
+            # 4. Average Similarity Score by Strategy
+            st.markdown("### Average Similarity Score")
+            if 'similarity_mean' in filtered_df.columns:
+                # Group by chunking strategy and calculate mean of similarity_mean
+                sim_mean_by_strategy = filtered_df.groupby('strategy_short')['similarity_mean'].mean().reset_index()
+                
+                fig4, ax4 = plt.subplots(figsize=(5, 4))
+                bars = sns.barplot(data=sim_mean_by_strategy, x='strategy_short', y='similarity_mean', ax=ax4)
+                
+                # Add value labels
+                for i, bar in enumerate(bars.patches):
+                    bars.text(bar.get_x() + bar.get_width()/2., 
+                            bar.get_height() + 0.01, 
+                            f'{bar.get_height():.3f}',
+                            ha='center', va='bottom')
+                            
+                ax4.set_xlabel('Strategy')
+                ax4.set_ylabel('Average Similarity Score')
+                ax4.set_ylim(0, max(sim_mean_by_strategy['similarity_mean']) * 1.1)
+                plt.xticks(rotation=45, ha='right')
+                plt.tight_layout()
+                st.pyplot(fig4)
+            else:
+                st.warning("Similarity mean data not available in the insights file.")
+        
+        # Add a new row for detailed data display
+        st.markdown("### Raw Insights Data")
+        st.dataframe(filtered_df, height=300)
+        
+        # Add a section for question analysis if we have question data
+        if 'question' in filtered_df.columns:
+            st.markdown("### Question Analysis")
+            
+            # Group by question and analyze performance across chunking strategies
+            question_analysis = filtered_df.groupby(['question', 'strategy_short'])['correct_answer'].mean().reset_index()
+            question_analysis = question_analysis.pivot(index='question', columns='strategy_short', values='correct_answer')
+            
+            # Create a heatmap of question correctness across strategies
+            if not question_analysis.empty:
+                st.markdown("#### Question Performance by Chunking Strategy")
+                st.write("This heatmap shows which questions were answered correctly (1.0) or incorrectly (0.0) by each chunking strategy.")
+                
+                # Configure figure size based on number of questions
+                fig_height = max(6, len(question_analysis) * 0.4)
+                fig5, ax5 = plt.subplots(figsize=(10, fig_height))
+                
+                # Create heatmap
+                sns.heatmap(question_analysis, cmap="RdYlGn", vmin=0, vmax=1, 
+                            annot=True, fmt=".1f", ax=ax5, cbar_kws={'label': 'Correct Answer (1=Yes, 0=No)'})
+                
+                ax5.set_ylabel('Question')
+                ax5.set_xlabel('Chunking Strategy')
+                plt.tight_layout()
+                st.pyplot(fig5)
+                
+                # Show the full questions text
+                st.markdown("#### Full Questions Text")
+                for i, question in enumerate(question_analysis.index, 1):
+                    st.markdown(f"**Q{i}:** {question}")
+        
+        # Add a section for retrieved chunk rank analysis
+        if 'retrieved_chunk_rank' in filtered_df.columns:
+            st.markdown("### Retrieved Chunk Rank Analysis")
+            st.write("This section shows which position (rank) contained the correct context across different chunking strategies.")
+            
+            # Filter out entries where context was not found (-1 values)
+            rank_df = filtered_df[filtered_df['retrieved_chunk_rank'] >= 0].copy()
+            
+            if not rank_df.empty:
+                col_rank1, col_rank2 = st.columns(2)
+                
+                with col_rank1:
+                    # 1. Average rank by strategy
+                    st.markdown("#### Average Position of Correct Context")
+                    avg_rank_by_strategy = rank_df.groupby('strategy_short')['retrieved_chunk_rank'].mean().reset_index()
+                    avg_rank_by_strategy['retrieved_chunk_rank'] = avg_rank_by_strategy['retrieved_chunk_rank']
+                    
+                    fig_rank1, ax_rank1 = plt.subplots(figsize=(5, 4))
+                    bars = sns.barplot(data=avg_rank_by_strategy, x='strategy_short', y='retrieved_chunk_rank', ax=ax_rank1)
+                    
+                    # Add value labels
+                    for i, bar in enumerate(bars.patches):
+                        bars.text(bar.get_x() + bar.get_width()/2., 
+                                bar.get_height() + 0.05, 
+                                f'{bar.get_height():.2f}',
+                                ha='center', va='bottom')
+                    
+                    ax_rank1.set_xlabel('Strategy')
+                    ax_rank1.set_ylabel('Average Position (lower is better)')
+                    plt.xticks(rotation=45, ha='right')
+                    plt.tight_layout()
+                    st.pyplot(fig_rank1)
+                    
+                    st.markdown("*Note: Lower values are better - they indicate the relevant context was found sooner in the results.*")
+                
+                with col_rank2:
+                    # 2. Distribution of ranks (histogram)
+                    st.markdown("#### Distribution of Context Positions")
+                    # Add 1 to rank for display (1-based instead of 0-based)
+                    rank_df['rank_display'] = rank_df['retrieved_chunk_rank']
+                    
+                    fig_rank2, ax_rank2 = plt.subplots(figsize=(5, 4))
+                    # Count occurrences by rank and strategy
+                    rank_counts = rank_df.groupby(['strategy_short', 'rank_display']).size().reset_index(name='count')
+                    sns.barplot(data=rank_counts, x='rank_display', y='count', hue='strategy_short', ax=ax_rank2)
+                    
+                    ax_rank2.set_xlabel('Position of Correct Context')
+                    ax_rank2.set_ylabel('Count')
+                    ax_rank2.legend(title='Strategy', bbox_to_anchor=(1.05, 1), loc='upper left')
+                    plt.tight_layout()
+                    st.pyplot(fig_rank2)
+                
+                # 3. Table showing top-k recall rates (in what percentage of cases was the context found in the top k positions)
+                st.markdown("#### Top-K Recall Rates")
+                st.write("This table shows the percentage of queries where the context was found within the top K results.")
+                
+                # Calculate top-k recall rates (top-1, top-3, top-5)
+                topk_stats = []
+                # We need to map the strategy back to shortened version
+                for strategy, group in rank_df.groupby('chunk_strategy'):
+                    # Count total queries for this strategy (including those where context was not found)
+                    total_queries = len(filtered_df[filtered_df['chunk_strategy'] == strategy])
+                    
+                    # Get short name for the strategy
+                    short_name = get_short_strategy_name(strategy)
+                    
+                    # Calculate recall rates
+                    top1_recall = (group['retrieved_chunk_rank'] <= 1).sum() / total_queries
+                    top3_recall = (group['retrieved_chunk_rank'] <= 3).sum() / total_queries
+                    top5_recall = (group['retrieved_chunk_rank'] <= 5).sum() / total_queries
+                    
+                    topk_stats.append({
+                        'Chunking Strategy': f"{short_name} ({strategy})",
+                        'Top-1 Recall': f"{top1_recall:.1%}",
+                        'Top-3 Recall': f"{top3_recall:.1%}",
+                        'Top-5 Recall': f"{top5_recall:.1%}"
+                    })
+                
+                # Create DataFrame and display as table
+                topk_df = pd.DataFrame(topk_stats)
+                st.table(topk_df)
+            else:
+                st.warning("No valid retrieved chunk rank data available (all values are -1).")

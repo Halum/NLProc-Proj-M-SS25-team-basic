@@ -8,19 +8,20 @@ This file contains the InsightGenerator class that provides:
 
 import pandas as pd
 
-from config.config import INSIGHT_FOLDER_PATH, GROUP_ID
+from config.config import INSIGHT_FOLDER_PATH, GROUP_ID, LOG_FILE_NAME
 from postprocessor.document_writer import DocumentWriter
 
 class InsightGenerator:
-    def __init__(self):
+    def __init__(self, flush_threshold=5):
         """
         Initialize the InsightGenerator class.
         """
+        self.flush_threshold = flush_threshold
         self.insight_df = pd.DataFrame(columns=["chunk_strategy", "number_of_chunks", "retrieved_chunk_rank", "correct_answer"])
         
     def update_insight(self, question, retrieved_chunks, prompt, generated_answer, chunk_strategy, 
-                       number_of_chunks, retrieved_chunk_rank, is_correct_answer, similarity_scores,
-                       similarity_mean):
+                       number_of_chunks, retrieved_chunk_rank, similarity_scores,
+                       similarity_mean, is_correct_answer=True):
         """
         Update the insight DataFrame with the results of the query.
         Args:
@@ -33,6 +34,7 @@ class InsightGenerator:
             retrieved_chunk_rank (int): The rank of the retrieved chunk.
             is_correct_answer (bool): Whether the answer was correct or not.
             similarity_scores (list): A list of similarity scores for the chunks.
+            simi
         Returns:
             pd.DataFrame: The updated DataFrame.
         """
@@ -44,7 +46,7 @@ class InsightGenerator:
             "generated_answer": [generated_answer],
             "chunk_strategy": [chunk_strategy],
             "number_of_chunks": [number_of_chunks],
-            "retrieved_chunk_rank": [retrieved_chunk_rank],
+            "retrieved_chunk_rank": [retrieved_chunk_rank + 1 if retrieved_chunk_rank >= 0 else retrieved_chunk_rank],  # Adjusting for 0-based index, but -1 means not found
             "correct_answer": [is_correct_answer],
             "similarity_scores": [similarity_scores],
             "similarity_mean": [similarity_mean],
@@ -53,14 +55,17 @@ class InsightGenerator:
         })
         self.insight_df = pd.concat([self.insight_df, new_row], ignore_index=True)
         
-    def save_insight(self, file_name):
+        if len(self.insight_df) >= self.flush_threshold:
+            print("Flushing insights to disk...")
+            self.save_insight()
+
+    def save_insight(self):
         """
-        Save the insight DataFrame to a CSV file.
-        Args:
-            file_name (str): The name to save the CSV file.
+        Save the insight DataFrame to a JSON file.
         """
-        DocumentWriter.df_to_csv(self.insight_df, INSIGHT_FOLDER_PATH, file_name)
-        
+        DocumentWriter.df_to_json(self.insight_df, INSIGHT_FOLDER_PATH, LOG_FILE_NAME)
+        self.insight_df = self.insight_df.iloc[0:0]  # Clear the DataFrame after saving
+
     @staticmethod
     def human_feedback(expected_answer, generated_answer):
         """

@@ -138,21 +138,26 @@
 },
 {
     "query": "How much exercise do I need as a student?",
-    "answer":"Just 20–30 minutes a day of walking, stretching, or light workouts can boost your mood, energy, and focus."
+    "answer":"Just 20–30 minutes a day of walking, stretching, or light workouts can boost your mood, energy, and focus.",
+    "context": "N/A"
 },
 {
     "query": "How can I start being healthier without changing everything at once?",
-    "answer": "Start small — drink more water, take short walks, or add one veggie to your meals. Little changes add up over time."
+    "answer": "Start small — drink more water, take short walks, or add one veggie to your meals. Little changes add up over time.",
+    "context": "N/A"
 },
 {
     "query": "What’s a simple way to stop spending too much?",
-    "answer": "Before buying something, ask yourself: “Do I really need this right now?” Waiting a day helps avoid impulse buys."
+    "answer": "Before buying something, ask yourself: “Do I really need this right now?” Waiting a day helps avoid impulse buys.",
+    "context": "N/A"
 },
 {
     "query": "What happens when emotions aren’t expressed?",
-    "answer": "Misunderstandings are more likely, and the person’s needs may go unnoticed."
+    "answer": "Misunderstandings are more likely, and the person’s needs may go unnoticed.",
+    "context": "N/A"
 },
 {
     "query": "What is felt when goals aren’t reached?",
-    "answer": "Frustration or self-doubt may be experienced, but sometimes motivation is also strengthened."
+    "answer": "Frustration or self-doubt may be experienced, but sometimes motivation is also strengthened.",
+    "context": "N/A"
 }]

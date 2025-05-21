@@ -121,7 +121,7 @@ def main():
             
             # break
         
-    insight_generator.save_insight('chunking_strategy_insights')
+    insight_generator.save_insight()
     print("Pipeline completed successfully.")
     # for embedding visualization
     # analyze_embeddings()

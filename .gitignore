@@ -176,3 +176,5 @@ cython_debug/
 # Ignore everything in data/db directory except .keep files
 baseline/data/db/*
 !baseline/data/db/.keep
+
+baseline/data/insight/*.lock

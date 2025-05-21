@@ -172,8 +172,6 @@ def process_documents(tab, selected_strategies, chunk_size, overlap):
                 chunk_counts[strategy_name] = len(chunks)
                 processing_times[strategy_name] = processing_time_ms
                 
-                retriever.save()
-                
                 # Store the retriever in session state for reuse in interaction tab
                 if 'strategy_retrievers' not in st.session_state:
                     st.session_state.strategy_retrievers = {}

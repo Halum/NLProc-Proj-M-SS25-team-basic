@@ -10,6 +10,7 @@ This file provides centralized configuration for:
 # Configuration management
 DOCUMENT_FOLDER_PATH='baseline/data/raw/'
 INSIGHT_FOLDER_PATH='baseline/data/insight/'
+LOG_FILE_NAME='chunking_strategy_insights'
 DB_INDEX_PATH='baseline/data/db/'
 TEST_QUESTIONS_PATH='baseline/data/tests/test_input.json'
 EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
