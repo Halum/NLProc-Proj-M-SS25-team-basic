@@ -224,8 +224,8 @@ def display_chunking_comparison_table(insights_df):
         # Display the comparison table
         st.table(stats_df)
         
-        # Add explanatory note
-        st.markdown("*Note: Average similarity scores are calculated from the first value in the similarity scores array for each entry.*")
+        # Add explanatory note for the table
+        st.markdown("*Note: Higher values are better for Correct Answers, Accuracy, and Similarity Scores. For Total Chunks, the optimal value depends on the specific use case.*")
 
 
 def display_insights(insights_df):
@@ -257,6 +257,7 @@ def display_insights(insights_df):
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
             st.pyplot(fig1)
+            st.markdown("*Note: This shows the average chunk count per strategy. Fewer chunks can mean less processing overhead, but effectiveness depends on other metrics.*")
         
         with col2:
             # 2. Correct Answer Rate by Strategy
@@ -278,6 +279,7 @@ def display_insights(insights_df):
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
             st.pyplot(fig2)
+            st.markdown("*Note: Higher is better - indicates a more effective chunking strategy for accurate answers.*")
         
         col3, col4 = st.columns(2)
         
@@ -304,6 +306,7 @@ def display_insights(insights_df):
             plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
             st.pyplot(fig3)
+            st.markdown("*Note: Higher is better - shows the percentage of queries where relevant context was found in the results.*")
         
         # Show similarity mean in the other column
         with col4:
@@ -329,6 +332,7 @@ def display_insights(insights_df):
                 plt.xticks(rotation=45, ha='right')
                 plt.tight_layout()
                 st.pyplot(fig4)
+                st.markdown("*Note: Higher is better - higher similarity scores indicate better semantic matching between queries and chunks.*")
             else:
                 st.warning("Similarity mean data not available in the insights file.")
         
@@ -361,11 +365,8 @@ def display_insights(insights_df):
                 ax5.set_xlabel('Chunking Strategy')
                 plt.tight_layout()
                 st.pyplot(fig5)
+                st.markdown("*Note: Greener (closer to 1.0) is better - indicates questions correctly answered by that strategy.*")
                 
-                # Show the full questions text
-                st.markdown("#### Full Questions Text")
-                for i, question in enumerate(question_analysis.index, 1):
-                    st.markdown(f"**Q{i}:** {question}")
         
         # Add a section for retrieved chunk rank analysis
         if 'retrieved_chunk_rank' in filtered_df.columns:
@@ -418,6 +419,7 @@ def display_insights(insights_df):
                     ax_rank2.legend(title='Strategy', bbox_to_anchor=(1.05, 1), loc='upper left')
                     plt.tight_layout()
                     st.pyplot(fig_rank2)
+                    st.markdown("*Note: Higher counts at lower positions (left side of chart) are better - they indicate the relevant context was found earlier in the results.*")
                 
                 # 3. Table showing top-k recall rates (in what percentage of cases was the context found in the top k positions)
                 st.markdown("#### Top-K Recall Rates")
@@ -448,5 +450,197 @@ def display_insights(insights_df):
                 # Create DataFrame and display as table
                 topk_df = pd.DataFrame(topk_stats)
                 st.table(topk_df)
+                st.markdown("*Note: Higher percentages are better - they indicate a greater proportion of queries where the correct context was found within the top K positions.*")
             else:
                 st.warning("No valid retrieved chunk rank data available (all values are -1).")
+        
+        # Add a correlation analysis section
+        st.markdown("### Correlation Analysis")
+        st.write("This section explores correlations between correct answers, retrieved chunk position, and similarity scores.")
+        
+        # Only proceed if we have the necessary columns
+        if all(col in filtered_df.columns for col in ['correct_answer', 'retrieved_chunk_rank']):
+            # Create a new row for correlation visualizations
+            corr_col1, corr_col2 = st.columns(2)
+            
+            # Only include rows where context was found
+            corr_df = filtered_df[filtered_df['retrieved_chunk_rank'] >= 0].copy()
+            
+            with corr_col1:
+                # Scatter plot: Retrieved Chunk Rank vs Correct Answer
+                st.markdown("#### Retrieved Chunk Position vs Correct Answers")
+                fig_corr1, ax_corr1 = plt.subplots(figsize=(6, 4))
+                
+                # Jitter the correct_answer values slightly for better visualization
+                corr_df['jittered_correct'] = corr_df['correct_answer'] + np.random.normal(0, 0.05, len(corr_df))
+                
+                sns.scatterplot(
+                    data=corr_df,
+                    x='retrieved_chunk_rank',
+                    y='jittered_correct',
+                    hue='strategy_short',
+                    alpha=0.7,
+                    ax=ax_corr1
+                )
+                
+                ax_corr1.set_xlabel('Retrieved Chunk Position')
+                ax_corr1.set_ylabel('Correct Answer (1=Yes, 0=No)')
+                ax_corr1.set_yticks([0, 1])
+                ax_corr1.set_yticklabels(['No', 'Yes'])
+                ax_corr1.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
+                plt.legend(title='Strategy', bbox_to_anchor=(1.05, 1), loc='upper left')
+                plt.tight_layout()
+                st.pyplot(fig_corr1)
+                
+                # Add some statistics
+                correct_by_rank = corr_df.groupby('retrieved_chunk_rank')['correct_answer'].mean()
+                st.markdown(f"**Correlation coefficient:** {corr_df['retrieved_chunk_rank'].corr(corr_df['correct_answer']):.3f}")
+                st.markdown("*Note: Lower chunk positions (chunks ranked higher) tend to yield more correct answers.*")
+            
+            with corr_col2:
+                # If similarity_mean is available, create a box plot
+                if 'similarity_mean' in corr_df.columns:
+                    st.markdown("#### Similarity Scores vs Answer Correctness")
+                    fig_corr2, ax_corr2 = plt.subplots(figsize=(6, 4))
+                    
+                    # Convert boolean to categorical for better labeling
+                    corr_df['Answer'] = corr_df['correct_answer'].map({True: 'Correct', False: 'Incorrect'})
+                    
+                    sns.boxplot(
+                        data=corr_df,
+                        x='Answer',
+                        y='similarity_mean',
+                        ax=ax_corr2
+                    )
+                    
+                    ax_corr2.set_xlabel('Answer Correctness')
+                    ax_corr2.set_ylabel('Mean Similarity Score')
+                    plt.tight_layout()
+                    st.pyplot(fig_corr2)
+                    
+                    # Add some statistics
+                    correct_sim = corr_df[corr_df['correct_answer']]['similarity_mean'].mean()
+                    incorrect_sim = corr_df[~corr_df['correct_answer']]['similarity_mean'].mean()
+                    st.markdown(f"**Avg similarity for correct answers:** {correct_sim:.3f}")
+                    st.markdown(f"**Avg similarity for incorrect answers:** {incorrect_sim:.3f}")
+                    st.markdown("*Note: Higher similarity scores tend to correlate with correct answers.*")
+            
+            # Add a heatmap showing correlations between metrics
+            st.markdown("#### Correlation Heatmap")
+            
+            # Prepare data for correlation analysis
+            corr_metrics = corr_df[['correct_answer', 'retrieved_chunk_rank', 'number_of_chunks']].copy()
+            
+            # Add similarity_mean if available
+            if 'similarity_mean' in corr_df.columns:
+                corr_metrics['similarity_mean'] = corr_df['similarity_mean']
+            
+            # Add min similarity score if similarity_scores is available
+            if 'similarity_scores' in corr_df.columns:
+                # Get minimum score from each row's similarity_scores array
+                corr_metrics['min_similarity'] = corr_df['similarity_scores'].apply(
+                    lambda x: min(x) if hasattr(x, '__len__') and len(x) > 0 else np.nan
+                )
+            
+            # Rename columns for better display
+            corr_metrics = corr_metrics.rename(columns={
+                'correct_answer': 'Correct Answer',
+                'retrieved_chunk_rank': 'Retrieved Position',
+                'number_of_chunks': 'Chunk Count',
+                'similarity_mean': 'Avg Similarity',
+                'min_similarity': 'Min Similarity'
+            })
+            
+            # Calculate correlation matrix
+            corr_matrix = corr_metrics.corr()
+            
+            # Create correlation heatmap
+            fig_corr3, ax_corr3 = plt.subplots(figsize=(8, 6))
+            sns.heatmap(
+                corr_matrix,
+                annot=True,
+                cmap='coolwarm',
+                fmt='.2f',
+                linewidths=0.5,
+                ax=ax_corr3
+            )
+            plt.tight_layout()
+            st.pyplot(fig_corr3)
+            
+            st.markdown("""
+            *Note on interpreting correlations:*
+            - Values close to 1 indicate strong positive correlation
+            - Values close to -1 indicate strong negative correlation
+            - Values close to 0 indicate little to no correlation
+            - We expect negative correlation between Retrieved Position and Correct Answer (lower position = better)
+            - We expect positive correlation between Similarity scores and Correct Answer
+            
+            **Important:** Negative correlations for similarity scores might indicate:
+            1. An inverse relationship where lower similarity scores result in better answers (unusual)
+            2. Data anomalies or outliers affecting the correlation calculation
+            3. Inconsistencies in how similarity scores were calculated across different strategies
+            4. Small sample sizes leading to statistically insignificant correlations
+            
+            If you see negative correlations between similarity scores and correct answers, you may want to examine the 
+            raw data more closely to understand the underlying pattern.
+            """)
+            
+            # Add detailed correlation breakdown
+            st.markdown("#### Similarity Score Detailed Analysis")
+            
+            if 'similarity_scores' in corr_df.columns:
+                # Create scatter plots of min/max similarity vs correctness
+                corr_detail_col1, corr_detail_col2 = st.columns(2)
+                
+                with corr_detail_col1:
+                    # Calculate first/top similarity score (usually most relevant)
+                    corr_df['top_similarity'] = corr_df['similarity_scores'].apply(
+                        lambda x: max(x) if hasattr(x, '__len__') and len(x) > 0 else np.nan
+                    )
+                    
+                    # Create violin plot for top similarity score by answer correctness
+                    st.markdown("##### Top Similarity Score Distribution")
+                    fig_sim1, ax_sim1 = plt.subplots(figsize=(6, 4))
+                    
+                    # Create violin plot
+                    sns.violinplot(
+                        data=corr_df,
+                        x='Answer',
+                        y='top_similarity',
+                        ax=ax_sim1
+                    )
+                    
+                    ax_sim1.set_xlabel('Answer Correctness')
+                    ax_sim1.set_ylabel('Top Similarity Score')
+                    plt.tight_layout()
+                    st.pyplot(fig_sim1)
+                
+                with corr_detail_col2:
+                    # Calculate correlation values specifically for similarity metrics
+                    sim_corr = pd.DataFrame()
+                    if 'top_similarity' in corr_df.columns:
+                        sim_corr['Top Similarity'] = [corr_df['correct_answer'].corr(corr_df['top_similarity'])]
+                    if 'similarity_mean' in corr_df.columns:
+                        sim_corr['Avg Similarity'] = [corr_df['correct_answer'].corr(corr_df['similarity_mean'])]
+                    if 'min_similarity' in corr_df.columns:
+                        sim_corr['Min Similarity'] = [corr_df['correct_answer'].corr(corr_df['min_similarity'])]
+                    
+                    sim_corr.index = ['Correlation with Correct Answer']
+                    
+                    # Display the correlation values
+                    st.markdown("##### Similarity Correlations with Correct Answers")
+                    st.table(sim_corr.T)
+                    
+                    st.markdown("""
+                    **Interpreting these values:**
+                    - Positive values indicate that higher similarity corresponds to more correct answers
+                    - Negative values suggest that lower similarity corresponds to more correct answers
+                    - Values close to zero indicate little relationship between similarity and correctness
+                    
+                    Unexpected correlations may result from:
+                    - How chunks are selected and ranked
+                    - Quality of embeddings for different types of questions
+                    - Interactions between chunk size and content relevance
+                    """)
+        else:
+            st.warning("Correlation analysis requires correct_answer and retrieved_chunk_rank columns.")

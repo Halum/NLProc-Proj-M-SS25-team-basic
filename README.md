@@ -5,6 +5,10 @@
   - [Table of Contents](#table-of-contents)
   - [Overview](#overview)
   - [Overall Goal](#overall-goal)
+  - [Specialization: Legal RAG System](#specialization-legal-rag-system)
+    - [Introduction \& Motivation](#introduction--motivation)
+    - [Objectives](#objectives)
+    - [Research Questions](#research-questions)
   - [Project Status: Working Components and Areas for Improvement](#project-status-working-components-and-areas-for-improvement)
     - [What's Working Well](#whats-working-well)
     - [Areas for Improvement](#areas-for-improvement)
@@ -30,6 +34,38 @@ The primary goal of this project is to develop and analyze various Retrieval-Aug
 
 In later phase, extend the baseline RAG application to a certain specialization.
 
+## Specialization: Legal RAG System
+
+### Introduction & Motivation
+**Context:** Retrieval-Augmented Generation (RAG) has shown promise in open-domain QA and summarization.
+
+**Gap:** Legal practitioners need rapid identification of applicable statutes and subsections for incident descriptions.
+
+**Aim:** Extend our baseline RAG system to support multi-stage legal retrieval, mapping user-described incidents to relevant laws and subsections.
+
+### Objectives
+
+1. **Incident → Law Retrieval**
+   - Coarse retrieval of relevant Acts or Codes based on an incident embedding.
+
+2. **Law → Subsection Drill-Down**
+   - Fine-grained retrieval of sections/subsections, leveraging cross-reference graphs.
+
+3. **Explainable Summarization [Optional]**
+   - Generate human-readable rationales explaining why each statute applies.
+
+### Research Questions
+
+Further analysis is needed to narrow down these questions:
+
+- **What do you want to change about the baseline system?**
+  - Modifications to chunking strategies, embedding techniques, or retrieval methods specific to legal documents
+
+- **How are you going to measure your performance?**
+  - Potential metrics, evaluation frameworks, or comparison methodologies
+
+- **What data are you going to use?**
+  - Sources of legal texts, case studies, or benchmark datasets for system validation
 
 ## Project Status: Working Components and Areas for Improvement
 
