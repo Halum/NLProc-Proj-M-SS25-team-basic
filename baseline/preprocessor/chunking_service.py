@@ -1,3 +1,12 @@
+"""
+Module for text chunking strategies.
+This file contains a collection of classes that provide:
+1. Different document chunking strategies using various approaches
+2. An extensible framework for implementing custom chunking algorithms
+3. Preprocessing techniques for improving text segmentation quality
+4. Integration with NLP libraries for semantic and structural chunking
+"""
+
 from abc import ABC, abstractmethod
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
