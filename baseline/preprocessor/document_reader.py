@@ -1,9 +1,19 @@
+"""
+Module for document loading and parsing functionality.
+This file contains a collection of classes that provide:
+1. Abstraction for loading different document formats (PDF, TXT, DOCX)
+2. A unified interface for extracting text from various file types
+3. Document content extraction and basic text preprocessing
+4. Directory traversal for batch document processing
+"""
+
 import os
 from abc import ABC, abstractmethod
 import PyPDF2
 from pathlib import Path
 import docx
 
+SUPPORTED_FILE_TYPES = ['txt', 'pdf', 'docx']
 
 class DocumentLoaderAbs(ABC):
     """Abstract base class for document loaders."""
@@ -111,6 +121,12 @@ class DocumentReader:
         documents = []    
         
         for filename in os.listdir(directory):
+            file_type = filename.split('.')[-1].lower()
+            
+            if file_type not in SUPPORTED_FILE_TYPES:
+                print(f"[WARNING] Unsupported file type '{file_type}' for file '{filename}'. Skipping.")
+                continue
+            
             file_path = os.path.join(directory, filename)
             
             if os.path.isfile(file_path):

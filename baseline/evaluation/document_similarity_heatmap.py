@@ -1,3 +1,12 @@
+"""
+Module for document similarity visualization.
+This file provides functionality for:
+1. Generating embeddings for a collection of documents
+2. Computing similarity matrices between document embeddings
+3. Creating visual heatmaps of document similarities
+4. Analyzing relationships between documents in the corpus
+"""
+
 import os
 import numpy as np
 import seaborn as sns

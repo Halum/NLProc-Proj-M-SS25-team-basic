@@ -1,3 +1,11 @@
+"""
+Module for LLM and embedding functionality.
+This file contains the LLM class that provides:
+1. Text embedding generation using HuggingFace models
+2. Language model invocation for generating text responses
+3. Utility methods for handling embedding dimensions and model instantiation
+"""
+
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
@@ -54,33 +62,7 @@ class LLM:
         return embedding_model
     
     @staticmethod
-    def generate_answering_prompt(query, relevant_contexts):
-        """
-        Generate a prompt for the LLM to answer a question using relevant contexts.
-        
-        Args:
-            query (str): The question to be answered.
-            relevant_contexts (list): List of relevant text chunks to use as context.
-            
-        Returns:
-            str: A formatted prompt for the LLM.
-        """
-        context  = "\n\n".join(relevant_contexts)
-        
-        prompt = f"""You are a helpful assistant. Use the following context to provide to the point answer of the question.
-
-        Context:
-        {context}
-
-        Question:
-        {query}
-
-        Answer:"""
-        
-        return prompt
-    
-    @staticmethod
-    def invoke_llm(prompt):
+    def invoke_llm(prompt, creativity=False):
         """
         Invoke the language model to generate a response to the given prompt.
         
@@ -95,9 +77,16 @@ class LLM:
         
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True)
         
+        num_beams = 1
+        do_sample = False
+        
+        if creativity:
+            num_beams = 2
+            do_sample = True
+        
         with torch.no_grad():
-            outputs = model.generate(**inputs, max_new_tokens=100)
-            
+            outputs = model.generate(**inputs, max_new_tokens=128, num_beams=num_beams, do_sample=do_sample)
+
         answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
         
         return answer

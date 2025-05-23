@@ -1,4 +1,12 @@
-import dis
+"""
+Module for vector database functionality.
+This file contains the VectorStoreFaiss class that provides:
+1. FAISS-based vector storage and retrieval operations
+2. Efficient similarity search for finding relevant documents
+3. Persistence capabilities to save and load vector indices
+4. Low-level vector operations for the retrieval pipeline
+"""
+
 import faiss
 import numpy as np
 
@@ -47,3 +55,22 @@ class VectorStoreFaiss:
         distances, indices = self.__db.search(np.array(query_embedding), k=k)
         
         return distances, indices
+    
+    def save_index(self, index_path):
+        """
+        Save the current state of the vector store to a file.
+        
+        Args:
+            index_path (str): Path to save the index file.
+        """
+        faiss.write_index(self.__db, f"{index_path}.faiss")
+        
+    def load_index(self, index_path):
+        """
+        Load a vector store index from a file.
+        
+        Args:
+            index_path (str): Path to the index file to load.
+        """
+        
+        self.__db = faiss.read_index(f"{index_path}.faiss")
