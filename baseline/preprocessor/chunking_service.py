@@ -11,14 +11,15 @@ from abc import ABC, abstractmethod
 from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
     MarkdownHeaderTextSplitter,
+    CharacterTextSplitter,
+    NLTKTextSplitter,
 )
 from generator.llm import LLM
 from langchain_experimental.text_splitter import SemanticChunker
 from typing import List, Tuple
-from nltk.tokenize import sent_tokenize
 import nltk
 
-nltk.download("punkt_tab", quiet=True)
+nltk.download("punkt", quiet=True)
 
 
 class ChunkingStrategy(ABC):
@@ -36,7 +37,7 @@ class ChunkingStrategy(ABC):
 
 class FixedSizeChunkingStrategy(ChunkingStrategy):
     """
-    Chunking strategy that splits text into fixed-size chunks.
+    Chunking strategy that splits text into fixed-size chunks using LangChain.
     """
 
     def __init__(self, chunk_size: int):
@@ -47,10 +48,15 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
             chunk_size (int): The size of each chunk in characters.
         """
         self.chunk_size = chunk_size
+        self.splitter = CharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=0,
+            separator=""
+        )
 
     def chunk(self, text: str) -> list:
         """
-        Chunk the text into fixed-size pieces.
+        Chunk the text into fixed-size pieces using LangChain.
 
         Args:
             text (str): The text to be chunked.
@@ -58,13 +64,7 @@ class FixedSizeChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        
-        chunks = []
-        for i in range(0, len(text), self.chunk_size):
-            chunk = text[i:i + self.chunk_size]
-            chunks.append(chunk)
-        
-        return chunks
+        return self.splitter.split_text(text)
 
 
 class SlidingWindowChunkingStrategy(ChunkingStrategy):
@@ -102,7 +102,7 @@ class SlidingWindowChunkingStrategy(ChunkingStrategy):
 
 class SentenceBasedChunkingStrategy(ChunkingStrategy):
     """
-    Chunking strategy that splits text into sentences.
+    Chunking strategy that splits text into sentences using LangChain NLTK splitter.
     """
 
     def __init__(self, chunk_size: int = 1000):
@@ -113,10 +113,14 @@ class SentenceBasedChunkingStrategy(ChunkingStrategy):
             chunk_size (int): The size of each chunk in characters.
         """
         self.chunk_size = chunk_size
+        self.splitter = NLTKTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=0
+        )
 
     def chunk(self, text: str) -> list:
         """
-        Chunk the text into sentences.
+        Chunk the text into sentences using LangChain NLTK splitter.
 
         Args:
             text (str): The text to be chunked.
@@ -124,26 +128,12 @@ class SentenceBasedChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        sentences = sent_tokenize(text)
-        chunks = []
-        current_chunk = ""
-
-        for sentence in sentences:
-            if len(current_chunk) + len(sentence) + 1 <= self.chunk_size:
-                current_chunk += (" " if current_chunk else "") + sentence
-            else:
-                chunks.append(current_chunk)
-                current_chunk = sentence
-
-        if current_chunk:
-            chunks.append(current_chunk)
-
-        return chunks
+        return self.splitter.split_text(text)
 
 
 class ParagraphBasedChunkingStrategy(ChunkingStrategy):
     """
-    Chunking strategy that splits text into paragraphs.
+    Chunking strategy that splits text into paragraphs using LangChain.
     """
 
     def __init__(self, chunk_size: int = 1000):
@@ -154,10 +144,15 @@ class ParagraphBasedChunkingStrategy(ChunkingStrategy):
             chunk_size (int): The size of each chunk in characters.
         """
         self.chunk_size = chunk_size
+        self.splitter = CharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=0,
+            separator="\n\n"
+        )
 
     def chunk(self, text: str) -> list:
         """
-        Chunk the text into paragraphs.
+        Chunk the text into paragraphs using LangChain.
 
         Args:
             text (str): The text to be chunked.
@@ -165,21 +160,7 @@ class ParagraphBasedChunkingStrategy(ChunkingStrategy):
         Returns:
             list: A list of text chunks.
         """
-        paragraphs = text.split("\n\n")
-        chunks = []
-        current_chunk = ""
-
-        for paragraph in paragraphs:
-            if len(current_chunk) + len(paragraph) + 1 <= self.chunk_size:
-                current_chunk += ("\n\n" if current_chunk else "") + paragraph
-            else:
-                chunks.append(current_chunk)
-                current_chunk = paragraph
-
-        if current_chunk:
-            chunks.append(current_chunk)
-
-        return chunks
+        return self.splitter.split_text(text)
 
 
 class SemanticChunkingStrategy(ChunkingStrategy):
