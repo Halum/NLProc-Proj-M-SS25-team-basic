@@ -14,7 +14,7 @@ from langchain_text_splitters import (
     CharacterTextSplitter,
     NLTKTextSplitter,
 )
-from generator.llm import LLM
+from baseline.generator.llm import LLM
 from langchain_experimental.text_splitter import SemanticChunker
 from typing import List, Tuple
 import nltk

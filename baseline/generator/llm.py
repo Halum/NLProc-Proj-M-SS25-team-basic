@@ -10,7 +10,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 import torch
 
-from config.config import (
+from baseline.config.config import (
     EMBEDDING_MODEL,
     LLM_MODEL,
 )
