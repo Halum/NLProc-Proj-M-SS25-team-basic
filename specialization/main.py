@@ -13,7 +13,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from specialization.config.config import *
-from specialization.pipelines.raw_to_embeddings import EmbeddingsPipeline
+from specialization.pipelines.processed_to_embeddings import EmbeddingsPipeline
 from specialization.pipelines.raw_to_knowledge_graph import KnowledgeGraphPipeline
 from specialization.pipelines.raw_to_sqlite import SQLitePipeline
 

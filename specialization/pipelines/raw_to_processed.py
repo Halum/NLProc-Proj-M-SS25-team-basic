@@ -18,7 +18,6 @@ Features:
 import os
 import sys
 import pandas as pd
-import ast
 from typing import List, Dict
 from pathlib import Path
 import logging
@@ -32,6 +31,10 @@ from specialization.config.config import (
     TARGET_GENRES, PROCESSED_DOCUMENT_NAME, EXCLUDED_COLUMNS, FLATTEN_COLUMNS, RAW_DATA_FILES
 )
 from specialization.preprocessor.document_reader import SpecializedDocumentLoaderFactory
+from specialization.utils import (
+    exclude_columns, flatten_list_columns, extract_names_from_json_list,
+    safe_numeric_conversion
+)
 
 # Setup logging
 logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s')
@@ -83,7 +86,7 @@ class RawToProcessedPipeline:
                 filename = file_path.stem  # Get filename without extension
                 
                 # Early exclusion of unwanted columns for performance
-                df = self.exclude_columns(df)
+                df = exclude_columns(df, EXCLUDED_COLUMNS)
                 
                 csv_files[filename] = df
                 logger.info(f"Loaded {filename}: {len(df)} rows, {len(df.columns)} columns")
@@ -103,18 +106,7 @@ class RawToProcessedPipeline:
         Returns:
             List[str]: List of genre names
         """
-        if pd.isna(genres_str) or not genres_str:
-            return []
-            
-        try:
-            # Safely evaluate the string as a Python literal
-            genres_list = ast.literal_eval(genres_str)
-            if isinstance(genres_list, list):
-                return [genre.get('name', '') for genre in genres_list if isinstance(genre, dict)]
-            return []
-        except (ValueError, SyntaxError) as e:
-            logger.warning(f"Failed to parse genres: {genres_str[:50]}... Error: {e}")
-            return []
+        return extract_names_from_json_list(genres_str)
     
     def filter_by_genres(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -163,8 +155,7 @@ class RawToProcessedPipeline:
                 continue
                 
             # Ensure 'id' column is consistent type
-            df['id'] = pd.to_numeric(df['id'], errors='coerce')
-            df = df.dropna(subset=['id'])  # Remove rows with invalid IDs
+            df = safe_numeric_conversion(df, 'id')
             
             if result_df is None:
                 result_df = df.copy()
@@ -179,77 +170,6 @@ class RawToProcessedPipeline:
             raise ValueError("No valid DataFrames found for joining")
             
         return result_df
-    
-    def exclude_columns(self, df: pd.DataFrame, columns_to_exclude: List[str] = None) -> pd.DataFrame:
-        """
-        Exclude specified columns from DataFrame for performance optimization.
-        
-        Args:
-            df (pd.DataFrame): Input DataFrame
-            columns_to_exclude (List[str]): List of column names to exclude
-            
-        Returns:
-            pd.DataFrame: DataFrame with specified columns removed
-        """
-        columns_to_exclude = columns_to_exclude or EXCLUDED_COLUMNS
-        existing_columns = [col for col in columns_to_exclude if col in df.columns]
-        
-        if existing_columns:
-            df = df.drop(columns=existing_columns)
-            logger.info(f"Excluded columns: {existing_columns}")
-        
-        return df
-    
-    def flatten_list_columns(self, df: pd.DataFrame, columns_to_flatten: List[str] = None) -> pd.DataFrame:
-        """
-        Flatten specified columns that contain JSON-like list data to extract only names.
-        
-        Args:
-            df (pd.DataFrame): Input DataFrame
-            columns_to_flatten (List[str]): List of column names to flatten
-            
-        Returns:
-            pd.DataFrame: DataFrame with flattened columns
-        """
-        columns_to_flatten = columns_to_flatten or FLATTEN_COLUMNS
-        df = df.copy()
-        
-        for column in columns_to_flatten:
-            if column in df.columns:
-                df[column] = df[column].apply(self._extract_names_from_json_list)
-                logger.info(f"Flattened column: {column}")
-        
-        return df
-    
-    def _extract_names_from_json_list(self, json_str: str) -> List[str]:
-        """
-        Extract names from JSON-like string containing list of dictionaries.
-        
-        Args:
-            json_str (str): JSON string representation of list
-            
-        Returns:
-            List[str]: List of extracted names
-        """
-        if pd.isna(json_str) or not json_str:
-            return []
-            
-        try:
-            # Safely evaluate the string as a Python literal
-            items_list = ast.literal_eval(json_str)
-            if isinstance(items_list, list):
-                names = []
-                for item in items_list:
-                    if isinstance(item, dict):
-                        # Handle different possible name fields
-                        name = item.get('name') or item.get('english_name') or item.get('title', '')
-                        if name:
-                            names.append(name)
-                return names
-            return []
-        except (ValueError, SyntaxError) as e:
-            logger.warning(f"Failed to parse JSON list: {json_str[:50]}... Error: {e}")
-            return []
     
     def process_data(self) -> pd.DataFrame:
         """
@@ -275,7 +195,7 @@ class RawToProcessedPipeline:
         joined_df = self.join_dataframes(dataframes)
         
         # Step 4: Flatten specified columns
-        joined_df = self.flatten_list_columns(joined_df)
+        joined_df = flatten_list_columns(joined_df, FLATTEN_COLUMNS)
         
         logger.info(f"Final processed dataset: {len(joined_df)} rows, {len(joined_df.columns)} columns")
         return joined_df
@@ -330,11 +250,10 @@ def main():
     try:
         pipeline = RawToProcessedPipeline()
         output_path = pipeline.run()
-        print("✅ Pipeline completed successfully!")
-        print(f"📁 Output saved to: {output_path}")
+        logger.info("✅ Pipeline completed successfully!")
+        logger.info(f"📁 Output saved to: {output_path}")
         
     except Exception as e:
-        print(f"❌ Pipeline failed: {e}")
         logger.error(f"Pipeline execution failed: {e}")
         sys.exit(1)
 
