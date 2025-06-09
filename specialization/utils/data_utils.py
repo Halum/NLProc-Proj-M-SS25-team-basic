@@ -10,9 +10,50 @@ pipelines and components.
 import pandas as pd
 import ast
 import logging
-from typing import List
+from typing import List, Dict, Any
 
 logger = logging.getLogger(__name__)
+
+
+def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str], 
+                       required_column: str = None) -> List[Dict[str, Any]]:
+    """
+    Filter JSON data to keep only specified columns.
+    
+    This function is the complement to exclude_columns but works with JSON data
+    instead of pandas DataFrames. It filters a list of dictionaries to keep only
+    the specified columns.
+    
+    Args:
+        data (List[Dict[str, Any]]): List of dictionaries (JSON data)
+        columns_to_keep (List[str]): List of column names to keep
+        required_column (str, optional): Column that must have a value for item to be included
+        
+    Returns:
+        List[Dict[str, Any]]: Filtered data with only specified columns
+    """
+    if not columns_to_keep:
+        return data
+        
+    filtered_data = []
+    for item in data:
+        filtered_item = {}
+        for column in columns_to_keep:
+            if column in item:
+                filtered_item[column] = item[column]
+            else:
+                logger.warning(f"Column '{column}' not found in item with id: {item.get('id', 'unknown')}")
+                filtered_item[column] = None
+        
+        # Only include items that have the required column with a value
+        if required_column:
+            if filtered_item.get(required_column):
+                filtered_data.append(filtered_item)
+        else:
+            filtered_data.append(filtered_item)
+    
+    logger.info(f"Filtered {len(data)} items to {len(filtered_data)} items with columns: {columns_to_keep}")
+    return filtered_data
 
 
 def exclude_columns(df: pd.DataFrame, columns_to_exclude: List[str]) -> pd.DataFrame:

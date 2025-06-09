@@ -4,19 +4,19 @@ Specialized configuration module.
 This module provides configuration settings that extend and override
 the baseline configuration for specialized NLP processing tasks.
 """
-# Document loader configs
-RAW_DOCUMENT_DIR_PATH = 'specialization/data/raw/'
 
+RAW_DOCUMENT_DIR_PATH = 'specialization/data/raw/'
 PROCESSED_DOCUMENT_DIR_PATH = 'specialization/data/processed/'
+
+# Processing pipeline configurations
 RAW_DATA_FILES = [
     'movies_metadata.csv',
     'credits.csv',
     'keywords.csv',
 ]
-PROCESSED_DOCUMENT_NAME = 'processed_movies_data.json'
 TARGET_GENRES = ['Family', 'Mystery', 'Western']
+PROCESSED_DOCUMENT_NAME = 'processed_movies_data.json'
 
-# Data processing configurations
 EXCLUDED_COLUMNS = [
     'crew',
     'belongs_to_collection', 
@@ -35,6 +35,18 @@ FLATTEN_COLUMNS = [
     'production_companies',
     'genres',
 ]
+
+# Embedding pipeline configurations
+EMBEDDING_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast']
+CHUNKING_COLUMN = 'overview'
+CHUNK_SIZE = 1000
+VECTOR_STORE_TYPE = 'chromadb'  # Using ChromaDB for this pipeline
+VECTOR_COLLECTION_NAME = 'movie_embeddings'
+VECTOR_PERSIST_DIRECTORY = 'specialization/data/db/chroma_db'
+
+# Batch processing settings
+EMBEDDING_BATCH_SIZE = 2500  # Max batch size for ChromaDB operations
+
 DB_INDEX_PATH = 'specialization/data/db/'
 KG_OUTPUT_PATH = 'specialization/data/knowledge_graphs/'
 EMBEDDINGS_OUTPUT_PATH = 'specialization/data/embeddings/'
@@ -42,7 +54,7 @@ SQLITE_OUTPUT_PATH = 'specialization/data/sqlite/'
 TEST_QUESTIONS_PATH = 'specialization/data/tests/test_input.json'
 
 # Specialized model configurations
-ENHANCED_EMBEDDING_MODEL = 'all-mpnet-base-v2'  # Better for semantic similarity
+EMBEDDING_MODEL = 'all-mpnet-base-v2'  # Better for semantic similarity
 GRAPH_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L12-v2'
 
 # Knowledge Graph settings

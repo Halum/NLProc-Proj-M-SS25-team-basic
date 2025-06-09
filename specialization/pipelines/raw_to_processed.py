@@ -57,7 +57,7 @@ class RawToProcessedPipeline:
             target_genres (List[str]): List of genres to filter for
         """
         self.raw_data_path = raw_data_path or RAW_DOCUMENT_DIR_PATH
-        self.raw_fiels = RAW_DATA_FILES
+        self.raw_files = RAW_DATA_FILES
         self.processed_data_path = processed_data_path or PROCESSED_DOCUMENT_DIR_PATH
         self.target_genres = target_genres or TARGET_GENRES
         self.document_loader = SpecializedDocumentLoaderFactory()
@@ -78,7 +78,7 @@ class RawToProcessedPipeline:
         csv_files = {}
         raw_path = Path(self.raw_data_path)
         
-        for file in self.raw_fiels:
+        for file in self.raw_files:
             file_path = raw_path / file
             try:
                 loader = self.document_loader.get_loader(str(file_path))
@@ -186,11 +186,12 @@ class RawToProcessedPipeline:
             raise ValueError("No CSV files found in raw data directory")
         
         # Step 2: Filter movies_metadata by genres first (before joining for efficiency)
-        if 'movies_metadata' in dataframes:
-            dataframes['movies_metadata'] = self.filter_by_genres(dataframes['movies_metadata'])
+        base_dataframe_name = Path(RAW_DATA_FILES[0]).stem
+        if base_dataframe_name in dataframes:
+            dataframes[base_dataframe_name] = self.filter_by_genres(dataframes[base_dataframe_name])
         else:
-            logger.warning("movies_metadata.csv not found - cannot filter by genres")
-        
+            logger.warning(f"{base_dataframe_name}.csv not found - cannot filter by genres")
+
         # Step 3: Join all DataFrames
         joined_df = self.join_dataframes(dataframes)
         
@@ -231,18 +232,16 @@ class RawToProcessedPipeline:
             str: Path to the output JSON file
         """
         try:
-            # Process the data
+            # Step 1: Process the data
             processed_df = self.process_data()
-            
-            # Save to JSON
+
+            # Step 2: Save to JSON
             output_path = self.save_to_json(processed_df)
             
-            logger.info("Pipeline completed successfully")
             return output_path
             
         except Exception as e:
-            logger.error(f"Pipeline failed: {e}")
-            raise
+            raise e
 
 
 def main():
