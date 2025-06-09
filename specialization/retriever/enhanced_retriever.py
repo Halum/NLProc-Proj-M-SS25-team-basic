@@ -14,9 +14,9 @@ from typing import List, Dict, Any
 # Add baseline to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from baseline.generator.llm import LLM
+from specialization.generator.enhanced_llm import EnhancedLLM
 from specialization.retriever.vector_store_chroma import VectorStoreChroma
-from specialization.config.config import VECTOR_COLLECTION_NAME, VECTOR_PERSIST_DIRECTORY, EMBEDDING_MODEL
+from specialization.config.config import VECTOR_COLLECTION_NAME, VECTOR_PERSIST_DIRECTORY
 
 
 class EnhancedRetriever:
@@ -41,8 +41,7 @@ class EnhancedRetriever:
         self.__vector_store = VectorStoreChroma(
             embedding_dim=embedding_dim,
             collection_name=VECTOR_COLLECTION_NAME,
-            persist_directory=VECTOR_PERSIST_DIRECTORY,
-            embedding_model=EMBEDDING_MODEL
+            persist_directory=VECTOR_PERSIST_DIRECTORY
         )
         
         if fresh_db:
@@ -50,9 +49,9 @@ class EnhancedRetriever:
             self.__reset__()
         
     def _get_embedding_dimensions(self) -> int:
-        """Get the embedding dimensions from the LLM module."""
+        """Get the embedding dimensions from the EnhancedLLM module."""
         try:
-            return LLM.embedding_dimensions()
+            return EnhancedLLM.embedding_dimensions()
         except (AttributeError, ImportError, Exception) as e:
             raise e
         
@@ -140,7 +139,7 @@ class EnhancedRetriever:
         Returns:
             List[Dict[str, Any]]: List of results with content, metadata, and scores.
         """
-        return self.__vector_store.search_with_metadata(query, k=k, filter_dict=filter_dict)
+        return self.__vector_store.search(query, k=k, filter_dict=filter_dict)
     
     def get_collection_info(self) -> Dict[str, Any]:
         """

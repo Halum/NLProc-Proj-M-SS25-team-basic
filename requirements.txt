@@ -10,9 +10,9 @@ jaraco.collections==5.1.0
 langchain-chroma==0.2.4
 langchain-experimental==0.3.4
 langchain-huggingface==0.2.0
+langchain-openai==0.3.21
 nbconvert==7.16.6
 nltk==3.9.1
-openai==1.77.0
 pip-chill==1.0.3
 pypdf2==3.0.1
 python-docx==1.1.2

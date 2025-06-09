@@ -5,6 +5,14 @@ This module provides configuration settings that extend and override
 the baseline configuration for specialized NLP processing tasks.
 """
 
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path, override=True)
+
 RAW_DOCUMENT_DIR_PATH = 'specialization/data/raw/'
 PROCESSED_DOCUMENT_DIR_PATH = 'specialization/data/processed/'
 
@@ -53,9 +61,10 @@ EMBEDDINGS_OUTPUT_PATH = 'specialization/data/embeddings/'
 SQLITE_OUTPUT_PATH = 'specialization/data/sqlite/'
 TEST_QUESTIONS_PATH = 'specialization/data/tests/test_input.json'
 
-# Specialized model configurations
-EMBEDDING_MODEL = 'all-mpnet-base-v2'  # Better for semantic similarity
-GRAPH_EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L12-v2'
+# Specialized model configurations - OpenAI only
+# OpenAI API configuration
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_EMBEDDING_MODEL = 'text-embedding-ada-002'  # OpenAI's embedding model
 
 # Knowledge Graph settings
 KG_EXTRACTION_MODEL = 'spacy'  # or 'transformers'

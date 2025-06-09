@@ -9,10 +9,13 @@ This file contains the VectorStoreChroma class that provides:
 
 import os
 import uuid
-import shutil
 from typing import List, Dict, Any, Optional
 from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+
+# Import the enhanced LLM for better embedding support
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from specialization.generator.enhanced_llm import EnhancedLLM
 
 
 class VectorStoreChroma:
@@ -25,7 +28,7 @@ class VectorStoreChroma:
     """
     
     def __init__(self, embedding_dim: int, collection_name: str = "default_collection", 
-                 persist_directory: str = "chroma_db", embedding_model: str = "all-mpnet-base-v2"):
+                 persist_directory: str = "chroma_db"):
         """
         Initialize the ChromaDB vector store with specified embedding dimensions.
         
@@ -33,18 +36,14 @@ class VectorStoreChroma:
             embedding_dim (int): Dimensionality of the embedding vectors.
             collection_name (str): Name of the ChromaDB collection.
             persist_directory (str): Directory to persist the database.
-            embedding_model (str): Name of the embedding model to use.
         """
         self.embedding_dim = embedding_dim
         self.collection_name = collection_name
         self.persist_directory = persist_directory
-        self.embedding_model_name = embedding_model
+        self.embedding_model = EnhancedLLM.embedding_model()
         
         # Create directory if it doesn't exist
         os.makedirs(persist_directory, exist_ok=True)
-        
-        # Initialize embedding model
-        self.embedding_model = HuggingFaceEmbeddings(model_name=embedding_model)
         
         # Initialize LangChain Chroma vector store (handles persistence automatically)
         self.__db = Chroma(
