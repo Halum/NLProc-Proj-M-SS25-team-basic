@@ -7,6 +7,7 @@ cleaning, and transformation operations that can be used across different
 pipelines and components.
 """
 
+from math import e
 import pandas as pd
 import ast
 import logging
@@ -15,8 +16,7 @@ from typing import List, Dict, Any
 logger = logging.getLogger(__name__)
 
 
-def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str], 
-                       required_column: str = None) -> List[Dict[str, Any]]:
+def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str]) -> List[Dict[str, Any]]:
     """
     Filter JSON data to keep only specified columns.
     
@@ -38,6 +38,7 @@ def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str],
     filtered_data = []
     for item in data:
         filtered_item = {}
+        
         for column in columns_to_keep:
             if column in item:
                 filtered_item[column] = item[column]
@@ -46,11 +47,7 @@ def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str],
                 filtered_item[column] = None
         
         # Only include items that have the required column with a value
-        if required_column:
-            if filtered_item.get(required_column):
-                filtered_data.append(filtered_item)
-        else:
-            filtered_data.append(filtered_item)
+        filtered_data.append(filtered_item)
     
     logger.info(f"Filtered {len(data)} items to {len(filtered_data)} items with columns: {columns_to_keep}")
     return filtered_data
@@ -241,3 +238,88 @@ def sample_dataframe(df: pd.DataFrame, sample_size: int, random_state: int = 42)
     logger.info(f"Sampled dataset size: {len(sampled_df)} rows")
     
     return sampled_df
+
+
+def concatenate_columns_to_chunking(data: List[Dict[str, Any]], chunking_column: str, 
+                                  columns_to_add: List[Dict[str, str]]) -> List[Dict[str, Any]]:
+    """
+    Concatenate additional columns to the chunking column using specified prefixes.
+    
+    This function enhances the main chunking column by appending content from other
+    columns with customizable prefixes. This is useful for enriching the text that
+    will be used for chunking and embedding generation.
+    
+    Args:
+        data (List[Dict[str, Any]]): List of dictionaries (JSON data)
+        chunking_column (str): Name of the main column used for chunking
+        columns_to_add (List[Dict[str, str]]): List of column configurations with format:
+            [{'column': 'column_name', 'prefix': 'Prefix text '}]
+            
+    Returns:
+        List[Dict[str, Any]]: Data with enhanced chunking column
+        
+    Example:
+        >>> data = [{'overview': 'A great movie', 'cast': 'Actor1, Actor2'}]
+        >>> columns_to_add = [{'column': 'cast', 'prefix': 'Starring: '}]
+        >>> result = concatenate_columns_to_chunking(data, 'overview', columns_to_add)
+        >>> result[0]['overview']  # 'A great movie. Starring: Actor1, Actor2'
+    """
+    if not columns_to_add or not chunking_column:
+        logger.info("No columns to concatenate or chunking column not specified")
+        return data
+    
+    enhanced_data = []
+    successful_concatenations = 0
+    chunking_column_no_data = 0
+    
+    for item in data:
+        enhanced_item = item.copy()
+        
+        # Get the base chunking column content
+        base_content = item.get(chunking_column, '')
+        if not base_content:
+            logger.warning(f"Item missing chunking column '{chunking_column}': {item.get('title', 'unknown')}")
+            chunking_column_no_data += 1
+            # enhanced_data.append(enhanced_item)
+            # continue
+            
+        # Build the enhanced content
+        enhanced_content = str(base_content).strip()
+        
+        for column_config in columns_to_add:
+            column_name = column_config.get('column')
+            prefix = column_config.get('prefix', '')
+            
+            if not column_name:
+                logger.warning(f"Column name not specified in config: {column_config}")
+                continue
+                
+            # Get the additional column content
+            additional_content = item.get(column_name)
+            if additional_content:
+                # Handle list content (like cast arrays)
+                if isinstance(additional_content, list):
+                    additional_text = ', '.join(str(item) for item in additional_content if item)
+                else:
+                    additional_text = str(additional_content).strip()
+                
+                if additional_text:
+                    # Add separator and prefix with additional content
+                    separator = '. ' if enhanced_content and not enhanced_content.endswith('.') else ' '
+                    enhanced_content += f"{separator}{prefix}{additional_text}"
+                    successful_concatenations += 1
+                else:
+                    logger.warning(f"Column '{column_name}' is empty for item: {item.get('title', 'unknown')}")
+            else:
+                logger.warning(f"Column '{column_name}' not found in item: {item.get('title', 'unknown')}")
+                    
+        
+        # Update the chunking column with enhanced content
+        enhanced_item[chunking_column] = enhanced_content
+        enhanced_data.append(enhanced_item)
+    
+    logger.info(f"Value missing chunking column '{chunking_column}': {chunking_column_no_data}")
+    logger.info(f"Enhanced {len(enhanced_data)} items with {successful_concatenations} successful concatenations")
+    logger.info(f"Concatenated columns {[config.get('column') for config in columns_to_add]} to '{chunking_column}'")
+
+    return enhanced_data

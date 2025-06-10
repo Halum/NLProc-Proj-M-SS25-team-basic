@@ -17,13 +17,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from baseline.preprocessor.chunking_service import FixedSizeChunkingStrategy
 from specialization.retriever.enhanced_retriever import EnhancedRetriever
-from specialization.utils.data_utils import filter_json_columns
+from specialization.utils.data_utils import filter_json_columns, concatenate_columns_to_chunking
 from specialization.config.config import (
     PROCESSED_DOCUMENT_DIR_PATH,
     PROCESSED_DOCUMENT_NAME,
-    EMBEDDING_COLUMNS_TO_KEEP,
-    CHUNKING_COLUMN,
-    CHUNK_SIZE
+    DATA_COLUMNS_TO_KEEP,
+    CHUNK_SIZE,
+    ADD_TO_CHUNKING_COLUMN,
+    CHUNKING_COLUMN
 )
 
 # Setup logging
@@ -56,7 +57,7 @@ class ProcessedToEmbeddingsRetrieverPipeline:
             self.processed_data_path = Path(PROCESSED_DOCUMENT_DIR_PATH) / PROCESSED_DOCUMENT_NAME
             
         logger.info(f"Pipeline initialized - Processed data: {self.processed_data_path}")
-        logger.info(f"Chunk size: {self.chunk_size}, Columns to keep: {EMBEDDING_COLUMNS_TO_KEEP}")
+        logger.info(f"Chunk size: {self.chunk_size}, Columns to keep: {DATA_COLUMNS_TO_KEEP}")
         
     def load_processed_data(self) -> List[Dict[str, Any]]:
         """
@@ -71,10 +72,13 @@ class ProcessedToEmbeddingsRetrieverPipeline:
             data = json.load(f)
         
         # Filter to keep only specified columns using utility function
-        filtered_data = filter_json_columns(data, EMBEDDING_COLUMNS_TO_KEEP, CHUNKING_COLUMN)
+        filtered_data = filter_json_columns(data, DATA_COLUMNS_TO_KEEP)
         
-        logger.info(f"Loaded {len(filtered_data)} documents with required columns")
-        return filtered_data
+        # Concatenate additional columns to chunking column using ADD_TO_CHUNKING_COLUMN
+        enhanced_data = concatenate_columns_to_chunking(filtered_data, CHUNKING_COLUMN, ADD_TO_CHUNKING_COLUMN)
+        
+        logger.info(f"Loaded {len(enhanced_data)} documents with required columns and enhanced chunking content")
+        return enhanced_data
     
     def run(self) -> str:
         """
@@ -86,11 +90,11 @@ class ProcessedToEmbeddingsRetrieverPipeline:
         logger.info("Starting enhanced embeddings pipeline")
         
         try:
-            # Step 1: Load and filter processed data
+            # Step 1: Load, filter, and enhance processed data
             documents = self.load_processed_data()
             
             # Step 2: Add processed documents to retriever
-            chunks_count = self.retriever.add_documents(documents, CHUNKING_COLUMN)
+            chunks_count = self.retriever.add_documents(documents)
             logger.info(f"Generated {chunks_count} chunks")
             
             # Step 5: Get collection info
@@ -98,36 +102,6 @@ class ProcessedToEmbeddingsRetrieverPipeline:
 
         except Exception as e:
             raise e
-    
-    def search_similar(self, query: str, k: int = 5, filter_dict: Dict[str, Any] = None) -> List[Dict[str, Any]]:
-        """
-        Search for similar documents using the retriever.
-        
-        Args:
-            query (str): Query text
-            k (int): Number of results to return
-            filter_dict (Dict[str, Any]): Optional metadata filter
-            
-        Returns:
-            List[Dict[str, Any]]: Search results
-        """
-        if filter_dict:
-            return self.retriever.query_with_metadata(query=query, k=k, filter_dict=filter_dict)
-        else:
-            return self.retriever.query_with_metadata(query=query, k=k)
-    
-    def search_baseline_compatible(self, query: str, k: int = 5):
-        """
-        Search using baseline-compatible interface.
-        
-        Args:
-            query (str): Query text
-            k (int): Number of results to return
-            
-        Returns:
-            tuple: (chunks, distances) following baseline pattern
-        """
-        return self.retriever.query(query, k=k)
 
 
 def main():

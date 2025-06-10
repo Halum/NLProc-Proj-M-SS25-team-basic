@@ -46,8 +46,13 @@ FLATTEN_COLUMNS = [
 ]
 
 # Embedding pipeline configurations
-EMBEDDING_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast']
+DATA_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast']
+METADATA_COLUMNS = ['title', 'revenue']
+ADD_TO_CHUNKING_COLUMN = [
+    {'column': 'cast', 'prefix': 'Starring with '}
+]
 CHUNKING_COLUMN = 'overview'
+
 CHUNK_SIZE = 1000
 VECTOR_STORE_TYPE = 'chromadb'  # Using ChromaDB for this pipeline
 VECTOR_COLLECTION_NAME = 'movie_embeddings'

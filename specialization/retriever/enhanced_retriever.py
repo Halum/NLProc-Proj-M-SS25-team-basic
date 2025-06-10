@@ -8,9 +8,11 @@ This file contains the EnhancedRetriever class that extends the baseline Retriev
 5. LangChain compatibility for RAG chains
 """
 
+from re import L
 import sys
 import os
 from typing import List, Dict, Any, Optional
+import logging
 
 # Add baseline to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -21,8 +23,11 @@ from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 from specialization.generator.enhanced_llm import EnhancedLLM
 from specialization.retriever.vector_store_chroma import VectorStoreChroma
-from specialization.config.config import VECTOR_COLLECTION_NAME, VECTOR_PERSIST_DIRECTORY
+from specialization.config.config import VECTOR_COLLECTION_NAME, VECTOR_PERSIST_DIRECTORY, METADATA_COLUMNS, CHUNKING_COLUMN
 
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class EnhancedRetriever:
     """
@@ -102,7 +107,7 @@ class EnhancedRetriever:
             metadatas=chunk_metadatas
         )
     
-    def add_documents(self, processed_data: List[Dict[str, Any]], chunk_column: str):
+    def add_documents(self, processed_data: List[Dict[str, Any]]):
         """
         Add processed documents with metadata (specialized functionality).
         
@@ -114,18 +119,25 @@ class EnhancedRetriever:
         metadatas = []
         
         for item in processed_data:
-            if chunk_column in item and item[chunk_column]:
-                documents.append(item[chunk_column])
+            if CHUNKING_COLUMN in item and item[CHUNKING_COLUMN]:
+                documents.append(item[CHUNKING_COLUMN])
                 # Create metadata from all other columns
-                metadata = {k: v for k, v in item.items() if k != chunk_column}
-                # Convert lists to strings for ChromaDB compatibility
-                for key, value in metadata.items():
-                    if isinstance(value, list):
-                        metadata[key] = ', '.join(str(v) for v in value)
+                metadata = {}
+                for k, v in item.items():
+                    if k in METADATA_COLUMNS:
+                        # Lowercase string values for efficient matching
+                        if isinstance(v, str):
+                            metadata[k] = v.lower()
+                        # Convert lists to strings for ChromaDB compatibility
+                        elif isinstance(v, list):
+                            metadata[k] = ', '.join(str(v) for v in v)
+                        else:
+                            metadata[k] = v
+
                 metadatas.append(metadata)
-        
+
         self._process_and_store_documents(documents, metadatas)
-        
+
         # Get collection info to verify preprocessing worked
         db_info = self.get_collection_info()
         
@@ -144,7 +156,17 @@ class EnhancedRetriever:
         Returns:
             List[Dict[str, Any]]: List of results with content, metadata, and scores.
         """
-        return self.__vector_store.search(query, k=k, filter_dict=filter_dict)
+        # Preprocess filter values to match metadata preprocessing
+        processed_filter = None
+        if filter_dict:
+            processed_filter = {}
+            for key, value in filter_dict.items():
+                if isinstance(value, str):
+                    processed_filter[key] = value.lower()
+                else:
+                    processed_filter[key] = value
+        
+        return self.__vector_store.search(query, k=k, filter_dict=processed_filter)
     
     def get_collection_info(self) -> Dict[str, Any]:
         """

@@ -184,4 +184,7 @@ personal/*
 specialization/data/raw/*
 !specialization/data/raw/.keep
 
+specialization/data/db/chroma_db/*
+!specialization/data/db/chroma_db/.keep
+
 *.lock

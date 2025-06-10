@@ -96,33 +96,38 @@ class VectorStoreChroma:
     def search(self, query: str, k: int = 5, 
                            filter_dict: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """
-        Enhanced search method that returns results with metadata.
+        Enhanced search method that returns results with metadata using ChromaDB's native filtering.
         
         Args:
             query (str): Query text to search for.
             k (int): Number of results to return.
-            filter_dict (Optional[Dict[str, Any]]): Metadata filter dictionary.
+            filter_dict (Optional[Dict[str, Any]]): Metadata filter dictionary in ChromaDB format.
             
         Returns:
             List[Dict[str, Any]]: List of search results with content and metadata.
         """
-        # Perform similarity search with metadata
-        results = self.__db.similarity_search_with_score(
-            query=query,
-            k=k,
-            filter=filter_dict
-        )
-        
-        # Format results
-        formatted_results = []
-        for doc, score in results:
-            formatted_results.append({
-                'content': doc.page_content,
-                'metadata': doc.metadata,
-                'score': score
-            })
-        
-        return formatted_results
+        try:
+            # Use the filter_dict directly - it should already be in ChromaDB format from QueryParser
+            results = self.__db.similarity_search_with_score(
+                query=query,
+                k=k,
+                filter=filter_dict
+            )
+            
+            # Format results to match expected output
+            formatted_results = []
+            for doc, score in results:
+                formatted_results.append({
+                    'content': doc.page_content,
+                    'metadata': doc.metadata,
+                    'score': score
+                })
+            
+            return formatted_results
+            
+        except Exception as e:
+            print(f"Error during search: {e}")
+            return []
     
     def get_collection_info(self) -> Dict[str, Any]:
         """

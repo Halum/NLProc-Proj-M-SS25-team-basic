@@ -33,6 +33,7 @@ from langchain.prompts import PromptTemplate
 from baseline.preprocessor.chunking_service import FixedSizeChunkingStrategy
 from specialization.retriever.enhanced_retriever import EnhancedRetriever
 from specialization.generator.enhanced_llm import EnhancedLLM
+from specialization.generator.query_parser import QueryParser
 from specialization.config.config import (
     CHUNK_SIZE
 )
@@ -55,7 +56,7 @@ class UserQueryPipeline:
         Args:
             chunk_size (int): Size for text chunking
             use_existing_db (bool): Whether to use existing database or recreate
-        """
+        """        
         self.chunk_size = chunk_size or CHUNK_SIZE
         self.chunking_strategy = FixedSizeChunkingStrategy(chunk_size=self.chunk_size)
         
@@ -67,6 +68,9 @@ class UserQueryPipeline:
         
         # Initialize LLM
         self.llm = EnhancedLLM.chat_model()
+        
+        # Initialize query parser for metadata extraction
+        self.query_parser = QueryParser()
         
         # Create custom RAG prompt template
         self.rag_prompt = PromptTemplate(
@@ -110,19 +114,17 @@ class UserQueryPipeline:
     def query_basic_rag(self, query: str, k: int = 5, 
                        filter_dict: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """
-        Perform basic RAG operation with direct retrieval and generation.
+        Perform basic RAG operation with automatic metadata parsing and filtering.
         
         Args:
             query (str): User query
             k (int): Number of documents to retrieve
-            filter_dict (Optional[Dict]): Metadata filter
+            filter_dict (Optional[Dict]): Manual metadata filter (overrides parsing)
             
         Returns:
             Dict: Response with answer, context, and metadata
-        """
-        logger.info(f"Processing query: {query[:50]}...")
-        
-        # Retrieve relevant documents
+        """        
+        # Retrieve relevant documents with metadata filtering
         retrieved_docs = self.retriever.query(query, k=k, filter_dict=filter_dict)
         
         if not retrieved_docs:
@@ -130,13 +132,14 @@ class UserQueryPipeline:
                 'answer': "I couldn't find any relevant information to answer your question.",
                 'context': [],
                 'query': query,
-                'filter_applied': filter_dict
+                'filter_applied': filter_dict,
+                'num_retrieved': 0
             }
         
         # Format context
         context = self._format_context(retrieved_docs)
         
-        # Generate answer using LLM
+        # Generate answer using LLM with the original question for context
         prompt = self.rag_prompt.format(context=context, question=query)
         answer = self.llm.invoke(prompt).content
         
@@ -147,92 +150,7 @@ class UserQueryPipeline:
             'filter_applied': filter_dict,
             'num_retrieved': len(retrieved_docs)
         }
-    
-    def query_langchain_rag(self, query: str, k: int = 5,
-                           filter_dict: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Perform RAG operation using LangChain RetrievalQA chain.
-        
-        Args:
-            query (str): User query
-            k (int): Number of documents to retrieve
-            filter_dict (Optional[Dict]): Metadata filter
-            
-        Returns:
-            Dict: Response with answer and metadata
-        """
-        logger.info(f"Processing LangChain RAG query: {query[:50]}...")
-        
-        # Get LangChain-compatible retriever
-        langchain_retriever = self.retriever.as_langchain_retriever(k=k, filter_dict=filter_dict)
-        
-        # Create RetrievalQA chain
-        qa_chain = RetrievalQA.from_chain_type(
-            llm=self.llm,
-            chain_type="stuff",
-            retriever=langchain_retriever,
-            chain_type_kwargs={"prompt": self.rag_prompt},
-            return_source_documents=True
-        )
-        
-        # Run the chain
-        result = qa_chain({"query": query})
-        
-        # Format source documents
-        source_docs = []
-        for doc in result.get('source_documents', []):
-            source_docs.append({
-                'content': doc.page_content,
-                'metadata': doc.metadata
-            })
-        
-        return {
-            'answer': result['result'],
-            'context': source_docs,
-            'query': query,
-            'filter_applied': filter_dict,
-            'num_retrieved': len(source_docs)
-        }
-    
-    def _parse_filter_input(self, filter_input: str) -> Optional[Dict[str, Any]]:
-        """
-        Parse user filter input into metadata filter dictionary.
-        
-        Args:
-            filter_input (str): User input for filters
-            
-        Returns:
-            Optional[Dict]: Parsed filter dictionary or None
-        """
-        if not filter_input.strip():
-            return None
-            
-        try:
-            # Simple parsing for common movie metadata filters
-            filters = {}
-            parts = filter_input.split(',')
-            
-            for part in parts:
-                if '=' in part:
-                    key, value = part.split('=', 1)
-                    key = key.strip()
-                    value = value.strip().strip('"\'')
-                    
-                    # Convert to appropriate type
-                    if key in ['revenue', 'budget']:
-                        try:
-                            filters[key] = float(value)
-                        except ValueError:
-                            filters[key] = value
-                    else:
-                        filters[key] = value
-            
-            return filters if filters else None
-            
-        except Exception as e:
-            logger.warning(f"Could not parse filter: {filter_input}. Error: {e}")
-            return None
-    
+
     def _display_results(self, result: Dict[str, Any], show_context: bool = False):
         """
         Display query results in a formatted way.
@@ -258,10 +176,13 @@ class UserQueryPipeline:
             print("-" * 40)
             for i, doc in enumerate(result['context']):
                 metadata = doc.get('metadata', {})
-                title = metadata.get('title', 'Unknown')
-                score = metadata.get('score', 'N/A')
+                title = metadata.get('title', 'Unknown').title()
+                score = doc.get('score', 'N/A')  # Score is at document level, not in metadata
+                # Format score to 4 decimal places if it's a number
+                if isinstance(score, (int, float)):
+                    score = f"{score:.3f}"
                 print(f"\n[{i+1}] Movie: {title} (Score: {score})")
-                print(f"Content: {doc['content'][:200]}...")
+                print(f"Content: {doc['content'][:150]}...")
         
         print("="*80)
     
@@ -309,23 +230,10 @@ class UserQueryPipeline:
                     print("- Type 'context' to toggle context display")
                     continue
                 
-                # Get filter input
-                # filter_input = input("🔍 Enter filters (optional, e.g., 'genres=Comedy'): ").strip()
-                # filter_dict = self._parse_filter_input(filter_input)
+                show_context = True
                 
-                # Get RAG method choice
-                # method = input("⚙️  Choose method (basic/langchain) [basic]: ").strip().lower()
-                # if not method:
-                #     method = 'basic'
-                
-                # Get context display preference
-                # show_context = input("📄 Show retrieved context? (y/n) [n]: ").strip().lower() == 'y'
-                show_context = True  # Always show context for now
-                # Process query
-                # if method == 'langchain':
-                #     result = self.query_langchain_rag(query, k=5, filter_dict=filter_dict)
-                # else:
-                result = self.query_basic_rag(query, k=5)
+                parsed_query, parsed_filters = self.query_parser.parse_with_chroma_filters(query)
+                result = self.query_basic_rag(parsed_query, k=5, filter_dict=parsed_filters)
                 
                 # Display results
                 self._display_results(result, show_context=show_context)
@@ -352,8 +260,6 @@ class UserQueryPipeline:
         Returns:
             Dict: Query result
         """
-        self._validate_api_key()
-        
         if method == 'langchain':
             result = self.query_langchain_rag(query, k=5, filter_dict=filter_dict)
         else:
