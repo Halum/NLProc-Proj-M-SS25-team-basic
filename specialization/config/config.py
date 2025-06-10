@@ -53,7 +53,7 @@ VECTOR_COLLECTION_NAME = 'movie_embeddings'
 VECTOR_PERSIST_DIRECTORY = 'specialization/data/db/chroma_db'
 
 # Batch processing settings
-EMBEDDING_BATCH_SIZE = 2500  # Max batch size for ChromaDB operations
+EMBEDDING_BATCH_SIZE = 1500  # Max batch size for ChromaDB operations
 
 DB_INDEX_PATH = 'specialization/data/db/'
 KG_OUTPUT_PATH = 'specialization/data/knowledge_graphs/'
@@ -65,6 +65,7 @@ TEST_QUESTIONS_PATH = 'specialization/data/tests/test_input.json'
 # OpenAI API configuration
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 OPENAI_EMBEDDING_MODEL = 'text-embedding-ada-002'  # OpenAI's embedding model
+OPENAI_CHAT_MODEL = 'gpt-4.1-nano'  # OpenAI's chat model
 
 # Knowledge Graph settings
 KG_EXTRACTION_MODEL = 'spacy'  # or 'transformers'

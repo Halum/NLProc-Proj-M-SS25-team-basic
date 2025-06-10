@@ -5,14 +5,19 @@ This file contains the EnhancedRetriever class that extends the baseline Retriev
 2. Enhanced document processing for structured data (movies)
 3. Advanced search capabilities with filtering
 4. Compatibility with baseline interface while adding new features
+5. LangChain compatibility for RAG chains
 """
 
 import sys
 import os
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 # Add baseline to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.documents import Document
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
 
 from specialization.generator.enhanced_llm import EnhancedLLM
 from specialization.retriever.vector_store_chroma import VectorStoreChroma
@@ -155,3 +160,61 @@ class EnhancedRetriever:
         Clean up the vector store and reset all data.
         """
         self.__reset__()
+    
+    def as_langchain_retriever(self, k: int = 5, filter_dict: Optional[Dict[str, Any]] = None):
+        """
+        Create a LangChain-compatible retriever wrapper.
+        
+        Args:
+            k (int): Number of documents to retrieve
+            filter_dict (Optional[Dict[str, Any]]): Metadata filter
+            
+        Returns:
+            LangChainRetrieverWrapper: LangChain-compatible retriever
+        """
+        return LangChainRetrieverWrapper(self, k=k, filter_dict=filter_dict)
+
+
+class LangChainRetrieverWrapper(BaseRetriever):
+    """
+    LangChain-compatible wrapper for the EnhancedRetriever.
+    """
+    
+    def __init__(self, enhanced_retriever: EnhancedRetriever, k: int = 5, 
+                 filter_dict: Optional[Dict[str, Any]] = None):
+        super().__init__()
+        self.enhanced_retriever = enhanced_retriever
+        self.k = k
+        self.filter_dict = filter_dict
+    
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> List[Document]:
+        """
+        Retrieve relevant documents using the EnhancedRetriever.
+        
+        Args:
+            query (str): The query string
+            run_manager: LangChain callback manager
+            
+        Returns:
+            List[Document]: List of LangChain Document objects
+        """
+        results = self.enhanced_retriever.query(
+            query=query, 
+            k=self.k, 
+            filter_dict=self.filter_dict
+        )
+        
+        documents = []
+        for result in results:
+            doc = Document(
+                page_content=result['content'],
+                metadata={
+                    **result['metadata'],
+                    'score': result['score']
+                }
+            )
+            documents.append(doc)
+        
+        return documents
