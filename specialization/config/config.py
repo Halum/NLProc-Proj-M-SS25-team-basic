@@ -17,13 +17,14 @@ RAW_DOCUMENT_DIR_PATH = 'specialization/data/raw/'
 PROCESSED_DOCUMENT_DIR_PATH = 'specialization/data/processed/'
 
 # Processing pipeline configurations
+DATA_SAMPLE_SIZE = 100  # Number of rows to sample from each CSV file for processing
 RAW_DATA_FILES = [
     'movies_metadata.csv',
     'credits.csv',
     'keywords.csv',
 ]
 TARGET_GENRES = ['Family', 'Mystery', 'Western']
-PROCESSED_DOCUMENT_NAME = 'processed_movies_data.json'
+PROCESSED_DOCUMENT_NAME = 'processed_movies_data_sample.json'
 
 EXCLUDED_COLUMNS = [
     'crew',

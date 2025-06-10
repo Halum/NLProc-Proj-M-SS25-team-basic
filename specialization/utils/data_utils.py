@@ -214,3 +214,30 @@ def filter_dataframe_by_list_field(df: pd.DataFrame, column: str, target_values:
     
     logger.info(f"Filtered {len(df)} rows to {len(filtered_df)} rows for {field_name} values: {target_values}")
     return filtered_df
+
+
+def sample_dataframe(df: pd.DataFrame, sample_size: int, random_state: int = 42) -> pd.DataFrame:
+    """
+    Randomly sample rows from a DataFrame for MVP/development purposes.
+    
+    Args:
+        df (pd.DataFrame): Input DataFrame to sample from
+        sample_size (int): Number of rows to sample
+        random_state (int): Random seed for reproducible results
+        
+    Returns:
+        pd.DataFrame: Sampled DataFrame with reset index
+    """
+    if sample_size <= 0:
+        logger.warning("Sample size must be positive, returning original DataFrame")
+        return df
+        
+    if len(df) <= sample_size:
+        logger.info(f"DataFrame has {len(df)} rows, which is <= sample_size ({sample_size}). Returning original DataFrame.")
+        return df
+        
+    logger.info(f"Sampling {sample_size} rows from {len(df)} rows for development")
+    sampled_df = df.sample(n=sample_size, random_state=random_state).reset_index(drop=True)
+    logger.info(f"Sampled dataset size: {len(sampled_df)} rows")
+    
+    return sampled_df

@@ -11,7 +11,8 @@ from .data_utils import (
     extract_names_from_json_list,
     parse_json_field,
     safe_numeric_conversion,
-    filter_dataframe_by_list_field
+    filter_dataframe_by_list_field,
+    sample_dataframe
 )
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     'extract_names_from_json_list',
     'parse_json_field',
     'safe_numeric_conversion',
-    'filter_dataframe_by_list_field'
+    'filter_dataframe_by_list_field',
+    'sample_dataframe'
 ]

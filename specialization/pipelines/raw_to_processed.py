@@ -28,12 +28,13 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 from baseline.postprocessor.document_writer import DocumentWriter
 from specialization.config.config import (
     RAW_DOCUMENT_DIR_PATH, PROCESSED_DOCUMENT_DIR_PATH, LOG_LEVEL, 
-    TARGET_GENRES, PROCESSED_DOCUMENT_NAME, EXCLUDED_COLUMNS, FLATTEN_COLUMNS, RAW_DATA_FILES
+    TARGET_GENRES, PROCESSED_DOCUMENT_NAME, EXCLUDED_COLUMNS, FLATTEN_COLUMNS, 
+    RAW_DATA_FILES, DATA_SAMPLE_SIZE
 )
 from specialization.preprocessor.document_reader import SpecializedDocumentLoaderFactory
 from specialization.utils import (
     exclude_columns, flatten_list_columns, extract_names_from_json_list,
-    safe_numeric_conversion
+    safe_numeric_conversion, sample_dataframe
 )
 
 # Setup logging
@@ -188,7 +189,15 @@ class RawToProcessedPipeline:
         # Step 2: Filter movies_metadata by genres first (before joining for efficiency)
         base_dataframe_name = Path(RAW_DATA_FILES[0]).stem
         if base_dataframe_name in dataframes:
+            # Filter by genres first
             dataframes[base_dataframe_name] = self.filter_by_genres(dataframes[base_dataframe_name])
+            
+            # Apply sampling for MVP if DATA_SAMPLE_SIZE is configured
+            if DATA_SAMPLE_SIZE:
+                dataframes[base_dataframe_name] = sample_dataframe(
+                    dataframes[base_dataframe_name], 
+                    DATA_SAMPLE_SIZE
+                )
         else:
             logger.warning(f"{base_dataframe_name}.csv not found - cannot filter by genres")
 
@@ -201,7 +210,7 @@ class RawToProcessedPipeline:
         logger.info(f"Final processed dataset: {len(joined_df)} rows, {len(joined_df.columns)} columns")
         return joined_df
     
-    def save_to_json(self, df: pd.DataFrame, filename: str = "processed_movies_data.json") -> str:
+    def save_to_json(self, df: pd.DataFrame, filename: str = None) -> str:
         """
         Save processed DataFrame to JSON format.
         

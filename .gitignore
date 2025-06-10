@@ -181,6 +181,7 @@ baseline/data/insight/*.lock
 
 personal/*
 
-
 specialization/data/raw/*
 !specialization/data/raw/.keep
+
+*.lock
