@@ -30,8 +30,10 @@ logger = logging.getLogger(__name__)
 class FiltersInput(TypedDict, total=False):
     """Type definition for extracted metadata filters."""
     min_revenue: Optional[float]
-    max_revenue: Optional[float] 
+    max_revenue: Optional[float]
     title_contains: Optional[str]
+    min_runtime: Optional[int]
+    max_runtime: Optional[int]
     question: str
 
 
@@ -47,6 +49,8 @@ def extract_metadata_filters(
     min_revenue: Optional[float] = None,
     max_revenue: Optional[float] = None,
     title_contains: Optional[str] = None,
+    min_runtime: Optional[int] = None,
+    max_runtime: Optional[int] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -64,6 +68,8 @@ def extract_metadata_filters(
         "min_revenue": min_revenue,
         "max_revenue": max_revenue,
         "title_contains": title_contains,
+        "min_runtime": min_runtime,
+        "max_runtime": max_runtime,
         "question": question,
     }
 
@@ -95,6 +101,7 @@ class QueryParser:
             Guidelines:
             - Revenue should be in dollars (e.g., "5 million" = 5000000)
             - Title contains should be specific title text mentioned
+            - Runtime should be in minutes (e.g., "over 2 hours" = 120 minutes)
             - The question should be the core information need about movies
 
             Examples:
@@ -189,6 +196,7 @@ class QueryParser:
         chroma_filters = {}
         
         for key, value in filters.items():
+            print(f"Processing filter: {key} = {value}")
             if key == 'title_contains' and value:
                 # Title filtering - Use exact equality for ChromaDB
                 # Convert to lowercase to match metadata preprocessing
@@ -215,6 +223,28 @@ class QueryParser:
                         chroma_filters['revenue'] = {"$lte": float(value)}
                 else:
                     chroma_filters['revenue'] = {"$lte": float(value)}
+            
+            elif key == 'min_runtime' and value is not None:
+                # Minimum runtime filtering
+                if 'runtime' in chroma_filters:
+                    # Combine with existing runtime filter
+                    if isinstance(chroma_filters['runtime'], dict):
+                        chroma_filters['runtime']['$gte'] = int(value)
+                    else:
+                        chroma_filters['runtime'] = {"$gte": int(value)}
+                else:
+                    chroma_filters['runtime'] = {"$gte": int(value)}
+            
+            elif key == 'max_runtime' and value is not None:
+                # Maximum runtime filtering
+                if 'runtime' in chroma_filters:
+                    # Combine with existing runtime filter
+                    if isinstance(chroma_filters['runtime'], dict):
+                        chroma_filters['runtime']['$lte'] = int(value)
+                    else:
+                        chroma_filters['runtime'] = {"$lte": int(value)}
+                else:
+                    chroma_filters['runtime'] = {"$lte": int(value)}
         
         # If we have multiple top-level conditions, wrap them in $and for ChromaDB
         if len(chroma_filters) > 1:
