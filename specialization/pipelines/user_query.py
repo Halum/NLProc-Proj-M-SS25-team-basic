@@ -274,6 +274,11 @@ class UserQueryPipeline:
 def main():
     """Main function to run the user query pipeline."""
     try:
+        # Fix SSL certificate issue on Windows
+        if "SSL_CERT_FILE" in os.environ:
+            logger.info(f"Removing problematic SSL_CERT_FILE environment variable: {os.environ['SSL_CERT_FILE']}")
+            del os.environ["SSL_CERT_FILE"]
+            
         # Initialize pipeline
         pipeline = UserQueryPipeline(use_existing_db=True)
         

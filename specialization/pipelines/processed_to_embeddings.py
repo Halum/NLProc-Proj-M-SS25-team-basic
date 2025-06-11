@@ -9,6 +9,7 @@ import os
 import sys
 import json
 import logging
+import traceback
 from typing import List, Dict, Any
 from pathlib import Path
 
@@ -107,6 +108,11 @@ class ProcessedToEmbeddingsRetrieverPipeline:
 def main():
     """Main function to run the pipeline."""
     try:
+        # Fix SSL certificate issue on Windows
+        if "SSL_CERT_FILE" in os.environ:
+            logger.info(f"Removing problematic SSL_CERT_FILE environment variable: {os.environ['SSL_CERT_FILE']}")
+            del os.environ["SSL_CERT_FILE"]
+            
         pipeline = ProcessedToEmbeddingsRetrieverPipeline()
         results = pipeline.run()
         logger.info("✅ Pipeline completed successfully!")
@@ -114,6 +120,7 @@ def main():
 
     except Exception as e:
         logger.error(f"Pipeline execution failed: {e}")
+        traceback.print_exc()
         sys.exit(1)
 
 
