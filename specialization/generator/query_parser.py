@@ -37,6 +37,8 @@ class FiltersInput(TypedDict, total=False):
     release_date: Optional[int]
     min_release_date: Optional[int]
     max_release_date: Optional[int]
+    min_vote_average: Optional[float]
+    max_vote_average: Optional[float]
     question: str
 
 
@@ -57,6 +59,8 @@ def extract_metadata_filters(
     release_date: Optional[int] = None,
     min_release_date: Optional[int] = None,
     max_release_date: Optional[int] = None,
+    min_vote_average: Optional[float] = None,
+    max_vote_average: Optional[float] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -79,6 +83,8 @@ def extract_metadata_filters(
         "release_date": release_date,
         "min_release_date": min_release_date,
         "max_release_date": max_release_date,
+        "min_vote_average": min_vote_average,
+        "max_vote_average": max_vote_average,
         "question": question,
     }
 
@@ -123,6 +129,10 @@ class QueryParser:
                 • "before the 90s" → max_release_year: 1989
                 • "after the 80s" → min_release_year: 1990
                 • "in the 80s" → min_release_year: 1980, max_release_year: 1989
+            - vote_average represents movie rating (1.0 to 10.0)
+                • "rated above 8" → min_vote_average: 8.0
+                • "with rating below 5" → max_vote_average: 5.0
+                • "highly rated movies" → min_vote_average: 7.0
             - The question should be the core information need about movies
 
             Return structured output for:
@@ -146,14 +156,24 @@ class QueryParser:
             - max_revenue: 50000000
             - question: "Action movies starring Brad Pitt"
 
-            "Good horror movies in the 90s" →
-            - min_release_date: 1990
-            - max_release_date: 1999
-            - question: "Good horror movies"
+            "Top rated movies from the 90s" →
+            - min_vote_average: 8.0
+            - min_release_year: 1990
+            - max_release_year: 1999
+            - question: "Top rated movies"
 
             "Movies before 1980 with short runtime" →
             - max_release_date: 1979
             - question: "Movies with short runtime"
+            
+            "Comedy films rated above 7" →
+            - min_vote_average: 7.0
+            - question: "Comedy films"
+            
+            "Romantic movies with rating between 7 and 9" →
+            - min_vote_average: 7.0
+            - max_vote_average: 9.0
+            - question: "Romantic movies"
             """),
             ("user", "{query}")
         ])
@@ -261,6 +281,12 @@ class QueryParser:
 
             elif key == 'max_release_date' and value is not None:
                 chroma_conditions.append({'release_date': {'$lte': int(value)}})
+                
+            elif key == 'min_vote_average' and value is not None:
+                chroma_conditions.append({'vote_average': {'$gte': float(value)}})
+
+            elif key == 'max_vote_average' and value is not None:
+                chroma_conditions.append({'vote_average': {'$lte': float(value)}})
 
         # Wrap with $and if there are multiple conditions
         print(f"Final ChromaDB filters: {chroma_conditions}")
