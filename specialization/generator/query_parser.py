@@ -15,8 +15,6 @@ import logging
 from typing import Dict, Any, Optional, TypedDict
 from pydantic import BaseModel
 
-import re
-
 from langchain_core.tools import tool
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
@@ -36,8 +34,6 @@ class FiltersInput(TypedDict, total=False):
     title_contains: Optional[str]
     min_runtime: Optional[int]
     max_runtime: Optional[int]
-    min_release_date: Optional[str]
-    max_release_date: Optional[str]
     question: str
 
 
@@ -55,8 +51,6 @@ def extract_metadata_filters(
     title_contains: Optional[str] = None,
     min_runtime: Optional[int] = None,
     max_runtime: Optional[int] = None,
-    min_release_date: Optional[str] = None,
-    max_release_date: Optional[str] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -76,8 +70,6 @@ def extract_metadata_filters(
         "title_contains": title_contains,
         "min_runtime": min_runtime,
         "max_runtime": max_runtime,
-        "min_release_date": min_release_date,
-        "max_release_date": max_release_date,
         "question": question,
     }
 
@@ -110,9 +102,6 @@ class QueryParser:
             - Revenue should be in dollars (e.g., "5 million" = 5000000)
             - Title contains should be specific title text mentioned
             - Runtime should be in minutes (e.g., "over 2 hours" = 120 minutes)
-            - Release dates should be converted to ISO format YYYY-MM-DD when possible
-                - For decades or years only, use the first day (e.g., "90s" → "1990-01-01", "2008" → "2008-01-01")
-                - For month and year, use the first day (e.g., "May 2019" → "2019-05-01")
             - The question should be the core information need about movies
 
             Examples:
@@ -120,19 +109,10 @@ class QueryParser:
             - min_revenue: 100000000
             - question: "Movies"
 
-            "Movies released after 2015 with revenue under 50M" →
-            - min_release_date: "2015-01-01"
+            "Action movies from 2020 starring Brad Pitt with revenue under 50M" →
+            - question: "Action movies from 2020"
             - max_revenue: 50000000
-            - question: "Movies"
-            
-            "Movies longer than 2.5 hours with good ratings" →
-            - min_runtime: 150
-            - question: "Movies with good ratings"
-            
-            "Movies from the 90s starring Brad Pitt" →
-            - min_release_date: "1990-01-01"
-            - max_release_date: "1999-12-31"
-            - question: "Movies starring Brad Pitt"
+            - question: "Action movies from 2020"
             """),
             ("user", "{query}")
         ])
@@ -214,9 +194,9 @@ class QueryParser:
             Dict[str, Any]: ChromaDB-compatible filter dictionary
         """
         chroma_filters = {}
-        date_filters = []
         
         for key, value in filters.items():
+            print(f"Processing filter: {key} = {value}")
             if key == 'title_contains' and value:
                 # Title filtering - Use exact equality for ChromaDB
                 # Convert to lowercase to match metadata preprocessing
@@ -265,50 +245,12 @@ class QueryParser:
                         chroma_filters['runtime'] = {"$lte": int(value)}
                 else:
                     chroma_filters['runtime'] = {"$lte": int(value)}
-            
-            # Handle date filters - convert to year for more robust filtering
-            elif key == 'min_release_date' and value is not None:
-                try:
-                    year_match = re.search(r'\b(19\d{2}|20\d{2})\b', str(value))
-                    if year_match:
-                        year = int(year_match.group(1))
-                        date_filters.append({"release_year": {"$gte": year}})
-                        # chroma_filters['release_year'] = {"$gte": year}
-                except Exception as e:
-                    print(f"Failed to convert min_release_date: {e}")
-                    
-            elif key == 'max_release_date' and value is not None:
-                try:
-                    year_match = re.search(r'\b(19\d{2}|20\d{2})\b', str(value))
-                    if year_match:
-                        year = int(year_match.group(1))
-                        date_filters.append({"release_year": {"$lte": year}})
-                        # chroma_filters['release_year'] = {"$lte": year}
-                except Exception as e:
-                    print(f"Failed to convert max_release_date: {e}")
         
         # If we have multiple top-level conditions, wrap them in $and for ChromaDB
-        # if len(chroma_filters) > 1:
-        #     return {"$and": [{key: value} for key, value in chroma_filters.items()]}
-        # else:
-        #     return chroma_filters
-        # Build the final filter structur e
-        all_filters = []
-        
-        # Add non-date filters
-        for key, value in chroma_filters.items():
-            all_filters.append({key: value})
-        
-        # Add date filters
-        all_filters.extend(date_filters)
-        
-        # If we have multiple conditions, wrap them in $and
-        if len(all_filters) > 1:
-            return {"$and": all_filters}
-        elif len(all_filters) == 1:
-            return all_filters[0]
+        if len(chroma_filters) > 1:
+            return {"$and": [{key: value} for key, value in chroma_filters.items()]}
         else:
-            return {}
+            return chroma_filters
     
     def parse_with_chroma_filters(self, query: str) -> tuple[str, Dict[str, Any]]:
         """

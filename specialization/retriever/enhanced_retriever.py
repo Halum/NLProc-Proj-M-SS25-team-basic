@@ -13,7 +13,6 @@ import sys
 import os
 from typing import List, Dict, Any, Optional
 import logging
-import re
 
 # Add baseline to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -72,74 +71,6 @@ class EnhancedRetriever:
         """
         self.__vector_store.cleanup()
     
-    def _prepare_document_metadata(self, metadata: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Prepare document metadata for storage and filtering.
-        
-        Args:
-            metadata (Dict[str, Any]): Original document metadata
-            
-        Returns:
-            Dict[str, Any]: Enhanced metadata with additional fields for filtering
-        """
-        # Create a copy to avoid modifying the original
-        prepared = metadata.copy()
-        
-        # Process release dates to add timestamps
-        if 'release_date' in prepared and prepared['release_date']:
-            try:
-                # Keep the original date string
-                date_str = str(prepared['release_date']).strip()
-                
-                # Skip empty or invalid values
-                if date_str and date_str.lower() not in ['nan', 'none', 'null', '']:
-                    # Extract year, month, day manually - more reliable than dateutil
-                    date_match = re.match(r'(\d{4})-(\d{1,2})-(\d{1,2})', date_str)
-                    
-                    if date_match:
-                        # Get year, month, day from regex match
-                        year = int(date_match.group(1))
-                        month = int(date_match.group(2))
-                        day = int(date_match.group(3))
-                        
-                        # Simple validation to avoid invalid dates
-                        if 1800 <= year <= 2100 and 1 <= month <= 12 and 1 <= day <= 31:
-                            # Store as numeric year for filtering (more reliable than timestamp)
-                            prepared['release_year'] = year
-                            
-                            # Calculate an integer value for sorting (YYYYMMDD format)
-                            prepared['release_date_sortable'] = year * 10000 + month * 100 + day
-                    else:
-                        # Fall back to year extraction for non-standard formats
-                        year_match = re.search(r'\b(19\d{2}|20\d{2})\b', date_str)
-                        if year_match:
-                            year = int(year_match.group(1))
-                            prepared['release_year'] = year
-                            prepared['release_date_sortable'] = year * 10000  # Just the year
-            except Exception as e:
-                print(f"Error processing release date '{prepared['release_date']}': {type(e).__name__} - {e}")
-        
-        # Process numeric fields to ensure they're stored as numbers
-        if 'revenue' in prepared and prepared['revenue']:
-            try:
-                if isinstance(prepared['revenue'], str) and prepared['revenue'].lower() in ['nan', 'none', 'null', '']:
-                    prepared['revenue'] = 0
-                else:
-                    prepared['revenue'] = float(prepared['revenue'])
-            except (ValueError, TypeError):
-                prepared['revenue'] = 0
-                
-        if 'runtime' in prepared and prepared['runtime']:
-            try:
-                if isinstance(prepared['runtime'], str) and prepared['runtime'].lower() in ['nan', 'none', 'null', '']:
-                    prepared['runtime'] = 0
-                else:
-                    prepared['runtime'] = int(float(prepared['runtime']))
-            except (ValueError, TypeError):
-                prepared['runtime'] = 0
-        
-        return prepared
-    
     def _process_and_store_documents(self, documents: List[str], metadatas: List[Dict[str, Any]] = None):
         """
         Process documents by chunking them and storing in ChromaDB.
@@ -161,9 +92,6 @@ class EnhancedRetriever:
             # Get document metadata
             doc_metadata = metadatas[i] if i < len(metadatas) else {}
             
-            # Prepare metadata - add this function to process dates
-            doc_metadata = self._prepare_document_metadata(doc_metadata)
-        
             # Generate chunks for this document
             chunks = self.chunking_strategy.chunk(document)
             

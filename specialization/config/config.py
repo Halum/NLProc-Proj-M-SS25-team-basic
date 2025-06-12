@@ -46,8 +46,8 @@ FLATTEN_COLUMNS = [
 ]
 
 # Embedding pipeline configurations
-DATA_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast', 'runtime', 'release_date']
-METADATA_COLUMNS = ['title', 'revenue', 'runtime', 'release_date']
+DATA_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast', 'runtime']
+METADATA_COLUMNS = ['title', 'revenue', 'runtime']
 ADD_TO_CHUNKING_COLUMN = [
     {'column': 'cast', 'prefix': 'Starring with '}
 ]
