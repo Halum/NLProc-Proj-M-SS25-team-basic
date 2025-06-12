@@ -34,6 +34,9 @@ class FiltersInput(TypedDict, total=False):
     title_contains: Optional[str]
     min_runtime: Optional[int]
     max_runtime: Optional[int]
+    release_date: Optional[int]
+    min_release_date: Optional[int]
+    max_release_date: Optional[int]
     question: str
 
 
@@ -51,6 +54,9 @@ def extract_metadata_filters(
     title_contains: Optional[str] = None,
     min_runtime: Optional[int] = None,
     max_runtime: Optional[int] = None,
+    release_date: Optional[int] = None,
+    min_release_date: Optional[int] = None,
+    max_release_date: Optional[int] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -70,6 +76,9 @@ def extract_metadata_filters(
         "title_contains": title_contains,
         "min_runtime": min_runtime,
         "max_runtime": max_runtime,
+        "release_date": release_date,
+        "min_release_date": min_release_date,
+        "max_release_date": max_release_date,
         "question": question,
     }
 
@@ -94,25 +103,57 @@ class QueryParser:
             ("system", """You are a helpful assistant that extracts filterable metadata from movie queries.
 
             Your task is to:
-            1. Identify any filterable movie metadata (revenue, title)
+            1. Identify any filterable movie metadata:
+                - revenue (min_revenue, max_revenue)
+                - runtime (min_runtime, max_runtime)
+                - title text (title_contains)
+                - release date (release_date, min_release_date, max_release_date)
             2. Extract the core question about movies
             3. Preserve the user's intent while separating filters from the question
-
+            
             Guidelines:
             - Revenue should be in dollars (e.g., "5 million" = 5000000)
-            - Title contains should be specific title text mentioned
-            - Runtime should be in minutes (e.g., "over 2 hours" = 120 minutes)
+            - Title contains should reflect specific text mentioned in the movie title
+            - Runtime should be in minutes (e.g., "over 2 hours" = min_runtime: 120)
+            - Release date should be handled as:
+                • "from 2020" → release_year: 2020
+                • "before 2000" → max_release_year: 1999
+                • "after 1990" → min_release_year: 1991
+                • "in the 90s" → min_release_year: 1990, max_release_year: 1999
+                • "before the 90s" → max_release_year: 1989
+                • "after the 80s" → min_release_year: 1990
+                • "in the 80s" → min_release_year: 1980, max_release_year: 1989
             - The question should be the core information need about movies
 
+            Return structured output for:
+                - min_revenue (float)
+                - max_revenue (float)
+                - title_contains (string)
+                - min_runtime (int)
+                - max_runtime (int)
+                - release_date (int)
+                - min_release_date (int)
+                - max_release_date (int)
+                - question (string)
+            
             Examples:
             "Movies with Tom Hanks that made over 100 million" → 
             - min_revenue: 100000000
-            - question: "Movies"
+            - question: "Movies with Tom Hanks"
 
-            "Action movies from 2020 starring Brad Pitt with revenue under 50M" →
-            - question: "Action movies from 2020"
+            "Action movies from 2020 starring Brad Pitt with revenue under 50M" → 
+            - release_date: 2020
             - max_revenue: 50000000
-            - question: "Action movies from 2020"
+            - question: "Action movies starring Brad Pitt"
+
+            "Good horror movies in the 90s" →
+            - min_release_date: 1990
+            - max_release_date: 1999
+            - question: "Good horror movies"
+
+            "Movies before 1980 with short runtime" →
+            - max_release_date: 1979
+            - question: "Movies with short runtime"
             """),
             ("user", "{query}")
         ])
@@ -193,64 +234,42 @@ class QueryParser:
         Returns:
             Dict[str, Any]: ChromaDB-compatible filter dictionary
         """
-        chroma_filters = {}
-        
+        chroma_conditions = []
+
         for key, value in filters.items():
             print(f"Processing filter: {key} = {value}")
             if key == 'title_contains' and value:
-                # Title filtering - Use exact equality for ChromaDB
-                # Convert to lowercase to match metadata preprocessing
-                chroma_filters['title'] = {"$eq": value.lower()}
-                
+                chroma_conditions.append({'title': {'$eq': value.lower()}})
+
             elif key == 'min_revenue' and value is not None:
-                # Revenue filtering - ChromaDB supports comparison operators
-                if 'revenue' in chroma_filters:
-                    # Combine with existing revenue filter
-                    if isinstance(chroma_filters['revenue'], dict):
-                        chroma_filters['revenue']['$gte'] = float(value)
-                    else:
-                        chroma_filters['revenue'] = {"$gte": float(value)}
-                else:
-                    chroma_filters['revenue'] = {"$gte": float(value)}
-                    
+                chroma_conditions.append({'revenue': {'$gte': float(value)}})
+
             elif key == 'max_revenue' and value is not None:
-                # Max revenue filtering
-                if 'revenue' in chroma_filters:
-                    # Combine with existing revenue filter
-                    if isinstance(chroma_filters['revenue'], dict):
-                        chroma_filters['revenue']['$lte'] = float(value)
-                    else:
-                        chroma_filters['revenue'] = {"$lte": float(value)}
-                else:
-                    chroma_filters['revenue'] = {"$lte": float(value)}
-            
+                chroma_conditions.append({'revenue': {'$lte': float(value)}})
+
             elif key == 'min_runtime' and value is not None:
-                # Minimum runtime filtering
-                if 'runtime' in chroma_filters:
-                    # Combine with existing runtime filter
-                    if isinstance(chroma_filters['runtime'], dict):
-                        chroma_filters['runtime']['$gte'] = int(value)
-                    else:
-                        chroma_filters['runtime'] = {"$gte": int(value)}
-                else:
-                    chroma_filters['runtime'] = {"$gte": int(value)}
-            
+                chroma_conditions.append({'runtime': {'$gte': int(value)}})
+
             elif key == 'max_runtime' and value is not None:
-                # Maximum runtime filtering
-                if 'runtime' in chroma_filters:
-                    # Combine with existing runtime filter
-                    if isinstance(chroma_filters['runtime'], dict):
-                        chroma_filters['runtime']['$lte'] = int(value)
-                    else:
-                        chroma_filters['runtime'] = {"$lte": int(value)}
-                else:
-                    chroma_filters['runtime'] = {"$lte": int(value)}
-        
-        # If we have multiple top-level conditions, wrap them in $and for ChromaDB
-        if len(chroma_filters) > 1:
-            return {"$and": [{key: value} for key, value in chroma_filters.items()]}
+                chroma_conditions.append({'runtime': {'$lte': int(value)}})
+
+            elif key == 'release_date' and value is not None:
+                chroma_conditions.append({'release_date': {'$eq': int(value)}})
+
+            elif key == 'min_release_date' and value is not None:
+                chroma_conditions.append({'release_date': {'$gte': int(value)}})
+
+            elif key == 'max_release_date' and value is not None:
+                chroma_conditions.append({'release_date': {'$lte': int(value)}})
+
+        # Wrap with $and if there are multiple conditions
+        print(f"Final ChromaDB filters: {chroma_conditions}")
+        if len(chroma_conditions) == 1:
+            return chroma_conditions[0]
+        elif chroma_conditions:
+            return {"$and": chroma_conditions}
         else:
-            return chroma_filters
+            return {}
     
     def parse_with_chroma_filters(self, query: str) -> tuple[str, Dict[str, Any]]:
         """

@@ -77,6 +77,7 @@ def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str], 
                 if column in type_map:
                     expected_type = type_map[column]
                     value = cast_value(value, expected_type)
+                    
                 filtered_item[column] = value
             else:
                 logger.warning(f"Column '{column}' not found in item with id: {item.get('id', 'unknown')}")

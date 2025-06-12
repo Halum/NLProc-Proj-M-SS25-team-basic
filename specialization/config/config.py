@@ -52,7 +52,7 @@ DATA_COLUMNS_TYPE_MAPPING = [ # accepted types : int | float | str | bool | year
     {'column': 'runtime', 'type': 'int'},
     {'column': 'release_date', 'type': 'year'},
 ]
-METADATA_COLUMNS = ['title', 'revenue', 'runtime']
+METADATA_COLUMNS = ['title', 'revenue', 'runtime', 'release_date']
 ADD_TO_CHUNKING_COLUMN = [
     {'column': 'cast', 'prefix': 'Starring with '}
 ]
