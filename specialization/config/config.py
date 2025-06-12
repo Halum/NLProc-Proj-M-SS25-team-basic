@@ -46,7 +46,12 @@ FLATTEN_COLUMNS = [
 ]
 
 # Embedding pipeline configurations
-DATA_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast', 'runtime']
+DATA_COLUMNS_TO_KEEP = ['overview', 'title', 'revenue', 'cast', 'runtime', 'release_date']
+DATA_COLUMNS_TYPE_MAPPING = [ # accepted types : int | float | str | bool | year (special)
+    {'column': 'revenue', 'type': 'float'},
+    {'column': 'runtime', 'type': 'int'},
+    {'column': 'release_date', 'type': 'year'},
+]
 METADATA_COLUMNS = ['title', 'revenue', 'runtime']
 ADD_TO_CHUNKING_COLUMN = [
     {'column': 'cast', 'prefix': 'Starring with '}

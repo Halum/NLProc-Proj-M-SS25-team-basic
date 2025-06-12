@@ -12,11 +12,12 @@ import pandas as pd
 import ast
 import logging
 from typing import List, Dict, Any
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 
-def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str]) -> List[Dict[str, Any]]:
+def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str], columns_type_mapping: List[Dict[str, str]]) -> List[Dict[str, Any]]:
     """
     Filter JSON data to keep only specified columns.
     
@@ -27,21 +28,56 @@ def filter_json_columns(data: List[Dict[str, Any]], columns_to_keep: List[str]) 
     Args:
         data (List[Dict[str, Any]]): List of dictionaries (JSON data)
         columns_to_keep (List[str]): List of column names to keep
-        required_column (str, optional): Column that must have a value for item to be included
+        columns_type_mapping (List[Dict[str, str]]): Mapping of column names to data types
         
     Returns:
         List[Dict[str, Any]]: Filtered data with only specified columns
     """
     if not columns_to_keep:
         return data
+    
+    # Prepare a quick lookup for type mapping
+    type_map = {entry['column']: entry['type'] for entry in columns_type_mapping}
+    
+    # Type casting functions
+    def cast_value(value, expected_type):
+        try:
+            if expected_type == 'int':
+                return int(float(value)) if value not in [None, ''] else None
+            elif expected_type == 'float':
+                return float(value) if value not in [None, ''] else None
+            elif expected_type == 'str':
+                return str(value) if value is not None else None
+            elif expected_type == 'bool':
+                return bool(value) if isinstance(value, (int, bool)) else str(value).lower() in ['true', '1']
+            elif expected_type == 'year':
+                return datetime.strptime(value, '%Y-%m-%d').year if isinstance(value, str) and value else None
+            else:
+                return value
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Failed to cast value '{value}' to {expected_type}: {e}")
+            return None
         
     filtered_data = []
     for item in data:
         filtered_item = {}
         
+        # for column in columns_to_keep:
+        #     if column in item:
+        #         print(f"Column '{column}' found and '{item[column]}'.")
+        #         filtered_item[column] = item[column]
+        #     else:
+        #         logger.warning(f"Column '{column}' not found in item with id: {item.get('id', 'unknown')}")
+        #         filtered_item[column] = None
         for column in columns_to_keep:
             if column in item:
-                filtered_item[column] = item[column]
+                value = item[column]
+                
+                # Cast value to expected type if specified
+                if column in type_map:
+                    expected_type = type_map[column]
+                    value = cast_value(value, expected_type)
+                filtered_item[column] = value
             else:
                 logger.warning(f"Column '{column}' not found in item with id: {item.get('id', 'unknown')}")
                 filtered_item[column] = None

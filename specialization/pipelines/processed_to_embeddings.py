@@ -23,6 +23,7 @@ from specialization.config.config import (
     PROCESSED_DOCUMENT_DIR_PATH,
     PROCESSED_DOCUMENT_NAME,
     DATA_COLUMNS_TO_KEEP,
+    DATA_COLUMNS_TYPE_MAPPING,
     CHUNK_SIZE,
     ADD_TO_CHUNKING_COLUMN,
     CHUNKING_COLUMN
@@ -73,7 +74,7 @@ class ProcessedToEmbeddingsRetrieverPipeline:
             data = json.load(f)
         
         # Filter to keep only specified columns using utility function
-        filtered_data = filter_json_columns(data, DATA_COLUMNS_TO_KEEP)
+        filtered_data = filter_json_columns(data, DATA_COLUMNS_TO_KEEP, DATA_COLUMNS_TYPE_MAPPING)
         
         # Concatenate additional columns to chunking column using ADD_TO_CHUNKING_COLUMN
         enhanced_data = concatenate_columns_to_chunking(filtered_data, CHUNKING_COLUMN, ADD_TO_CHUNKING_COLUMN)
