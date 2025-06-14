@@ -29,7 +29,7 @@ class Retriever:
         self.__documents = []
         self.chunking_strategy = chunking_strategy
         self.__chunks = []
-        self.__vector_store = VectorStoreFaiss(LLM.embedding_dimensions())
+        self.__vector_store = VectorStoreFaiss(LLM.embedding_model())
         
     def __reset__(self):
         """
@@ -98,13 +98,19 @@ class Retriever:
         Returns:
             list: List of document chunks.
         """
+        all_chunks = []
         for document in self.__documents:
             chunks = self.chunking_strategy.chunk(document)
-            self.__chunks.extend(chunks)
-            
+            # If the chunking strategy returns a list, extend; else, append
+            if isinstance(chunks, list):
+                all_chunks.extend(chunks)
+            else:
+                all_chunks.append(chunks)
+        self.__chunks = all_chunks
+
         embeddings = LLM.generate_embedding(self.__chunks)
-        self.__vector_store.add(embeddings)
-            
+        self.__vector_store.add(self.__chunks)
+
         return self.__chunks
     
     def query(self, query):
@@ -118,10 +124,9 @@ class Retriever:
             list: List of relevant chunks.
             list: List of distances to the relevant chunks.
         """
-        query_embedding = LLM.generate_embedding([query])
-        distances, indices = self.__vector_store.search(query_embedding)
-        retrieved_chunks = self.__get_relevant_chunks(indices)
-        
+        results = self.__vector_store.search(query)
+        retrieved_chunks = [doc for doc, score in results]
+        distances = [score for doc, score in results]
         return retrieved_chunks, distances
     
     def load(self):

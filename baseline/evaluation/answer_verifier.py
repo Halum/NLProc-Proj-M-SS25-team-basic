@@ -24,7 +24,7 @@ class AnswerVerifier:
         """
         
         try:
-            with open(TEST_QUESTIONS_PATH, 'r') as file:
+            with open(TEST_QUESTIONS_PATH, encoding="utf-8") as file:
                 labeled_data = json.load(file)
             # return [labeled_data[0], labeled_data[1]]
             return labeled_data

@@ -15,7 +15,6 @@ from preprocessor.chunking_service import (
     SlidingWindowChunkingStrategy,
     SentenceBasedChunkingStrategy,
     ParagraphBasedChunkingStrategy,
-    SemanticChunkingStrategy,
     MarkdownHeaderChunkingStrategy
 )
 
@@ -54,7 +53,6 @@ def main():
         SlidingWindowChunkingStrategy(chunk_size=1000, overlap=100),
         SentenceBasedChunkingStrategy(chunk_size=1000),
         ParagraphBasedChunkingStrategy(chunk_size=1000),
-        SemanticChunkingStrategy(),
         MarkdownHeaderChunkingStrategy()
     ]
     insight_generator = InsightGenerator()
