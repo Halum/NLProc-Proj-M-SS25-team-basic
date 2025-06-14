@@ -1,76 +1,88 @@
 """
-Module for vector database functionality.
+Module for vector database functionality using LangChain.
 This file contains the VectorStoreFaiss class that provides:
-1. FAISS-based vector storage and retrieval operations
+1. FAISS-based vector storage and retrieval operations via LangChain
 2. Efficient similarity search for finding relevant documents
 3. Persistence capabilities to save and load vector indices
 4. Low-level vector operations for the retrieval pipeline
 """
 
-import faiss
+from langchain_community.vectorstores import FAISS
 import numpy as np
+import os
 
 class VectorStoreFaiss:
     """
-    Vector store implementation using Facebook AI Similarity Search (FAISS).
+    Vector store implementation using LangChain's FAISS wrapper.
     Provides methods for storing and retrieving vector embeddings.
     """
-    
-    def __init__(self, embedding_dim):
+
+    def __init__(self, embedding_model):
         """
-        Initialize the vector store with specified embedding dimensions.
-        
+        Initialize the vector store with a LangChain embedding model.
+
         Args:
-            embedding_dim (int): Dimensionality of the embedding vectors.
+            embedding_model: LangChain embedding model instance.
         """
-        self.__db = faiss.IndexFlatL2(embedding_dim)
-        
-    def add(self, embeddings):
+        self.embedding_model = embedding_model
+        self.db = None
+        self.texts = []
+
+    def add(self, texts):
         """
-        Add embeddings to the vector store.
-        
+        Add texts to the vector store (embeddings are computed internally).
+
         Args:
-            embeddings (list): List of embedding vectors to add to the store.
+            texts (list): List of text chunks to add to the store.
         """
-        self.__db.add(np.array(embeddings))
-        
+        if not texts:
+            return
+        if self.db is None:
+            self.db = FAISS.from_texts(texts, self.embedding_model)
+            self.texts.extend(texts)
+        else:
+            new_db = FAISS.from_texts(texts, self.embedding_model)
+            self.db.merge_from(new_db)
+            self.texts.extend(texts)
+
     def cleanup(self):
         """
         Reset the vector store, removing all stored embeddings.
         """
-        self.__db.reset()
-        
-    def search(self, query_embedding, k=5):
+        self.db = None
+        self.texts = []
+
+    def search(self, query, k=5):
         """
         Search for similar vectors in the vector store.
-        
+
         Args:
-            query_embedding (list): The query embedding vector.
+            query (str): The query text.
             k (int, optional): Number of nearest neighbors to return. Defaults to 5.
-            
+
         Returns:
-            tuple: (distances, indices) where distances are the L2 distances to the
-                  nearest neighbors and indices are their positions in the database.
+            list: List of (text, score) tuples for the top-k matches.
         """
-        distances, indices = self.__db.search(np.array(query_embedding), k=k)
-        
-        return distances, indices
-    
+        if self.db is None:
+            return []
+        results = self.db.similarity_search_with_score(query, k=k)
+        return [(doc.page_content, score) for doc, score in results]
+
     def save_index(self, index_path):
         """
         Save the current state of the vector store to a file.
-        
+
         Args:
             index_path (str): Path to save the index file.
         """
-        faiss.write_index(self.__db, f"{index_path}.faiss")
-        
+        if self.db is not None:
+            self.db.save_local(index_path)
+
     def load_index(self, index_path):
         """
         Load a vector store index from a file.
-        
+
         Args:
             index_path (str): Path to the index file to load.
         """
-        
-        self.__db = faiss.read_index(f"{index_path}.faiss")
+        self.db = FAISS.load_local(index_path, self.embedding_model)

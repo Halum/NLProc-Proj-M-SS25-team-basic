@@ -8,12 +8,17 @@ This file provides centralized configuration for:
 """
 
 # Configuration management
-DOCUMENT_FOLDER_PATH='baseline/data/raw/'
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DOCUMENT_FOLDER_PATH = os.path.join(BASE_DIR, '..', 'data', 'raw')
+DOCUMENT_FOLDER_PATH = os.path.abspath(DOCUMENT_FOLDER_PATH)
 INSIGHT_FOLDER_PATH='baseline/data/insight/'
 LOG_FILE_NAME='chunking_strategy_insights'
 DB_INDEX_PATH='baseline/data/db/'
-TEST_QUESTIONS_PATH='baseline/data/tests/test_input.json'
-EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEST_QUESTIONS_PATH = os.path.abspath(os.path.join(BASE_DIR, "..", "data", "tests", "test_input.json"))
+EMBEDDING_MODEL = 'sentence-transformers/all-MiniLM-L6-v2'
 # LLM_MODEL = 'declare-lab/flan-alpaca-base'
 LLM_MODEL = 'google/flan-t5-large'
 GROUP_ID = 'Team Basic'
+VECTOR_STORE_TYPE = 'faiss'
