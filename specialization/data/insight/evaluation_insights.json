@@ -7,47 +7,66 @@
       {
         "content":"Two French journalists become embroiled in a criminal plot in New York City involving a disappeared United Nations diplomat. Starring with Pierre Grasset, Christiane Eudes, Ginger Hall, Jean-Pierre Melville",
         "metadata":{
-          "title":"two men in manhattan",
-          "revenue":0.0
+          "release_date":1959,
+          "vote_average":6.5,
+          "revenue":0.0,
+          "runtime":84,
+          "title":"two men in manhattan"
         },
-        "score":0.3289670348
+        "score":0.3289017975
       },
       {
         "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
+          "vote_average":7.1,
           "revenue":161849455.0,
+          "release_date":2011,
+          "runtime":105,
           "title":"limitless"
         },
-        "score":0.3319121599
+        "score":0.3316361308
       },
       {
         "content":"An obsessive, insubordinate homicide cop is convinced a serial killer is loose in the Hollywood area and disobeys orders in order to catch him. Starring with James Woods, Lesley Ann Warren, Charles Durning, Charles Haid, Raymond J. Barry, Randi Brooks, Steven Lambert, Christopher Wynne, Jan McGill, Vicki Wauchope",
         "metadata":{
-          "revenue":0.0,
-          "title":"cop"
+          "title":"cop",
+          "runtime":110,
+          "vote_average":6.6,
+          "release_date":1988,
+          "revenue":0.0
         },
-        "score":0.3439857364
+        "score":0.3440672159
       },
       {
         "content":"A mad cap private-eye caper about a team of detectives who are following, and are being followed by, a group of beautiful women. Starring with Audrey Hepburn, Ben Gazzara, Patti Hansen, John Ritter, Dorothy Stratten, Blaine Novak, Colleen Camp, Glenn Scarpelli, Vassili Lambrinos",
         "metadata":{
           "revenue":0.0,
+          "vote_average":5.5,
+          "release_date":1981,
+          "runtime":115,
           "title":"they all laughed"
         },
-        "score":0.3462299109
+        "score":0.3462497592
       },
       {
         "content":"One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet. Starring with Jesse Eisenberg, Woody Harrelson, Mark Ruffalo, Dave Franco, Morgan Freeman, Michael Caine, Lizzy Caplan, Daniel Radcliffe, Jay Chou, Henry Lloyd-Hughes, Sanaa Lathan, Justine Wachsberger, Alexandra Fraser, David Warshofsky, Tsai Chin, Ben Lamb, Lasco Atkins, Amber Elizabeth, Alexander Cooper, Judit Novotnik, Richard Laing, Alexa Brown, William Henderson, Brick Patrick, Zach Gerard, Fenfen Huang, Aaron Ly, Cyd Casados, Jem Wilner, James Richard Marshall, Karl McMillan, Jim Pirri, Christopher Logan, Varada Sethu, Michael Walters, Simon Connolly, Dino Fetscher, Martin Delaney, Nichole Bird, Danielle Bird, Michael Cooke, John Cooke, Greg McKenzie, Michael McKenzie, Tai Yin Chan, Bruce Chong, Missy Malek, Krystal Ellsworth, Jessica",
         "metadata":{
+          "runtime":129,
           "title":"now you see me 2",
+          "release_date":2016,
+          "vote_average":6.7,
           "revenue":334901337.0
         },
-        "score":0.3610016108
+        "score":0.3610191047
       }
     ],
     "is_correct":true,
-    "similarity_score":null,
-    "metadata_filters":null,
-    "timestamp":"2025-06-21T17:52:50.172"
+    "avg_similarity_score":0.3423748016,
+    "metadata_filters":{
+
+    },
+    "parsed_query":"A movie where FBI is involved",
+    "original_query":"A movie where FBI is involved",
+    "timestamp":"2025-06-21T18:45:40.964"
   }
 ]

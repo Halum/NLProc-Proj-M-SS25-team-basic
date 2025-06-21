@@ -226,7 +226,7 @@ class RawToProcessedPipeline:
         
         try:
             # Use DocumentWriter for consistent output formatting
-            DocumentWriter.df_to_json(df, self.processed_data_path, filename.replace('.json', ''), append=False)
+            DocumentWriter.df_to_json(df, self.processed_data_path, filename, append=False)
             logger.info(f"Successfully saved processed data to {output_path}")
             return str(output_path)
         except Exception as e:

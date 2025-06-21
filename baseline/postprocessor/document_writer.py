@@ -65,10 +65,9 @@ class DocumentWriter:
         if not directory.exists():
             directory.mkdir(parents=True, exist_ok=True)
             
-        file_path = directory / file_name
-        
-        if not file_name.endswith('.json'):
-            file_path += '.json'
+        file_name = file_name.replace('.json', '')
+            
+        file_path = directory / f"{file_name}.json"
         
         # Create a file lock to prevent concurrent writes
         lock_path = file_path.with_suffix('.lock')
