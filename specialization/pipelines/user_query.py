@@ -35,11 +35,12 @@ from specialization.retriever.enhanced_retriever import EnhancedRetriever
 from specialization.generator.enhanced_llm import EnhancedLLM
 from specialization.generator.query_parser import QueryParser
 from specialization.config.config import (
-    CHUNK_SIZE
+    CHUNK_SIZE,
+    LOG_LEVEL
 )
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -233,10 +234,7 @@ class UserQueryPipeline:
                 show_context = True
                 
                 parsed_query, parsed_filters = self.query_parser.parse_with_chroma_filters(query)
-                result = self.query_basic_rag(parsed_query, k=5, filter_dict=parsed_filters)
-                
-                # Display results
-                self._display_results(result, show_context=show_context)
+                result = self.run_single_query(parsed_query, filter_dict=parsed_filters, show_context=show_context)
                 
             except KeyboardInterrupt:
                 print("\n\n👋 Goodbye!")
@@ -245,25 +243,20 @@ class UserQueryPipeline:
                 logger.error(f"Error processing query: {e}")
                 print(f"❌ Error: {e}")
     
-    def run_single_query(self, query: str, method: str = 'basic', 
-                        filter_dict: Optional[Dict[str, Any]] = None,
+    def run_single_query(self, query: str, filter_dict: Optional[Dict[str, Any]] = None,
                         show_context: bool = True) -> Dict[str, Any]:
         """
         Run a single query for programmatic use.
         
         Args:
             query (str): User query
-            method (str): RAG method ('basic' or 'langchain')
             filter_dict (Optional[Dict]): Metadata filter
             show_context (bool): Whether to display context
             
         Returns:
             Dict: Query result
         """
-        if method == 'langchain':
-            result = self.query_langchain_rag(query, k=5, filter_dict=filter_dict)
-        else:
-            result = self.query_basic_rag(query, k=5, filter_dict=filter_dict)
+        result = self.query_basic_rag(query, k=5, filter_dict=filter_dict)
         
         if show_context:
             self._display_results(result, show_context=True)

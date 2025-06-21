@@ -96,6 +96,9 @@ VECTOR_STORE_TYPE = 'faiss'  # or 'chromadb'
 
 # Evaluation settings
 EVALUATION_METRICS = ['precision', 'recall', 'f1', 'bleu', 'rouge']
+GOLD_INPUT_PATH = 'specialization/data/tests/gold_input.json'
+EVALUATION_INSIGHTS_PATH = 'specialization/data/insight/evaluation_insights.json'
+APPEND_INSIGHTS = False  # When False, replaces existing insights file; when True, appends to it
 
 # Logging
 LOG_LEVEL = 'INFO'

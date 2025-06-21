@@ -8,14 +8,20 @@ for specialized NLP processing workflows.
 import argparse
 import sys
 import os
+import logging
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from specialization.config.config import *
+from specialization.config.config import (
+    LOG_LEVEL, DOCUMENT_FOLDER_PATH, EMBEDDINGS_OUTPUT_PATH,
+    KG_OUTPUT_PATH, SQLITE_OUTPUT_PATH
+)
 from specialization.pipelines.processed_to_embeddings import EmbeddingsPipeline
-from specialization.pipelines.raw_to_knowledge_graph import KnowledgeGraphPipeline
-from specialization.pipelines.raw_to_sqlite import SQLitePipeline
+
+# Setup logging
+logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def main():
     """

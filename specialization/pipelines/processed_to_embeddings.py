@@ -26,11 +26,12 @@ from specialization.config.config import (
     DATA_COLUMNS_TYPE_MAPPING,
     CHUNK_SIZE,
     ADD_TO_CHUNKING_COLUMN,
-    CHUNKING_COLUMN
+    CHUNKING_COLUMN,
+    LOG_LEVEL
 )
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=getattr(logging, LOG_LEVEL), format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
