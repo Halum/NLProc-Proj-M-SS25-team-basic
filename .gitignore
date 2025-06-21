@@ -178,3 +178,13 @@ baseline/data/db/*
 !baseline/data/db/.keep
 
 baseline/data/insight/*.lock
+
+personal/*
+
+specialization/data/raw/*
+!specialization/data/raw/.keep
+
+specialization/data/db/chroma_db/*
+!specialization/data/db/chroma_db/.keep
+
+*.lock
