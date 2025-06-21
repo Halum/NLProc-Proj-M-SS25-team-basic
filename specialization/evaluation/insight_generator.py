@@ -42,14 +42,14 @@ class InsightGenerator:
         self.insight_df = pd.DataFrame(columns=[
             "question", "gold_answer", "generated_answer", "context", 
             "is_correct", "avg_similarity_score", "metadata_filters",
-            "parsed_query", "original_query", "timestamp"
+            "parsed_query", "timestamp"
         ])
         
         logger.info(f"InsightGenerator initialized with path: {insight_path}")
         
     def update_insight(self, question, gold_answer, generated_answer, context, 
                       is_correct, avg_similarity_score=None, metadata_filters=None,
-                      parsed_query=None, original_query=None):
+                      parsed_query=None):
         """
         Update the insight DataFrame with the results of the query.
         
@@ -62,7 +62,6 @@ class InsightGenerator:
             avg_similarity_score (float, optional): Average similarity score of retrieved documents
             metadata_filters (dict, optional): Any filters applied during retrieval
             parsed_query (str, optional): The query after parsing and cleaning
-            original_query (str, optional): The original user query before parsing
             
         Returns:
             pd.DataFrame: The updated DataFrame
@@ -77,7 +76,6 @@ class InsightGenerator:
             "avg_similarity_score": [avg_similarity_score],
             "metadata_filters": [metadata_filters],
             "parsed_query": [parsed_query],
-            "original_query": [original_query],
             "timestamp": pd.Timestamp.now()
         })
         

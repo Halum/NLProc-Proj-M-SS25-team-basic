@@ -3,5 +3,10 @@
         "question": "A movie where FBI is involved",
         "answer": "Now You See Me 2",
         "context": "One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet."
+    },
+    {
+        "question": "a movie with rating over 7 and has firefighter in the movie plot",
+        "answer": "One Deadly Summer",
+        "context": "In spring 1976, a 19-year-old beauty, her German-born mother, and her crippled father move to the town of a firefighter nicknamed Pin-Pon. Everyone notices the provocative Eliane. She singles out Pin-Pon and soon is crying on his shoulder (she's myopic and hates her reputation as a dunce and as easy); she moves in with him, knits baby clothes, and plans their wedding. Is this love or some kind of plot? She asks Pin-Pon's mother and aunt about the piano in the barn: who delivered it on a November night in 1955? Why does she want to know, and what does it have to do with her mother's sorrows, her father's injury, this quick marriage, and the last name on her birth certificate?"
     }
 ]

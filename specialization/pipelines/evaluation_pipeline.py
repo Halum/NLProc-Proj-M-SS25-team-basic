@@ -149,8 +149,7 @@ class EvaluationPipeline:
             is_correct=is_correct,
             avg_similarity_score=avg_similarity_score,
             metadata_filters=parsed_filters,
-            parsed_query=parsed_query,
-            original_query=question
+            parsed_query=parsed_query
         )
         
         return {
