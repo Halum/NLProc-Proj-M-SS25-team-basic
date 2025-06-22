@@ -8,7 +8,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import statistics
 
-def calculate_dynamic_height(df, query_col='Query', min_height=600, base_multiplier=40, text_factor=0.5):
+def calculate_dynamic_height(df, query_col='Query', min_height=600, base_multiplier=40, text_factor=0.8):
     """
     Calculate dynamic chart height based on number of entries and query text length.
     
@@ -108,41 +108,111 @@ def plot_similarity_distributions(insights_df):
         'Is Correct': insights_df['is_correct'].map({True: 'Correct', False: 'Incorrect'})
     })
     
-    # Create histogram of similarity scores colored by correctness
-    fig = px.histogram(
-        plot_df,
-        x='Average Similarity',
-        color='Is Correct',
-        barmode='group',
-        nbins=20,
-        color_discrete_map={'Correct': '#4CAF50', 'Incorrect': '#F44336'},
-        title='Distribution of Similarity Scores by Answer Correctness'
-    )
+    # Make sure we have numeric values for similarity scores
+    plot_df['Average Similarity'] = pd.to_numeric(plot_df['Average Similarity'], errors='coerce')
     
+    # Drop any NaN values after conversion
+    plot_df = plot_df.dropna(subset=['Average Similarity'])
+    
+    # Split data by correctness
+    correct_df = plot_df[plot_df['Is Correct'] == 'Correct']
+    incorrect_df = plot_df[plot_df['Is Correct'] == 'Incorrect']
+    
+    # Define bin parameters for the histogram (0 to 1 with steps of 0.05)
+    
+    # Create figure manually with go.Histogram for more control
+    fig = go.Figure()
+    
+    # Add histogram for correct answers
+    if not correct_df.empty:
+        fig.add_trace(go.Histogram(
+            x=correct_df['Average Similarity'],
+            name='Correct',
+            marker_color='#4CAF50',
+            xbins=dict(start=0, end=1, size=0.05),  # Explicit bin definition
+            opacity=0.7,
+            hovertemplate='Similarity: %{x:.4f}<br>Count: %{y}<extra></extra>'
+        ))
+    
+    # Add histogram for incorrect answers
+    if not incorrect_df.empty:
+        fig.add_trace(go.Histogram(
+            x=incorrect_df['Average Similarity'],
+            name='Incorrect',
+            marker_color='#F44336',
+            xbins=dict(start=0, end=1, size=0.05),  # Explicit bin definition
+            opacity=0.7,
+            hovertemplate='Similarity: %{x:.4f}<br>Count: %{y}<extra></extra>'
+        ))
+    
+    # Update layout
     fig.update_layout(
+        title='Distribution of Similarity Scores by Answer Correctness',
         xaxis_title='Average Similarity Score',
         yaxis_title='Count',
-        bargap=0.1
+        barmode='group',  # Group bars side by side
+        bargap=0.1,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
+    
+    # Format x-axis to show decimals
+    fig.update_xaxes(tickformat=".2f")
     
     st.plotly_chart(fig, use_container_width=True)
     
-    # Create scatter plot of similarity scores vs. query
-    fig = px.scatter(
-        plot_df,
-        x='Average Similarity',
-        y='Query',
-        color='Is Correct',
-        color_discrete_map={'Correct': '#4CAF50', 'Incorrect': '#F44336'},
-        title='Similarity Scores by Query'
-    )
+    # Calculate dynamic height based on number of entries and query text length
+    chart_height = calculate_dynamic_height(plot_df)
     
+    # Sort by Average Similarity for better visualization
+    plot_df = plot_df.sort_values(by='Average Similarity', ascending=True)
+    
+    # Create horizontal bar chart of similarity scores vs. query
+    fig = go.Figure()
+    
+    # Split data by correctness to create separate bars
+    correct_df = plot_df[plot_df['Is Correct'] == 'Correct']
+    incorrect_df = plot_df[plot_df['Is Correct'] == 'Incorrect']
+    
+    # Add bars for correct answers
+    if not correct_df.empty:
+        fig.add_trace(
+            go.Bar(
+                y=correct_df['Query'].tolist(),
+                x=correct_df['Average Similarity'].tolist(),
+                name='Correct',
+                marker_color='#4CAF50',
+                orientation='h',
+                text=[f"{x:.4f}" for x in correct_df['Average Similarity'].tolist()],  # Format to 4 decimal places
+                textposition='auto'
+            )
+        )
+    
+    # Add bars for incorrect answers
+    if not incorrect_df.empty:
+        fig.add_trace(
+            go.Bar(
+                y=incorrect_df['Query'].tolist(),
+                x=incorrect_df['Average Similarity'].tolist(),
+                name='Incorrect',
+                marker_color='#F44336',
+                orientation='h',
+                text=[f"{x:.4f}" for x in incorrect_df['Average Similarity'].tolist()],  # Format to 4 decimal places
+                textposition='auto'
+            )
+        )
+    
+    # Update layout
     fig.update_layout(
-        height=600,
+        title='Similarity Scores by Query',
+        height=chart_height,
         xaxis_title='Average Similarity Score',
         yaxis_title='Query',
-        yaxis={'categoryorder': 'total ascending'}
+        yaxis={'categoryorder': 'total ascending'},
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
+    
+    # Ensure x-axis shows proper decimal formatting
+    fig.update_xaxes(tickformat=".4f")
     
     st.plotly_chart(fig, use_container_width=True)
     

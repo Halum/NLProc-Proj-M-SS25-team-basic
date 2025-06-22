@@ -148,7 +148,7 @@ def main():
                 filtered_df = insights_df[~insights_df['is_correct']]
                 
             # Display paginated records
-            records_per_page = 5
+            records_per_page = 15
             total_pages = (len(filtered_df) + records_per_page - 1) // records_per_page
             page = st.number_input("Page", min_value=1, max_value=max(1, total_pages), value=1)
             
@@ -157,7 +157,7 @@ def main():
             
             for i in range(start_idx, end_idx):
                 record = filtered_df.iloc[i]
-                with st.expander(f"Query: {record['question']}"):
+                with st.expander(f"**Query: {record['question']}**"):
                     col1, col2 = st.columns([1, 1], gap="large")
                     
                     with col1:
@@ -180,7 +180,76 @@ def main():
                         st.markdown("**Similarity Score:**")
                         st.metric("Avg. Similarity", f"{record['avg_similarity_score']:.4f}")
                         
-                    st.markdown("**Retrieved Context:**")
+                    # Create a new section for evaluation metrics
+                    st.markdown("---")
+                    st.markdown("### Evaluation Metrics")
+                    metric_col1, metric_col2 = st.columns([1, 1], gap="large")
+                    
+                    with metric_col1:
+                        # Display BERT scores if available
+                        st.markdown("**BERT Scores:**")
+                        if 'bert_score' in record and isinstance(record['bert_score'], dict):
+                            bert_col1, bert_col2, bert_col3 = st.columns(3)
+                            with bert_col1:
+                                st.metric("Precision", f"{record['bert_score'].get('bert_precision', 'N/A'):.4f}" 
+                                          if isinstance(record['bert_score'].get('bert_precision'), (int, float)) else "N/A")
+                            with bert_col2:
+                                st.metric("Recall", f"{record['bert_score'].get('bert_recall', 'N/A'):.4f}"
+                                          if isinstance(record['bert_score'].get('bert_recall'), (int, float)) else "N/A")
+                            with bert_col3:
+                                st.metric("F1", f"{record['bert_score'].get('bert_f1', 'N/A'):.4f}"
+                                          if isinstance(record['bert_score'].get('bert_f1'), (int, float)) else "N/A")
+                        else:
+                            st.info("BERT scores not available for this record")
+                    
+                    with metric_col2:
+                        # Display ROUGE scores if available
+                        st.markdown("**ROUGE Scores:**")
+                        if 'rouge_score' in record and isinstance(record['rouge_score'], dict):
+                            rouge_col1, rouge_col2, rouge_col3 = st.columns(3)
+                            with rouge_col1:
+                                st.metric("ROUGE-1 F1", f"{record['rouge_score'].get('rouge1_fmeasure', 'N/A'):.4f}"
+                                          if isinstance(record['rouge_score'].get('rouge1_fmeasure'), (int, float)) else "N/A")
+                            with rouge_col2:
+                                st.metric("ROUGE-2 F1", f"{record['rouge_score'].get('rouge2_fmeasure', 'N/A'):.4f}"
+                                          if isinstance(record['rouge_score'].get('rouge2_fmeasure'), (int, float)) else "N/A")
+                            with rouge_col3:
+                                st.metric("ROUGE-L F1", f"{record['rouge_score'].get('rougeL_fmeasure', 'N/A'):.4f}"
+                                          if isinstance(record['rouge_score'].get('rougeL_fmeasure'), (int, float)) else "N/A")
+                        else:
+                            st.info("ROUGE scores not available for this record")
+                    
+                    st.markdown("---")
+                    
+                    # Display gold context first
+                    st.markdown("### Gold Context")
+                    if 'gold_context' in record and record['gold_context']:
+                        if isinstance(record['gold_context'], list):
+                            for j, ctx in enumerate(record['gold_context']):
+                                if isinstance(ctx, dict):
+                                    # Handle gold context that's a list of context dictionaries
+                                    title = ctx.get('metadata', {}).get('title', f'Document {j+1}')
+                                    st.markdown(f"**{title}**")
+                                    st.text(ctx.get('content', 'No content available'))
+                                else:
+                                    # Handle gold context that's a list of strings
+                                    st.markdown(f"**Document {j+1}**")
+                                    st.text(ctx)
+                        elif isinstance(record['gold_context'], dict):
+                            # Handle gold context as a single dictionary
+                            title = record['gold_context'].get('metadata', {}).get('title', 'Gold Document')
+                            st.markdown(f"**{title}**")
+                            st.text(record['gold_context'].get('content', 'No content available'))
+                        else:
+                            # Handle gold context as a string
+                            st.text(str(record['gold_context']))
+                    else:
+                        st.info("No gold context available for this record")
+                    
+                    st.markdown("---")
+                    
+                    # Display retrieved context
+                    st.markdown("### Retrieved Context")
                     for j, ctx in enumerate(record['context']):
                         st.markdown(f"**Document {j+1}** (Score: {ctx['score']:.4f}) - {ctx['metadata']['title']}")
                         st.text(ctx['content'])
