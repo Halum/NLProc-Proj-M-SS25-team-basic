@@ -6,6 +6,41 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import statistics
+
+def calculate_dynamic_height(df, query_col='Query', min_height=600, base_multiplier=40, text_factor=0.5):
+    """
+    Calculate dynamic chart height based on number of entries and query text length.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing queries
+        query_col (str): Name of the column containing query text
+        min_height (int): Minimum height in pixels
+        base_multiplier (int): Base pixels per row
+        text_factor (float): Factor for additional height based on text length
+    
+    Returns:
+        int: Calculated height in pixels
+    """
+    # Get number of entries
+    num_entries = len(df)
+    
+    # Calculate average query text length if the query column exists
+    if query_col in df.columns:
+        text_lengths = [len(str(q)) for q in df[query_col]]
+        if text_lengths:
+            avg_length = statistics.mean(text_lengths)
+            # Add height for longer than average queries
+            text_adjustment = max(0, avg_length - 50) * text_factor
+        else:
+            text_adjustment = 0
+    else:
+        text_adjustment = 0
+    
+    # Calculate height with minimum value
+    height = max(min_height, int(num_entries * (base_multiplier + text_adjustment)))
+    
+    return height
 
 def plot_answer_correctness(insights_df):
     """
@@ -224,13 +259,16 @@ def plot_bert_scores(insights_df):
                 )
             )
         
+        # Calculate dynamic height based on number of entries and query text length
+        chart_height = calculate_dynamic_height(bert_df)
+        
         # Update layout
         fig.update_layout(
             title="BERT Scores <br>(Higher scores indicate better semantic matching)",
-            height=max(450, len(bert_df) * 30),
+            height=chart_height,
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=150, l=200),
+            margin=dict(t=170, l=200),
             annotations=[
                 dict(
                     text="Precision: Accuracy of generated text<br>Recall: Completeness of information<br>F1: Overall quality (balance of precision & recall)",
@@ -352,13 +390,16 @@ def plot_rouge_scores(insights_df):
                 )
             )
         
+        # Calculate dynamic height based on number of entries and query text length
+        chart_height = calculate_dynamic_height(rouge_df)
+        
         # Update layout
         fig.update_layout(
             title="ROUGE Scores <br>(Higher scores indicate better text matching)",
-            height=max(450, len(rouge_df) * 30),
+            height=chart_height,
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=150, l=200),
+            margin=dict(t=170, l=200),
             annotations=[
                 dict(
                     text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",

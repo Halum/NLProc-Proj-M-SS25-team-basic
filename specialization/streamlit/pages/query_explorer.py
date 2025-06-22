@@ -59,7 +59,7 @@ def display_query_details(query_data):
     
     with col1:
         st.subheader("Query Information")
-        st.markdown(f"**Parsed Query:** {query_data['parsed_query']}")
+        st.markdown(f"**Parsed Question:** {query_data['parsed_question']}")
         
         # Display metadata filters if available
         if query_data['metadata_filters'] and len(query_data['metadata_filters']) > 0:

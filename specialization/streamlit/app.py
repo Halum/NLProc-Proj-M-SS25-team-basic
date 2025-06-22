@@ -161,8 +161,8 @@ def main():
                     col1, col2 = st.columns([1, 1], gap="large")
                     
                     with col1:
-                        st.markdown("**Parsed Query:**")
-                        st.info(record['parsed_query'])
+                        st.markdown("**Parsed Question:**")
+                        st.info(record['parsed_question'])
                         
                         st.markdown("**Metadata Filters:**")
                         st.json(record['metadata_filters'])
