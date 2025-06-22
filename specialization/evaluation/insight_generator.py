@@ -41,7 +41,7 @@ class InsightGenerator:
         self.flush_threshold = flush_threshold
         self.insight_df = pd.DataFrame(columns=[
             "question", 
-            "parsed_query",
+            "parsed_question",
             "gold_answer",
             "generated_answer", 
             "is_correct",
@@ -50,6 +50,7 @@ class InsightGenerator:
             "bert_score",
             "rouge_score",
             "timestamp",
+            "gold_context",
             "context", 
         ])
         # this copy will be used to generate metrics in calculate_metrics
@@ -76,7 +77,8 @@ class InsightGenerator:
 
     def update_insight(self, question, gold_answer, generated_answer, context,
                       is_correct, avg_similarity_score=None, metadata_filters=None,
-                      parsed_query=None, bert_score=None, rouge_score=None):
+                      parsed_question=None, bert_score=None, rouge_score=None,
+                      gold_context=None):
         """
         Update the insight DataFrame with the results of the query.
         
@@ -88,9 +90,10 @@ class InsightGenerator:
             is_correct (bool): Whether the answer matches gold standard
             avg_similarity_score (float, optional): Average similarity score of retrieved documents
             metadata_filters (dict, optional): Any filters applied during retrieval
-            parsed_query (str, optional): The query after parsing and cleaning
+            parsed_question (str, optional): The query after parsing and cleaning
             bert_score (dict, optional): Dictionary with bert precision, recall and f1 scores
             rouge_score (dict, optional): Dictionary with rouge precision, recall and f1 scores
+            gold_context (list, optional): The gold standard context for the question
 
         Returns:
             pd.DataFrame: The updated DataFrame
@@ -98,7 +101,7 @@ class InsightGenerator:
         # Prepare basic row data
         row_data = {
             "question": [question],
-            "parsed_query": [parsed_query],
+            "parsed_question": [parsed_question],
             "gold_answer": [gold_answer],
             "generated_answer": [generated_answer],
             "is_correct": [is_correct],
@@ -108,6 +111,7 @@ class InsightGenerator:
             "rouge_score": [rouge_score],
             "timestamp": pd.Timestamp.now(),
             "context": [context],
+            "gold_context": [gold_context],
         }
         
         # Update the DataFrame with the results

@@ -113,18 +113,19 @@ class EvaluationPipeline:
         """
         question = gold_item['question']
         gold_answer = gold_item['answer']
-        
+        gold_context = gold_item['context']  # Optional gold context
+
         logger.info(f"Evaluating question: {question}")
         
         # Parse query to extract filters and clean question - same as user_query.py
-        parsed_query, parsed_filters = self.query_parser.parse_with_chroma_filters(question)
-        
-        logger.info(f"Parsed query: {parsed_query}")
+        parsed_question, parsed_filters = self.query_parser.parse_with_chroma_filters(question)
+
+        logger.info(f"Parsed question: {parsed_question}")
         logger.info(f"Parsed filters: {parsed_filters}")
-        
-        # Run query through pipeline with parsed query and filters
+
+        # Run query through pipeline with parsed question and filters
         result = self.query_pipeline.run_single_query(
-            query=parsed_query,
+            query=parsed_question,
             filter_dict=parsed_filters,
             show_context=False
         )
@@ -149,9 +150,10 @@ class EvaluationPipeline:
             "is_correct": is_correct,
             "avg_similarity_score": avg_similarity_score,
             "metadata_filters": parsed_filters,
-            "parsed_query": parsed_query,
+            "parsed_question": parsed_question,
             "bert_score": MetricsGenerator.calculate_bert_score(gold_answer, generated_answer),
-            "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer, generated_answer)
+            "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer, generated_answer),
+            "gold_context": gold_context
         }
         # Add to insights
         self.insight_generator.update_insight(**insight_data)
@@ -195,8 +197,6 @@ class EvaluationPipeline:
 def main():
     """Main function to run the evaluation pipeline."""
     try:
-        import os
-        from datetime import datetime
         
         # Initialize and run evaluation pipeline
         pipeline = EvaluationPipeline(
