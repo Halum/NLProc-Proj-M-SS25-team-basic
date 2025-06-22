@@ -23,18 +23,38 @@ def plot_answer_correctness(insights_df):
     # Replace boolean values with readable labels
     correct_counts['Is Correct'] = correct_counts['Is Correct'].map({True: 'Correct', False: 'Incorrect'})
     
-    # Create pie chart
+    # Ensure Count column is numeric
+    correct_counts['Count'] = pd.to_numeric(correct_counts['Count'])
+    
+    # Create pie chart directly from DataFrame
     fig = px.pie(
-        correct_counts, 
-        names='Is Correct', 
-        values='Count', 
+        correct_counts,
+        values='Count',
+        names='Is Correct',
         color='Is Correct',
         color_discrete_map={'Correct': '#4CAF50', 'Incorrect': '#F44336'},
         title='Answer Correctness Distribution'
     )
+    # Make sure we're working with explicit values in case of any type issues
+    values = correct_counts['Count'].tolist()
+    labels = correct_counts['Is Correct'].tolist()
     
-    # Update layout
+    # Create color map making sure Incorrect is always red
+    color_map = {
+        'Correct': '#4CAF50',
+        'Incorrect': '#F44336'
+    }
+    colors = [color_map[label] for label in labels]
+    
+    # Create pie chart manually with go.Pie
+    fig = go.Figure(data=[go.Pie(
+        labels=labels, 
+        values=values,
+        marker_colors=colors
+    )])
+    
     fig.update_layout(
+        title='Answer Correctness Distribution',
         legend_title=None,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )

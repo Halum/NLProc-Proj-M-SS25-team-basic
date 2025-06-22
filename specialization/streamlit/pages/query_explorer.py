@@ -7,7 +7,6 @@ and their performance metrics.
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
 
 # Add the project root to the path
@@ -25,12 +24,38 @@ st.set_page_config(
     layout="wide"
 )
 
+# Add custom CSS for consistent styling
+st.markdown("""
+<style>
+    /* Reduce sidebar width */
+    [data-testid="stSidebar"] {
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+    /* Add extra spacing between horizontal blocks */
+    [data-testid="stHorizontalBlock"] {
+        gap: 3rem !important;
+    }
+    [data-testid="stHorizontalBlock"] > div:first-child {
+        margin-right: 4rem;
+        padding-right: 2rem;
+    }
+    /* Fix sidebar navigation text to be title case */
+    section[data-testid="stSidebarUserContent"] .css-17lntkn {
+        text-transform: capitalize !important;
+    }
+    section[data-testid="stSidebarUserContent"] .css-17lntkn:first-letter {
+        text-transform: uppercase !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 def display_query_details(query_data):
     """Display detailed information about a specific query"""
     st.header(f"Query: {query_data['question']}")
     
     # Create columns for side-by-side comparison
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1], gap="large")
     
     with col1:
         st.subheader("Query Information")

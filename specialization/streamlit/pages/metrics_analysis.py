@@ -8,12 +8,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 # Add the project root to the path
 import sys
-import os
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -26,6 +23,32 @@ st.set_page_config(
     page_icon="📈",
     layout="wide"
 )
+
+# Add custom CSS for consistent styling
+st.markdown("""
+<style>
+    /* Reduce sidebar width */
+    [data-testid="stSidebar"] {
+        min-width: 200px !important;
+        max-width: 200px !important;
+    }
+    /* Add extra spacing between horizontal blocks */
+    [data-testid="stHorizontalBlock"] {
+        gap: 3rem !important;
+    }
+    [data-testid="stHorizontalBlock"] > div:first-child {
+        margin-right: 4rem;
+        padding-right: 2rem;
+    }
+    /* Fix sidebar navigation text to be title case */
+    section[data-testid="stSidebarUserContent"] .css-17lntkn {
+        text-transform: capitalize !important;
+    }
+    section[data-testid="stSidebarUserContent"] .css-17lntkn:first-letter {
+        text-transform: uppercase !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 def analyze_bert_scores(insights_df):
     """Analyze BERT scores in detail"""
