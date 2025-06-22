@@ -227,10 +227,10 @@ def plot_bert_scores(insights_df):
         # Update layout
         fig.update_layout(
             title="BERT Scores (Higher scores indicate better semantic matching)",
-            height=max(400, len(bert_df) * 30),
+            height=max(450, len(bert_df) * 30),
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=100, l=200),
+            margin=dict(t=150, l=200),
             annotations=[
                 dict(
                     text="Precision: Accuracy of generated text<br>Recall: Completeness of information<br>F1: Overall quality (balance of precision & recall)",
@@ -355,10 +355,10 @@ def plot_rouge_scores(insights_df):
         # Update layout
         fig.update_layout(
             title="ROUGE Scores (Higher scores indicate better text matching)",
-            height=max(400, len(rouge_df) * 30),
+            height=max(450, len(rouge_df) * 30),
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=100, l=200),
+            margin=dict(t=150, l=200),
             annotations=[
                 dict(
                     text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",
