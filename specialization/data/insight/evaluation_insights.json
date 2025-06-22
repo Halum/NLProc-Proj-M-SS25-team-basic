@@ -1,69 +1,69 @@
 [
   {
-    "avg_similarity_score":0.34242028,
+    "avg_similarity_score":0.3421318352,
     "bert_score":{
-      "bert_precision":0.3040018678,
-      "bert_recall":0.5565478206,
-      "bert_f1":0.3932174742
+      "bert_precision":0.3131639063,
+      "bert_recall":0.7196768522,
+      "bert_f1":0.4364212453
     },
     "context":[
       {
         "content":"Two French journalists become embroiled in a criminal plot in New York City involving a disappeared United Nations diplomat. Starring with Pierre Grasset, Christiane Eudes, Ginger Hall, Jean-Pierre Melville",
         "metadata":{
-          "release_date":1959,
           "runtime":84,
-          "vote_average":6.5,
+          "release_date":1959,
           "revenue":0.0,
-          "title":"two men in manhattan"
+          "title":"two men in manhattan",
+          "vote_average":6.5
         },
-        "score":0.3289729655
+        "score":0.3287523389
       },
       {
         "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
           "runtime":105,
-          "title":"limitless",
           "vote_average":7.1,
+          "revenue":161849455.0,
           "release_date":2011,
-          "revenue":161849455.0
+          "title":"limitless"
         },
-        "score":0.3321558833
+        "score":0.331787318
       },
       {
         "content":"An obsessive, insubordinate homicide cop is convinced a serial killer is loose in the Hollywood area and disobeys orders in order to catch him. Starring with James Woods, Lesley Ann Warren, Charles Durning, Charles Haid, Raymond J. Barry, Randi Brooks, Steven Lambert, Christopher Wynne, Jan McGill, Vicki Wauchope",
         "metadata":{
+          "revenue":0.0,
+          "runtime":110,
           "title":"cop",
           "release_date":1988,
-          "vote_average":6.6,
-          "revenue":0.0,
-          "runtime":110
+          "vote_average":6.6
         },
-        "score":0.3441878259
+        "score":0.3439176083
       },
       {
         "content":"A mad cap private-eye caper about a team of detectives who are following, and are being followed by, a group of beautiful women. Starring with Audrey Hepburn, Ben Gazzara, Patti Hansen, John Ritter, Dorothy Stratten, Blaine Novak, Colleen Camp, Glenn Scarpelli, Vassili Lambrinos",
         "metadata":{
           "vote_average":5.5,
+          "revenue":0.0,
           "title":"they all laughed",
           "runtime":115,
-          "release_date":1981,
-          "revenue":0.0
+          "release_date":1981
         },
-        "score":0.3461855352
+        "score":0.3459126353
       },
       {
         "content":"One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet. Starring with Jesse Eisenberg, Woody Harrelson, Mark Ruffalo, Dave Franco, Morgan Freeman, Michael Caine, Lizzy Caplan, Daniel Radcliffe, Jay Chou, Henry Lloyd-Hughes, Sanaa Lathan, Justine Wachsberger, Alexandra Fraser, David Warshofsky, Tsai Chin, Ben Lamb, Lasco Atkins, Amber Elizabeth, Alexander Cooper, Judit Novotnik, Richard Laing, Alexa Brown, William Henderson, Brick Patrick, Zach Gerard, Fenfen Huang, Aaron Ly, Cyd Casados, Jem Wilner, James Richard Marshall, Karl McMillan, Jim Pirri, Christopher Logan, Varada Sethu, Michael Walters, Simon Connolly, Dino Fetscher, Martin Delaney, Nichole Bird, Danielle Bird, Michael Cooke, John Cooke, Greg McKenzie, Michael McKenzie, Tai Yin Chan, Bruce Chong, Missy Malek, Krystal Ellsworth, Jessica",
         "metadata":{
-          "runtime":129,
           "title":"now you see me 2",
+          "release_date":2016,
+          "runtime":129,
           "vote_average":6.7,
-          "revenue":334901337.0,
-          "release_date":2016
+          "revenue":334901337.0
         },
-        "score":0.36059919
+        "score":0.3602892756
       }
     ],
-    "generated_answer":"The relevant movies involving the FBI are \"Now You See Me 2,\" which features the Four Horsemen and their encounters with a new enemy, and \"Two Men in Manhattan,\" which involves a criminal plot in New York City with a United Nations diplomat, potentially involving law enforcement agencies. However, based on the provided content, \"Now You See Me 2\" explicitly involves the FBI.",
+    "generated_answer":"The relevant movies involving the FBI are \"Now You See Me 2,\" which features the Four Horsemen outwitting the FBI, and \"Two Men in Manhattan,\" which involves a criminal plot in New York City with a United Nations diplomat, potentially involving law enforcement elements.",
     "gold_answer":"Now You See Me 2",
     "is_correct":true,
     "metadata_filters":{
@@ -72,83 +72,83 @@
     "parsed_query":"A movie where FBI is involved",
     "question":"A movie where FBI is involved",
     "rouge_score":{
-      "rouge1_precision":0.0793650794,
+      "rouge1_precision":0.1136363636,
       "rouge1_recall":1.0,
-      "rouge1_fmeasure":0.1470588235,
-      "rouge2_precision":0.064516129,
+      "rouge1_fmeasure":0.2040816327,
+      "rouge2_precision":0.0930232558,
       "rouge2_recall":1.0,
-      "rouge2_fmeasure":0.1212121212,
-      "rougeL_precision":0.0793650794,
+      "rouge2_fmeasure":0.170212766,
+      "rougeL_precision":0.1136363636,
       "rougeL_recall":1.0,
-      "rougeL_fmeasure":0.1470588235
+      "rougeL_fmeasure":0.2040816327
     },
-    "timestamp":"2025-06-22T19:32:59.896"
+    "timestamp":"2025-06-22T20:01:14.309"
   },
   {
     "avg_similarity_score":0.4255351901,
     "bert_score":{
-      "bert_precision":0.3114212751,
-      "bert_recall":0.7503554821,
-      "bert_f1":0.440161556
+      "bert_precision":0.3910267353,
+      "bert_recall":0.7776690722,
+      "bert_f1":0.5203909874
     },
     "context":[
       {
         "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
+          "release_date":2011,
           "title":"limitless",
           "revenue":161849455.0,
-          "runtime":105,
-          "release_date":2011,
-          "vote_average":7.1
+          "vote_average":7.1,
+          "runtime":105
         },
         "score":0.410764128
       },
       {
         "content":"A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans. Starring with Rufus Sewell, William Hurt, Kiefer Sutherland, Jennifer Connelly, Richard O'Brien, Ian Richardson, Bruce Spence, Colin Friels, John Bluthal, Mitchell Butel, Melissa George, Frank Gallacher, Ritchie Singer, Justin Monjo, Nicholas Bell, Satya Gumbert, Noah Gumbert, Frederick Miragliotta, Jeanette Cronin",
         "metadata":{
-          "revenue":27200316.0,
+          "vote_average":7.2,
           "title":"dark city",
-          "release_date":1998,
           "runtime":100,
-          "vote_average":7.2
+          "release_date":1998,
+          "revenue":27200316.0
         },
         "score":0.413398087
       },
       {
         "content":"A boy must brave deep winter snow to obtain an important family keepsake. Before he can even start this difficult journey he must first help his family survive financial ruin, rescue his beloved pet goat, and with his best friend, outwit a bratty bully who seems out to get him at every turn. Will he make it back to the village in time to celebrate the end-of-winter holiday of Chalandamarz?. Starring with Jonas Hartmann, Julia Jeker, Laurin Michael, Marcus Signer, Tonia Maria Zindel, Martin Rapold, Sarah Sophia Meyer, Andrea Zogg, Peter Jecklin, René Schnoz, Herbert Leiser, Leonardo Nigro",
         "metadata":{
-          "vote_average":7.5,
           "title":"a bell for ursli",
-          "runtime":100,
+          "vote_average":7.5,
           "revenue":0.0,
-          "release_date":2015
+          "release_date":2015,
+          "runtime":100
         },
         "score":0.4251538515
       },
       {
         "content":"In spring 1976, a 19-year-old beauty, her German-born mother, and her crippled father move to the town of a firefighter nicknamed Pin-Pon. Everyone notices the provocative Eliane. She singles out Pin-Pon and soon is crying on his shoulder (she's myopic and hates her reputation as a dunce and as easy); she moves in with him, knits baby clothes, and plans their wedding. Is this love or some kind of plot? She asks Pin-Pon's mother and aunt about the piano in the barn: who delivered it on a November night in 1955? Why does she want to know, and what does it have to do with her mother's sorrows, her father's injury, this quick marriage, and the last name on her birth certificate?. Starring with Isabelle Adjani, Alain Souchon, Suzanne Flon, Jenny Clève, Evelyne Didi, Maria Machado, Jean Gaven, François Cluzet, Manuel Gélin, Roger Carel, Michel Galabru, Marie-Pierre Casey, Cécile Vassort, Edith Scob, Virginie Vignon, Martin Lamotte, Yves Afonso, Raymond Meunier, Jacques Dynam, Jacques Nolot,",
         "metadata":{
-          "revenue":0.0,
           "release_date":1983,
-          "title":"one deadly summer",
+          "revenue":0.0,
           "runtime":130,
-          "vote_average":7.1
+          "vote_average":7.1,
+          "title":"one deadly summer"
         },
         "score":0.4371251762
       },
       {
         "content":"Private Detective Philip Marlowe is hired by a rich family. Before the complex case is over, he's seen murder, blackmail, and what might be love. Starring with Humphrey Bogart, Lauren Bacall, John Ridgely, Martha Vickers, Dorothy Malone, Peggy Knudsen, Charles Waldron, Regis Toomey, Charles D. Brown, Elisha Cook Jr., Louis Jean Heydt, Bob Steele, Sonia Darrin",
         "metadata":{
-          "vote_average":7.6,
-          "title":"the big sleep",
-          "release_date":1946,
           "revenue":0.0,
-          "runtime":116
+          "vote_average":7.6,
+          "runtime":116,
+          "title":"the big sleep",
+          "release_date":1946
         },
         "score":0.4412347078
       }
     ],
-    "generated_answer":"The movie with a firefighter in the plot is \"one deadly summer,\" which features a firefighter nicknamed Pin-Pon.",
+    "generated_answer":"The movie with a firefighter in the plot is \"one deadly summer.\"",
     "gold_answer":"One Deadly Summer",
     "is_correct":true,
     "metadata_filters":{
@@ -159,20 +159,20 @@
     "parsed_query":"a movie with firefighter in the movie plot",
     "question":"a movie with rating over 7 and has firefighter in the movie plot",
     "rouge_score":{
-      "rouge1_precision":0.1578947368,
+      "rouge1_precision":0.25,
       "rouge1_recall":1.0,
-      "rouge1_fmeasure":0.2727272727,
-      "rouge2_precision":0.1111111111,
+      "rouge1_fmeasure":0.4,
+      "rouge2_precision":0.1818181818,
       "rouge2_recall":1.0,
-      "rouge2_fmeasure":0.2,
-      "rougeL_precision":0.1578947368,
+      "rouge2_fmeasure":0.3076923077,
+      "rougeL_precision":0.25,
       "rougeL_recall":1.0,
-      "rougeL_fmeasure":0.2727272727
+      "rougeL_fmeasure":0.4
     },
-    "timestamp":"2025-06-22T19:33:02.457"
+    "timestamp":"2025-06-22T20:01:16.477"
   },
   {
-    "avg_similarity_score":0.4658970177,
+    "avg_similarity_score":0.4587608516,
     "bert_score":{
       "bert_precision":0.314551115,
       "bert_recall":0.298748076,
@@ -182,57 +182,57 @@
       {
         "content":"After a strange storm in the Carribean causes a boat to sink, a family finds itself stranded on an island in the \"27th dimension\". Starring with Naomi Watts, Sam Behrens, Susanna Thompson, Lisa Jakub, David Gallagher",
         "metadata":{
-          "runtime":96,
-          "release_date":1996,
-          "title":"the bermuda triangle",
           "revenue":0.0,
-          "vote_average":6.2
+          "title":"the bermuda triangle",
+          "release_date":1996,
+          "vote_average":6.2,
+          "runtime":96
         },
-        "score":0.4508522153
+        "score":0.4363378882
+      },
+      {
+        "content":"Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai",
+        "metadata":{
+          "title":"hukkle",
+          "release_date":2002,
+          "runtime":78,
+          "revenue":0.0,
+          "vote_average":6.6
+        },
+        "score":0.4614614546
+      },
+      {
+        "content":"The discovery of a corpse threatens to unravel a bumbling local politician's campaign for governor of Colorado. Starring with Chris Cooper, Richard Dreyfuss, Thora Birch, Maria Bello, Miguel Ferrer",
+        "metadata":{
+          "vote_average":6.3,
+          "runtime":128,
+          "release_date":2004,
+          "title":"silver city",
+          "revenue":0.0
+        },
+        "score":0.4619275928
       },
       {
         "content":"In Search of the Castaways is a 1962 Walt Disney Productions feature film starring Hayley Mills and Maurice Chevalier in a tale about a worldwide search for a shipwrecked sea captain. The film was directed by Robert Stevenson from a screenplay by Lowell S, Hawley based upon Jules Verne's 1868 adventure novel Captain Grant's Children. Starring with Maurice Chevalier, Hayley Mills, George Sanders, Wilfrid Hyde-White, Michael Anderson Jr., Antonio Cifariello, Wilfrid Brambell, Jack Gwillim, Ronald Fraser, Norman Bird, George Murcell, Inia Te Wiata, Mark Dignam, Michael Wynne, David Spenser, Milo Sperber, Roger Delgado, Barry Keegan, Maxwell Shaw, Andreas Malandrinos, Keith Hamshere, Joss Ackland",
         "metadata":{
           "vote_average":6.2,
+          "revenue":0.0,
           "runtime":98,
-          "title":"in search of the castaways",
-          "revenue":0.0,
-          "release_date":1962
+          "release_date":1962,
+          "title":"in search of the castaways"
         },
-        "score":0.4651342034
+        "score":0.4661256075
       },
       {
-        "content":"Two tough westerners bring home a group of settlers who have spent years as Comanche hostages. Starring with James Stewart, Richard Widmark, Shirley Jones, Linda Cristal, Andy Devine, John McIntire, Paul Birch, Willis Bouchey, Henry Brandon, Harry Carey, Jr., Olive Carey, Ken Curtis, Chet Douglas, Annelle Hayes, Woody Strode, John Qualen, Jeanette Nolan, Anna Lee, Ford Rainey, O.Z. Whitehead",
+        "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
-          "revenue":0.0,
-          "release_date":1961,
-          "runtime":109,
-          "vote_average":6.1,
-          "title":"two rode together"
+          "runtime":105,
+          "release_date":2011,
+          "revenue":161849455.0,
+          "title":"limitless",
+          "vote_average":7.1
         },
-        "score":0.4692822993
-      },
-      {
-        "content":"Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai",
-        "metadata":{
-          "revenue":0.0,
-          "runtime":78,
-          "title":"hukkle",
-          "release_date":2002,
-          "vote_average":6.6
-        },
-        "score":0.4703865647
-      },
-      {
-        "content":"The discovery of a corpse threatens to unravel a bumbling local politician's campaign for governor of Colorado. Starring with Chris Cooper, Richard Dreyfuss, Thora Birch, Maria Bello, Miguel Ferrer",
-        "metadata":{
-          "title":"silver city",
-          "vote_average":6.3,
-          "revenue":0.0,
-          "runtime":128,
-          "release_date":2004
-        },
-        "score":0.4738298059
+        "score":0.467951715
       }
     ],
     "generated_answer":"Unable to answer.",
@@ -241,7 +241,7 @@
     "metadata_filters":{
 
     },
-    "parsed_query":"What movies have overviews involving plane crashes or survival stories?",
+    "parsed_query":"What movies have overviews involving plane crashes or survival stories",
     "question":"What movies have overviews involving plane crashes or survival stories?",
     "rouge_score":{
       "rouge1_precision":0.0,
@@ -254,10 +254,10 @@
       "rougeL_recall":0.0,
       "rougeL_fmeasure":0.0
     },
-    "timestamp":"2025-06-22T19:33:04.240"
+    "timestamp":"2025-06-22T20:01:18.345"
   },
   {
-    "avg_similarity_score":0.4072956204,
+    "avg_similarity_score":0.4304133594,
     "bert_score":{
       "bert_precision":0.3078181148,
       "bert_recall":0.2780309618,
@@ -265,68 +265,70 @@
     },
     "context":[
       {
-        "content":"Horror anthology consisting of three episodes directed by Jörg Buttgereit, Andreas Marschall and Michal Kosakowski. Starring with Lola Gave, Axel Holst, Andreas Pape, Annika Strauss, Matthan Harris, Daniel Faust, Martina Schöne-Radunski, Denis Lyons, Lucia Wolf, Milton Welsh, Désirée Giorgetti, Kristina Kostiv, Rüdiger Kuhlbrodt, Magdalena Ritter, Katja Bienert, Stephen Patrick Hanna, Florian Kleine, David Brückner, David Masterson, Jörg Buttgereit, Andreas Marschall, Michal Kosakowski",
+        "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
-          "title":"german angst",
-          "release_date":2015,
-          "vote_average":5.9,
-          "revenue":0.0,
-          "runtime":111
+          "runtime":105,
+          "title":"limitless",
+          "release_date":2011,
+          "vote_average":7.1,
+          "revenue":161849455.0
         },
-        "score":0.3769674897
+        "score":0.4114342332
       },
       {
-        "content":"A series of mysterious events and the pestering motor gang 'The Red Vampires' turns the idyllic holiday of Blinker and his friends into a thrilling adventure. Starring with Joren Seldeslachts, Melissa Gorduyn, Benny Claessens, Matthias Meersmans, Saskia Aelen",
+        "content":"A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans. Starring with Rufus Sewell, William Hurt, Kiefer Sutherland, Jennifer Connelly, Richard O'Brien, Ian Richardson, Bruce Spence, Colin Friels, John Bluthal, Mitchell Butel, Melissa George, Frank Gallacher, Ritchie Singer, Justin Monjo, Nicholas Bell, Satya Gumbert, Noah Gumbert, Frederick Miragliotta, Jeanette Cronin",
         "metadata":{
-          "vote_average":6.0,
-          "title":"blinker",
-          "revenue":0.0,
-          "runtime":90,
-          "release_date":1999
+          "vote_average":7.2,
+          "revenue":27200316.0,
+          "title":"dark city",
+          "runtime":100,
+          "release_date":1998
         },
-        "score":0.4130497575
+        "score":0.4121491909
       },
       {
-        "content":"A series of mysterious events and the pestering motor gang 'The Red Vampires' turns the idyllic holiday of Blinker and his friends into a thrilling adventure. Starring with Joren Seldeslachts, Melissa Gorduyn, Benny Claessens, Matthias Meersmans, Saskia Aelen",
+        "content":"Two young men strangle their \"inferior\" classmate, hide his body in their apartment, and invite his friends and family to a dinner party as a means to challenge the \"perfection\" of their crime. Starring with James Stewart, John Dall, Farley Granger, Constance Collier, Douglas Dick, Edith Evanson, Dick Hogan, Joan Chandler, Cedric Hardwicke",
         "metadata":{
-          "runtime":90,
-          "vote_average":6.0,
-          "title":"blinker",
-          "revenue":0.0,
-          "release_date":1999
+          "title":"rope",
+          "runtime":80,
+          "release_date":1948,
+          "revenue":2200000.0,
+          "vote_average":7.8
         },
-        "score":0.4130497575
+        "score":0.4187569916
       },
       {
-        "content":"The “Summer Camp” horror trilogy was one of the most popular franchises of the 1980s. However, the decade ended and so did director Julian Barrett’s career. Now Barrett plans to resurrect his gory series via a modern reboot patterned after reality filmmaking. With his former leading lady and an eclectic group of 10 young “contestants,” Barrett returns to the same locale where his old splatter-fests were filmed. When one of the campers is found savagely murdered, they realize there’s more at stake than just fame and fortune. Each of them is in a fight for their lives as they realize summer is over – forever. Starring with Eric Roberts, Danielle Harris, Felissa Rose, Brian Gallagher, Ashley Sumner, Nicole Cinaglia, Joe Raffa, Montana Marks, Gnomi Gre, Kyle Patrick Brennan, Davy Raphaely, Angel Sanchez, Alexander Mandell",
-        "metadata":{
-          "release_date":2014,
-          "title":"camp dread",
-          "vote_average":4.6,
-          "runtime":90,
-          "revenue":0.0
-        },
-        "score":0.4162504077
-      },
-      {
-        "content":"An obsessive, insubordinate homicide cop is convinced a serial killer is loose in the Hollywood area and disobeys orders in order to catch him. Starring with James Woods, Lesley Ann Warren, Charles Durning, Charles Haid, Raymond J. Barry, Randi Brooks, Steven Lambert, Christopher Wynne, Jan McGill, Vicki Wauchope",
+        "content":"The Case of the Scorpion's Tail begins with the mysterious death of a millionaire and spirals into the murder of his suddenly rich wife, which draws the attention of a dogged investigator, who follows a trail of blood to the bitter end. Starring with George Hilton, Anita Strindberg, Alberto de Mendoza, Ida Galli, Janine Reynaud, Luigi Pistilli, Tom Felleghy, Luis Barboo, Lisa Leonardi, Tomás Picó, Fulvio Mingozzi",
         "metadata":{
           "revenue":0.0,
-          "runtime":110,
-          "release_date":1988,
-          "vote_average":6.6,
-          "title":"cop"
+          "release_date":1971,
+          "vote_average":7.0,
+          "title":"the case of the scorpion's tail",
+          "runtime":90
         },
-        "score":0.4171606898
+        "score":0.4492251873
+      },
+      {
+        "content":"A social event choreographed in the manner of a dance, illuminated by concepts drawn from Greek legend; one of filmmaker Maya Deren’s most intriguing works. Starring with Rita Christiani, Maya Deren, Anaïs Nin, Frank Westbrook, Gore Vidal",
+        "metadata":{
+          "vote_average":7.8,
+          "release_date":1946,
+          "revenue":0.0,
+          "runtime":15,
+          "title":"ritual in transfigured time"
+        },
+        "score":0.460501194
       }
     ],
     "generated_answer":"Unable to answer.",
     "gold_answer":"The Case of the Scorpion's Tail",
     "is_correct":false,
     "metadata_filters":{
-
+      "vote_average":{
+        "$gte":7.0
+      }
     },
-    "parsed_query":"Find horror movies with high ratings and a unique plot",
+    "parsed_query":"Horror movies with high ratings and a unique plot",
     "question":"Find horror movies with high ratings and a unique plot.",
     "rouge_score":{
       "rouge1_precision":0.0,
@@ -339,24 +341,24 @@
       "rougeL_recall":0.0,
       "rougeL_fmeasure":0.0
     },
-    "timestamp":"2025-06-22T19:33:06.200"
+    "timestamp":"2025-06-22T20:01:20.732"
   },
   {
     "avg_similarity_score":0.3857340336,
     "bert_score":{
-      "bert_precision":0.2090006769,
-      "bert_recall":0.5903548598,
-      "bert_f1":0.3087101281
+      "bert_precision":0.2223526239,
+      "bert_recall":0.5872744322,
+      "bert_f1":0.3225732148
     },
     "context":[
       {
         "content":"Zoo animals leave the comforts of man-made habitats for exotic adventure in this animated family film. After escaping from the zoo, four friends -- a lion, a hippo, a zebra and a giraffe -- are sent back to Africa. When their ship capsizes, stranding them on Madagascar, an island populated by crazy critters, the pals must adapt to jungle life and their new roles as wild animals. Starring with Ben Stiller, Chris Rock, David Schwimmer, Jada Pinkett Smith, Sacha Baron Cohen, Paco León, Cedric the Entertainer, Andy Richter, Tom McGrath, Christopher Knights, Chris Miller, Conrad Vernon, Eric Darnell, David Cowgill, Elisa Gabrielli, Stephen Apostolina, Devika Parikh, David P. Smith, Cody Cameron, Bob Saget, Jeffrey Katzenberg",
         "metadata":{
+          "revenue":532680671.0,
+          "runtime":86,
           "release_date":2005,
           "vote_average":6.6,
-          "runtime":86,
-          "title":"madagascar",
-          "revenue":532680671.0
+          "title":"madagascar"
         },
         "score":0.3455543816
       },
@@ -364,48 +366,48 @@
         "content":"A young boy lets the animals out of their cages at the Zoo, to set them free, but the animals start taking over the town. Starring with Jay North, Martin Milner, Andy Devine, Joyce Meadows, Jim Davis, Dorothy Green, Karen Green, Vaughn Taylor, Wayne Thomas",
         "metadata":{
           "vote_average":5.0,
-          "revenue":0.0,
-          "release_date":1965,
+          "runtime":92,
           "title":"zebra in the kitchen",
-          "runtime":92
+          "revenue":0.0,
+          "release_date":1965
         },
         "score":0.3533676565
       },
       {
         "content":"Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai",
         "metadata":{
-          "release_date":2002,
           "vote_average":6.6,
-          "revenue":0.0,
           "runtime":78,
-          "title":"hukkle"
+          "release_date":2002,
+          "title":"hukkle",
+          "revenue":0.0
         },
         "score":0.4044505656
       },
       {
         "content":"A boy must brave deep winter snow to obtain an important family keepsake. Before he can even start this difficult journey he must first help his family survive financial ruin, rescue his beloved pet goat, and with his best friend, outwit a bratty bully who seems out to get him at every turn. Will he make it back to the village in time to celebrate the end-of-winter holiday of Chalandamarz?. Starring with Jonas Hartmann, Julia Jeker, Laurin Michael, Marcus Signer, Tonia Maria Zindel, Martin Rapold, Sarah Sophia Meyer, Andrea Zogg, Peter Jecklin, René Schnoz, Herbert Leiser, Leonardo Nigro",
         "metadata":{
-          "vote_average":7.5,
           "runtime":100,
-          "title":"a bell for ursli",
+          "vote_average":7.5,
           "release_date":2015,
-          "revenue":0.0
+          "revenue":0.0,
+          "title":"a bell for ursli"
         },
         "score":0.411901325
       },
       {
         "content":"When twelve-year-old Ryan is forced to move to a new town, he soon discovers the kids there are mean and tough. And they really don't like strangers. But when they steal his dog Theo, Ryan is given a strange pair of magical shoes and finds that the sky's the limit. Starring with Andy Weiss, Connor Synder, Geneve Rupert, Chris McGurrin, Damon Schoeffler",
         "metadata":{
-          "title":"flyin' ryan",
-          "runtime":84,
+          "release_date":2003,
           "revenue":0.0,
+          "title":"flyin' ryan",
           "vote_average":0.0,
-          "release_date":2003
+          "runtime":84
         },
         "score":0.4133962393
       }
     ],
-    "generated_answer":"Relevant movies with animals as central characters include \"Madagascar,\" which features zoo animals escaping and adapting to jungle life, and \"Zebra in the Kitchen,\" which involves animals being let out of cages and taking over a town.",
+    "generated_answer":"Relevant movies with animals as central characters include \"Madagascar,\" which features zoo animals adapting to jungle life on Madagascar, and \"Zebra in the Kitchen,\" which involves animals escaping from a zoo and taking over a town.",
     "gold_answer":"Madagascar",
     "is_correct":true,
     "metadata_filters":{
@@ -414,58 +416,58 @@
     "parsed_query":"Find me movies with animals as central characters",
     "question":"Find me movies with animals as central characters.",
     "rouge_score":{
-      "rouge1_precision":0.027027027,
+      "rouge1_precision":0.0277777778,
       "rouge1_recall":1.0,
-      "rouge1_fmeasure":0.0526315789,
+      "rouge1_fmeasure":0.0540540541,
       "rouge2_precision":0.0,
       "rouge2_recall":0.0,
       "rouge2_fmeasure":0.0,
-      "rougeL_precision":0.027027027,
+      "rougeL_precision":0.0277777778,
       "rougeL_recall":1.0,
-      "rougeL_fmeasure":0.0526315789
+      "rougeL_fmeasure":0.0540540541
     },
-    "timestamp":"2025-06-22T19:33:14.019"
+    "timestamp":"2025-06-22T20:01:23.174"
   },
   {
-    "avg_similarity_score":0.4763116837,
+    "avg_similarity_score":0.4809953272,
     "bert_score":{
-      "bert_precision":0.254104346,
-      "bert_recall":0.5946031809,
-      "bert_f1":0.3560501933
+      "bert_precision":0.2620801926,
+      "bert_recall":0.7760246992,
+      "bert_f1":0.3918307424
     },
     "context":[
       {
         "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
-          "runtime":105,
           "vote_average":7.1,
+          "runtime":105,
+          "release_date":2011,
           "title":"limitless",
-          "revenue":161849455.0,
-          "release_date":2011
+          "revenue":161849455.0
         },
-        "score":0.3985527158
+        "score":0.4128729701
       },
       {
         "content":"A boy must brave deep winter snow to obtain an important family keepsake. Before he can even start this difficult journey he must first help his family survive financial ruin, rescue his beloved pet goat, and with his best friend, outwit a bratty bully who seems out to get him at every turn. Will he make it back to the village in time to celebrate the end-of-winter holiday of Chalandamarz?. Starring with Jonas Hartmann, Julia Jeker, Laurin Michael, Marcus Signer, Tonia Maria Zindel, Martin Rapold, Sarah Sophia Meyer, Andrea Zogg, Peter Jecklin, René Schnoz, Herbert Leiser, Leonardo Nigro",
         "metadata":{
-          "release_date":2015,
-          "revenue":0.0,
           "runtime":100,
+          "vote_average":7.5,
+          "revenue":0.0,
           "title":"a bell for ursli",
-          "vote_average":7.5
+          "release_date":2015
         },
-        "score":0.469977349
+        "score":0.4732966423
       },
       {
         "content":"A beautiful girl who has everything. Charming, playful, in her own words: 'too joyful to fall in love.' A sudden car crash, and her heart stops for a few minutes. When she wakes up, everyone assures 'every-thing's alright.' But she knows it isn't. Because she cant remember her final month; a September of her life is missing. Leading a trail of hastily covered clues she finds herself in a remote Aegean island. A weird looking, grubby recluse, comes up-to him and proclaims: 'Don't you remember me? I'm the man you fell in love with.' Everything sensible about her screams 'get out of there' but she follows her memories right onto the tragic end of a miraculous affair. Starring with Engin Akyurek, Farah Zeynep Abdullah, Ceren Moray, Ebru Aykaç, Ege Aydan",
         "metadata":{
+          "vote_average":7.4,
           "revenue":0.0,
-          "runtime":102,
-          "release_date":2014,
           "title":"a small september affair",
-          "vote_average":7.4
+          "runtime":102,
+          "release_date":2014
         },
-        "score":0.4773742855
+        "score":0.4801537097
       },
       {
         "content":"Icarus (Anton Chelnokov) is the main character of Varekai, who falls to the ground, breaking his legs as he does. He is suddenly in a strange, new world full of creatures he has never seen before. \"Parachuted into the shadows of a magical forest, a kaleidoscopic world populated by fantastical creatures, this young man sets off on an adventure both absurd and extraordinary.",
@@ -476,21 +478,21 @@
           "revenue":0.0,
           "runtime":0
         },
-        "score":0.4963412881
+        "score":0.5005837679
       },
       {
         "content":"A legendary and friendly creature named Nessie lives happily in a small pond with her friend MacQuack, a rubber duck. When a rich developer takes the pond and land surrounding it to build a miniature golf course, Nessie is forced to search for a new home. Starring with Billy Connolly",
         "metadata":{
           "title":"the ballad of nessie",
-          "vote_average":7.3,
           "revenue":0.0,
+          "vote_average":7.3,
           "runtime":6,
           "release_date":2011
         },
-        "score":0.5393127799
+        "score":0.5380695462
       }
     ],
-    "generated_answer":"Relevant movies related to thrillers include \"Limitless,\" which is described as a paranoia-fueled action thriller involving a top-secret drug that enhances mental abilities and attracts shadowy forces. The other listed movies—\"A Bell for Ursli,\" \"A Small September Affair,\" \"Cirque du Soleil: Varekai,\" and \"The Ballad of Nessie\"—are not thrillers.",
+    "generated_answer":"Relevant movies related to thrillers include \"Limitless,\" which is described as a paranoia-fueled action thriller involving a top-secret drug that enhances mental abilities and attracts shadowy forces. The other listed movies—\"A Bell for Ursli,\" \"A Small September Affair,\" \"Cirque du Soleil: Varekai,\" and \"The Ballad of Nessie\"—do not fall into the thriller genre. \n\nAnswer: Limitless",
     "gold_answer":"limitless",
     "is_correct":true,
     "metadata_filters":{
@@ -507,20 +509,20 @@
         }
       ]
     },
-    "parsed_query":"thrillers",
+    "parsed_query":"Thrillers",
     "question":"Looking for a few top rated thrillers after 2000.",
     "rouge_score":{
-      "rouge1_precision":0.0188679245,
+      "rouge1_precision":0.0169491525,
       "rouge1_recall":1.0,
-      "rouge1_fmeasure":0.037037037,
+      "rouge1_fmeasure":0.0333333333,
       "rouge2_precision":0.0,
       "rouge2_recall":0.0,
       "rouge2_fmeasure":0.0,
-      "rougeL_precision":0.0188679245,
+      "rougeL_precision":0.0169491525,
       "rougeL_recall":1.0,
-      "rougeL_fmeasure":0.037037037
+      "rougeL_fmeasure":0.0333333333
     },
-    "timestamp":"2025-06-22T19:33:16.714"
+    "timestamp":"2025-06-22T20:01:26.123"
   },
   {
     "avg_similarity_score":0.4637762785,
@@ -534,10 +536,10 @@
         "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
         "metadata":{
           "vote_average":7.1,
-          "revenue":161849455.0,
-          "runtime":105,
           "release_date":2011,
-          "title":"limitless"
+          "revenue":161849455.0,
+          "title":"limitless",
+          "runtime":105
         },
         "score":0.3880246878
       },
@@ -545,21 +547,21 @@
         "content":"A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans. Starring with Rufus Sewell, William Hurt, Kiefer Sutherland, Jennifer Connelly, Richard O'Brien, Ian Richardson, Bruce Spence, Colin Friels, John Bluthal, Mitchell Butel, Melissa George, Frank Gallacher, Ritchie Singer, Justin Monjo, Nicholas Bell, Satya Gumbert, Noah Gumbert, Frederick Miragliotta, Jeanette Cronin",
         "metadata":{
           "vote_average":7.2,
-          "revenue":27200316.0,
           "runtime":100,
+          "title":"dark city",
           "release_date":1998,
-          "title":"dark city"
+          "revenue":27200316.0
         },
         "score":0.4695966244
       },
       {
         "content":"The same man lives out several parallel lives in different \"worlds\" and in different relationships at the same time. Starring with Tom McCamus, Tilda Swinton, Shaun McCann, Gabriel Gascon, Griffith Brewer, Danielle Brooks, Steve Adams, Russell Yuen, Mariah Inger, Laurent Imbault, Lisa Bronwyn Moore, Eric Hoziel, Jessica Paré",
         "metadata":{
-          "release_date":2000,
+          "runtime":93,
           "revenue":0.0,
           "title":"possible worlds",
-          "vote_average":5.8,
-          "runtime":93
+          "release_date":2000,
+          "vote_average":5.8
         },
         "score":0.4830560684
       },
@@ -567,21 +569,21 @@
         "content":"Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age. Starring with Trevor Morgan, Emmy Rossum, Charles Fleischer, Yannick Bisson, Peter Keleghan, Philip Granger",
         "metadata":{
           "title":"genius",
-          "runtime":82,
           "revenue":0.0,
           "release_date":1999,
-          "vote_average":4.6
+          "vote_average":4.6,
+          "runtime":82
         },
         "score":0.4864858389
       },
       {
         "content":"The rivalry between the manipulative boss of an advertising agency and her talented protégée escalates from stealing credit to public humiliation to murder. Starring with Rachel McAdams, Noomi Rapace, Karoline Herfurth, Paul Anderson, Rainer Bock, Benjamin Sadler, Dominic Raacke, Ian T. Dickinson, Frank Witter, Leila Rozario, Alexander Yassin",
         "metadata":{
-          "title":"passion",
+          "runtime":100,
           "revenue":0.0,
           "vote_average":5.1,
-          "release_date":2012,
-          "runtime":100
+          "title":"passion",
+          "release_date":2012
         },
         "score":0.491718173
       }
@@ -605,6 +607,433 @@
       "rougeL_recall":1.0,
       "rougeL_fmeasure":0.0769230769
     },
-    "timestamp":"2025-06-22T19:33:18.769"
+    "timestamp":"2025-06-22T20:01:28.089"
+  },
+  {
+    "avg_similarity_score":0.4931932151,
+    "bert_score":{
+      "bert_precision":0.3137081563,
+      "bert_recall":0.2794970572,
+      "bert_f1":0.2956160903
+    },
+    "context":[
+      {
+        "content":"Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai",
+        "metadata":{
+          "vote_average":6.6,
+          "revenue":0.0,
+          "title":"hukkle",
+          "release_date":2002,
+          "runtime":78
+        },
+        "score":0.4758440852
+      },
+      {
+        "content":"The rivalry between the manipulative boss of an advertising agency and her talented protégée escalates from stealing credit to public humiliation to murder. Starring with Rachel McAdams, Noomi Rapace, Karoline Herfurth, Paul Anderson, Rainer Bock, Benjamin Sadler, Dominic Raacke, Ian T. Dickinson, Frank Witter, Leila Rozario, Alexander Yassin",
+        "metadata":{
+          "vote_average":5.1,
+          "release_date":2012,
+          "title":"passion",
+          "revenue":0.0,
+          "runtime":100
+        },
+        "score":0.4913092256
+      },
+      {
+        "content":"Two young men strangle their \"inferior\" classmate, hide his body in their apartment, and invite his friends and family to a dinner party as a means to challenge the \"perfection\" of their crime. Starring with James Stewart, John Dall, Farley Granger, Constance Collier, Douglas Dick, Edith Evanson, Dick Hogan, Joan Chandler, Cedric Hardwicke",
+        "metadata":{
+          "vote_average":7.8,
+          "release_date":1948,
+          "revenue":2200000.0,
+          "runtime":80,
+          "title":"rope"
+        },
+        "score":0.4939936996
+      },
+      {
+        "content":"An obsessive, insubordinate homicide cop is convinced a serial killer is loose in the Hollywood area and disobeys orders in order to catch him. Starring with James Woods, Lesley Ann Warren, Charles Durning, Charles Haid, Raymond J. Barry, Randi Brooks, Steven Lambert, Christopher Wynne, Jan McGill, Vicki Wauchope",
+        "metadata":{
+          "release_date":1988,
+          "revenue":0.0,
+          "runtime":110,
+          "vote_average":6.6,
+          "title":"cop"
+        },
+        "score":0.499607712
+      },
+      {
+        "content":"Police detective Joe Leland investigates the murder of a homosexual man. While investigating, he discovers links to official corruption in New York City in this drama that delves into a world of sex and drugs. Starring with Frank Sinatra, Lee Remick, Jacqueline Bisset, Ralph Meeker, Jack Klugman, Horace McMahon, Lloyd Bochner, William Windom, Tony Musante, Al Freeman, Jr., Robert Duvall, Pat Henry, Patrick McVey, Dixie Marquis, Sugar Ray Robinson, Renée Taylor, James Inman, Tom Atkins, Joe Santos, George Plimpton",
+        "metadata":{
+          "title":"the detective",
+          "release_date":1968,
+          "vote_average":6.3,
+          "runtime":114,
+          "revenue":0.0
+        },
+        "score":0.5052113533
+      }
+    ],
+    "generated_answer":"Unable to answer.",
+    "gold_answer":"hukkle",
+    "is_correct":false,
+    "metadata_filters":{
+      "vote_average":{
+        "$gte":5.0
+      }
+    },
+    "parsed_query":"Suggest me drama movies without violence or murder with rating over 5",
+    "question":"Suggest me drama movies without violence or murder with rating over 5.",
+    "rouge_score":{
+      "rouge1_precision":0.0,
+      "rouge1_recall":0.0,
+      "rouge1_fmeasure":0.0,
+      "rouge2_precision":0.0,
+      "rouge2_recall":0.0,
+      "rouge2_fmeasure":0.0,
+      "rougeL_precision":0.0,
+      "rougeL_recall":0.0,
+      "rougeL_fmeasure":0.0
+    },
+    "timestamp":"2025-06-22T20:01:30.208"
+  },
+  {
+    "avg_similarity_score":0.4774912953,
+    "bert_score":{
+      "bert_precision":0.2660111189,
+      "bert_recall":0.2569718659,
+      "bert_f1":0.2614133656
+    },
+    "context":[
+      {
+        "content":"The “Summer Camp” horror trilogy was one of the most popular franchises of the 1980s. However, the decade ended and so did director Julian Barrett’s career. Now Barrett plans to resurrect his gory series via a modern reboot patterned after reality filmmaking. With his former leading lady and an eclectic group of 10 young “contestants,” Barrett returns to the same locale where his old splatter-fests were filmed. When one of the campers is found savagely murdered, they realize there’s more at stake than just fame and fortune. Each of them is in a fight for their lives as they realize summer is over – forever. Starring with Eric Roberts, Danielle Harris, Felissa Rose, Brian Gallagher, Ashley Sumner, Nicole Cinaglia, Joe Raffa, Montana Marks, Gnomi Gre, Kyle Patrick Brennan, Davy Raphaely, Angel Sanchez, Alexander Mandell",
+        "metadata":{
+          "release_date":2014,
+          "runtime":90,
+          "vote_average":4.6,
+          "title":"camp dread",
+          "revenue":0.0
+        },
+        "score":0.4749932587
+      },
+      {
+        "content":"The same man lives out several parallel lives in different \"worlds\" and in different relationships at the same time. Starring with Tom McCamus, Tilda Swinton, Shaun McCann, Gabriel Gascon, Griffith Brewer, Danielle Brooks, Steve Adams, Russell Yuen, Mariah Inger, Laurent Imbault, Lisa Bronwyn Moore, Eric Hoziel, Jessica Paré",
+        "metadata":{
+          "revenue":0.0,
+          "runtime":93,
+          "release_date":2000,
+          "title":"possible worlds",
+          "vote_average":5.8
+        },
+        "score":0.477212131
+      },
+      {
+        "content":"After a strange storm in the Carribean causes a boat to sink, a family finds itself stranded on an island in the \"27th dimension\". Starring with Naomi Watts, Sam Behrens, Susanna Thompson, Lisa Jakub, David Gallagher",
+        "metadata":{
+          "release_date":1996,
+          "title":"the bermuda triangle",
+          "runtime":96,
+          "revenue":0.0,
+          "vote_average":6.2
+        },
+        "score":0.4774700701
+      },
+      {
+        "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
+        "metadata":{
+          "revenue":161849455.0,
+          "runtime":105,
+          "release_date":2011,
+          "vote_average":7.1,
+          "title":"limitless"
+        },
+        "score":0.4784938395
+      },
+      {
+        "content":"Horror anthology consisting of three episodes directed by Jörg Buttgereit, Andreas Marschall and Michal Kosakowski. Starring with Lola Gave, Axel Holst, Andreas Pape, Annika Strauss, Matthan Harris, Daniel Faust, Martina Schöne-Radunski, Denis Lyons, Lucia Wolf, Milton Welsh, Désirée Giorgetti, Kristina Kostiv, Rüdiger Kuhlbrodt, Magdalena Ritter, Katja Bienert, Stephen Patrick Hanna, Florian Kleine, David Brückner, David Masterson, Jörg Buttgereit, Andreas Marschall, Michal Kosakowski",
+        "metadata":{
+          "vote_average":5.9,
+          "title":"german angst",
+          "revenue":0.0,
+          "release_date":2015,
+          "runtime":111
+        },
+        "score":0.4792871773
+      }
+    ],
+    "generated_answer":"Unable to answer.",
+    "gold_answer":"Now You See Me 2",
+    "is_correct":false,
+    "metadata_filters":{
+
+    },
+    "parsed_query":"Find the best-rated sequels in any genre",
+    "question":"Find the best-rated sequels in any genre.",
+    "rouge_score":{
+      "rouge1_precision":0.0,
+      "rouge1_recall":0.0,
+      "rouge1_fmeasure":0.0,
+      "rouge2_precision":0.0,
+      "rouge2_recall":0.0,
+      "rouge2_fmeasure":0.0,
+      "rougeL_precision":0.0,
+      "rougeL_recall":0.0,
+      "rougeL_fmeasure":0.0
+    },
+    "timestamp":"2025-06-22T20:01:32.205"
+  },
+  {
+    "avg_similarity_score":0.4228808284,
+    "bert_score":{
+      "bert_precision":0.2759307623,
+      "bert_recall":0.2115610391,
+      "bert_f1":0.2394961417
+    },
+    "context":[
+      {
+        "content":"A boy must brave deep winter snow to obtain an important family keepsake. Before he can even start this difficult journey he must first help his family survive financial ruin, rescue his beloved pet goat, and with his best friend, outwit a bratty bully who seems out to get him at every turn. Will he make it back to the village in time to celebrate the end-of-winter holiday of Chalandamarz?. Starring with Jonas Hartmann, Julia Jeker, Laurin Michael, Marcus Signer, Tonia Maria Zindel, Martin Rapold, Sarah Sophia Meyer, Andrea Zogg, Peter Jecklin, René Schnoz, Herbert Leiser, Leonardo Nigro",
+        "metadata":{
+          "revenue":0.0,
+          "runtime":100,
+          "title":"a bell for ursli",
+          "release_date":2015,
+          "vote_average":7.5
+        },
+        "score":0.397261858
+      },
+      {
+        "content":"Tim Avery, an aspiring cartoonist, finds himself in a predicament when his dog stumbles upon the mask of Loki. Then after conceiving an infant son \"born of the mask\", he discovers just how looney child raising can be. Starring with Jamie Kennedy, Alan Cumming, Traylor Howard, Kal Penn, Steven Wright, Bob Hoskins, Ben Stein",
+        "metadata":{
+          "title":"son of the mask",
+          "runtime":94,
+          "vote_average":3.6,
+          "revenue":0.0,
+          "release_date":2005
+        },
+        "score":0.4205143452
+      },
+      {
+        "content":"When twelve-year-old Ryan is forced to move to a new town, he soon discovers the kids there are mean and tough. And they really don't like strangers. But when they steal his dog Theo, Ryan is given a strange pair of magical shoes and finds that the sky's the limit. Starring with Andy Weiss, Connor Synder, Geneve Rupert, Chris McGurrin, Damon Schoeffler",
+        "metadata":{
+          "revenue":0.0,
+          "runtime":84,
+          "vote_average":0.0,
+          "release_date":2003,
+          "title":"flyin' ryan"
+        },
+        "score":0.4236133099
+      },
+      {
+        "content":"The same man lives out several parallel lives in different \"worlds\" and in different relationships at the same time. Starring with Tom McCamus, Tilda Swinton, Shaun McCann, Gabriel Gascon, Griffith Brewer, Danielle Brooks, Steve Adams, Russell Yuen, Mariah Inger, Laurent Imbault, Lisa Bronwyn Moore, Eric Hoziel, Jessica Paré",
+        "metadata":{
+          "vote_average":5.8,
+          "revenue":0.0,
+          "runtime":93,
+          "title":"possible worlds",
+          "release_date":2000
+        },
+        "score":0.4309936762
+      },
+      {
+        "content":"Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai",
+        "metadata":{
+          "title":"hukkle",
+          "vote_average":6.6,
+          "revenue":0.0,
+          "release_date":2002,
+          "runtime":78
+        },
+        "score":0.4420209527
+      }
+    ],
+    "generated_answer":"Unable to answer",
+    "gold_answer":"My Little Pony: Equestria Girls",
+    "is_correct":false,
+    "metadata_filters":{
+
+    },
+    "parsed_query":"Find family-friendly movies with highly rated plots related to mythological worlds",
+    "question":"Find family-friendly movies with highly rated plots related to mythological worlds.",
+    "rouge_score":{
+      "rouge1_precision":0.0,
+      "rouge1_recall":0.0,
+      "rouge1_fmeasure":0.0,
+      "rouge2_precision":0.0,
+      "rouge2_recall":0.0,
+      "rouge2_fmeasure":0.0,
+      "rougeL_precision":0.0,
+      "rougeL_recall":0.0,
+      "rougeL_fmeasure":0.0
+    },
+    "timestamp":"2025-06-22T20:01:34.052"
+  },
+  {
+    "avg_similarity_score":0.3597225249,
+    "bert_score":{
+      "bert_precision":0.2352873981,
+      "bert_recall":0.3771324158,
+      "bert_f1":0.2897832394
+    },
+    "context":[
+      {
+        "content":"The same man lives out several parallel lives in different \"worlds\" and in different relationships at the same time. Starring with Tom McCamus, Tilda Swinton, Shaun McCann, Gabriel Gascon, Griffith Brewer, Danielle Brooks, Steve Adams, Russell Yuen, Mariah Inger, Laurent Imbault, Lisa Bronwyn Moore, Eric Hoziel, Jessica Paré",
+        "metadata":{
+          "revenue":0.0,
+          "title":"possible worlds",
+          "runtime":93,
+          "vote_average":5.8,
+          "release_date":2000
+        },
+        "score":0.2984721065
+      },
+      {
+        "content":"A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film. Starring with Bradley Cooper, Robert De Niro, Abbie Cornish, Andrew Howard, Anna Friel, Johnny Whitworth, Robert John Burke, Darren Goldstein, Tomas Arana, Ned Eisenberg, T.V. Carpio, Richard Bekins, Patricia Kalember, Cindy Katz, Brian Anthony Wilson, Rebecca Dayan",
+        "metadata":{
+          "title":"limitless",
+          "revenue":161849455.0,
+          "runtime":105,
+          "release_date":2011,
+          "vote_average":7.1
+        },
+        "score":0.3672589958
+      },
+      {
+        "content":"Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age. Starring with Trevor Morgan, Emmy Rossum, Charles Fleischer, Yannick Bisson, Peter Keleghan, Philip Granger",
+        "metadata":{
+          "runtime":82,
+          "release_date":1999,
+          "title":"genius",
+          "vote_average":4.6,
+          "revenue":0.0
+        },
+        "score":0.3708410561
+      },
+      {
+        "content":"A mad cap private-eye caper about a team of detectives who are following, and are being followed by, a group of beautiful women. Starring with Audrey Hepburn, Ben Gazzara, Patti Hansen, John Ritter, Dorothy Stratten, Blaine Novak, Colleen Camp, Glenn Scarpelli, Vassili Lambrinos",
+        "metadata":{
+          "release_date":1981,
+          "vote_average":5.5,
+          "runtime":115,
+          "title":"they all laughed",
+          "revenue":0.0
+        },
+        "score":0.3712055087
+      },
+      {
+        "content":"A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished. Starring with Julianne Moore, Jonathan Rhys Meyers, Jeffrey DeMunn, Frances Conroy, Nate Corddry, Brooklynn Proulx, Brian Anthony Wilson, Joyce Feurring, Steven Rishard, Charles Techman, John Peakes, Michale Graves, Chaz Moneypenny, Charles David Richards, Rick Applegate, Loretta Higgins, Tamara Johnson, James Howard, David Dale McCue, Irene Ziegler, William Kania, Giovanna Yannotti, Stephanie Macdougall, Jules Sylvester",
+        "metadata":{
+          "title":"shelter",
+          "revenue":851517.0,
+          "release_date":2010,
+          "runtime":112,
+          "vote_average":5.7
+        },
+        "score":0.3908349574
+      }
+    ],
+    "generated_answer":"Movies relevant to characters navigating multiple identities or secret lives include \"Genius,\" where Charlie Boyle leads a double life to make friends his own age, and \"Shelter,\" where a forensic psychiatrist uncovers multiple personalities of a murder victim. \"Possible Worlds\" also involves a man living out parallel lives in different worlds and relationships.",
+    "gold_answer":"Shelter",
+    "is_correct":true,
+    "metadata_filters":{
+
+    },
+    "parsed_query":"Movies with characters navigating multiple identities or secret lives.",
+    "question":"Movies with characters navigating multiple identities or secret lives.",
+    "rouge_score":{
+      "rouge1_precision":0.0188679245,
+      "rouge1_recall":1.0,
+      "rouge1_fmeasure":0.037037037,
+      "rouge2_precision":0.0,
+      "rouge2_recall":0.0,
+      "rouge2_fmeasure":0.0,
+      "rougeL_precision":0.0188679245,
+      "rougeL_recall":1.0,
+      "rougeL_fmeasure":0.037037037
+    },
+    "timestamp":"2025-06-22T20:01:36.221"
+  },
+  {
+    "avg_similarity_score":0.3963344395,
+    "bert_score":{
+      "bert_precision":0.3904214501,
+      "bert_recall":0.2738412321,
+      "bert_f1":0.3219012618
+    },
+    "context":[
+      {
+        "content":"A series of mysterious events and the pestering motor gang 'The Red Vampires' turns the idyllic holiday of Blinker and his friends into a thrilling adventure. Starring with Joren Seldeslachts, Melissa Gorduyn, Benny Claessens, Matthias Meersmans, Saskia Aelen",
+        "metadata":{
+          "title":"blinker",
+          "revenue":0.0,
+          "runtime":90,
+          "vote_average":6.0,
+          "release_date":1999
+        },
+        "score":0.3716823161
+      },
+      {
+        "content":"A series of mysterious events and the pestering motor gang 'The Red Vampires' turns the idyllic holiday of Blinker and his friends into a thrilling adventure. Starring with Joren Seldeslachts, Melissa Gorduyn, Benny Claessens, Matthias Meersmans, Saskia Aelen",
+        "metadata":{
+          "title":"blinker",
+          "revenue":0.0,
+          "runtime":90,
+          "vote_average":6.0,
+          "release_date":1999
+        },
+        "score":0.3716823161
+      },
+      {
+        "content":"The humans and animals believe a werewolf is on the loose, and former hunter Shaw uses the opportunity to re-open the season. Boog, Elliot, and Mr. Weenie have to face their fears and find the werewolf to get the season closed permanently. Starring with Garry Chalk, Kathleen Barr, Willa Townsend, Melissa Sturm, Trevor Devall, Trevor Devall",
+        "metadata":{
+          "vote_average":5.5,
+          "revenue":0.0,
+          "title":"open season: scared silly",
+          "release_date":2015,
+          "runtime":85
+        },
+        "score":0.4056041241
+      },
+      {
+        "content":"When Dr Frankenstein decides to retire from the monster-making business, he calls an international roster of monsters to a creepy convention to elect his successor. Everyone is there including Dracula, The Werewolf, The Creature, Dr Jekyll &amp; Mr Hyde and many more. But Frankenstein's title is not all that is at stake. The famous doctor has also discovered the secret of total destruction that must not fall into the wrong hands!. Starring with Boris Karloff, Allen Swift, Gale Garnett, Phyllis Diller, Ethel Ennis",
+        "metadata":{
+          "revenue":0.0,
+          "vote_average":6.1,
+          "release_date":1967,
+          "runtime":95,
+          "title":"mad monster party?"
+        },
+        "score":0.4138856828
+      },
+      {
+        "content":"A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans. Starring with Rufus Sewell, William Hurt, Kiefer Sutherland, Jennifer Connelly, Richard O'Brien, Ian Richardson, Bruce Spence, Colin Friels, John Bluthal, Mitchell Butel, Melissa George, Frank Gallacher, Ritchie Singer, Justin Monjo, Nicholas Bell, Satya Gumbert, Noah Gumbert, Frederick Miragliotta, Jeanette Cronin",
+        "metadata":{
+          "vote_average":7.2,
+          "revenue":27200316.0,
+          "release_date":1998,
+          "runtime":100,
+          "title":"dark city"
+        },
+        "score":0.4188177586
+      }
+    ],
+    "generated_answer":"Unable to answer.",
+    "gold_answer":"Blinker, Mad Monster Party?, and Open Season: Scared Silly.",
+    "is_correct":false,
+    "metadata_filters":{
+
+    },
+    "parsed_query":"Find all movies where the plot involves vampires or werewolves.",
+    "question":"Find all movies where the plot involves vampires or werewolves.",
+    "rouge_score":{
+      "rouge1_precision":0.0,
+      "rouge1_recall":0.0,
+      "rouge1_fmeasure":0.0,
+      "rouge2_precision":0.0,
+      "rouge2_recall":0.0,
+      "rouge2_fmeasure":0.0,
+      "rougeL_precision":0.0,
+      "rougeL_recall":0.0,
+      "rougeL_fmeasure":0.0
+    },
+    "timestamp":"2025-06-22T20:01:38.228"
   }
 ]

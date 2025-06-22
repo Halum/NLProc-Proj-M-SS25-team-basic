@@ -33,5 +33,30 @@
         "question": "I just watched a movie named 'limitless'. Suggest me another movie like it.",
         "answer": "Genius",
         "context": "Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age."
+    },
+    {
+        "question": "Suggest me drama movies without violence or murder with rating over 5.",
+        "answer": "hukkle",
+        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai"
+    },
+    {
+        "question": "Find the best-rated sequels in any genre.",
+        "answer": "Now You See Me 2",
+        "context": "The answer 'Now You See Me 2' refers to a highly-rated sequel in the database, known for its thrilling plot and captivating performances, continuing the story from the first film and maintaining a high rating, making it one of the best-rated sequels."
+    },
+    {
+        "question": "Find family-friendly movies with highly rated plots related to mythological worlds.",
+        "answer": "My Little Pony: Equestria Girls",
+        "context": "Via a magic mirror, Twilight Sparkle travels into an alternate universe in order to recover a crown that was stolen from the Crystal Empire. Upon her arrival she is horrified to learn that she has turned into a human."
+    },
+    {
+        "question": "Movies with characters navigating multiple identities or secret lives.",
+        "answer": "Shelter",
+        "context": "A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished."
+    },
+    {
+        "question": "Find all movies where the plot involves vampires or werewolves.",
+        "answer": "Blinker, Mad Monster Party?, and Open Season: Scared Silly.",
+        "context": "The movies where the plot involves vampires or werewolves, based on the database, are Blinker, Mad Monster Party?, and Open Season: Scared Silly, each featuring supernatural creatures like vampires or werewolves in their storylines."
     }
 ]

@@ -137,7 +137,7 @@ class QueryParser:
                 • "after the 80s" → min_release_year: 1990
                 • "in the 80s" → min_release_year: 1980, max_release_year: 1989
             - vote_average (range: 1.0 to 10.0):
-                • "rated above 8" → min_vote_average: 8.0
+                • "rated above or over 8" → min_vote_average: 8.0
                 • "with rating below 5" → max_vote_average: 5.0
                 • "highly rated", "top rated", or "high ratings" → min_vote_average: 7.0
                 • "critically acclaimed", "great reviews" → min_vote_average: 8.0
