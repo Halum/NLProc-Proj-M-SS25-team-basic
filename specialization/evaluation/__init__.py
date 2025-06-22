@@ -6,7 +6,9 @@ the performance of specialized components.
 """
 
 from .insight_generator import InsightGenerator
+from .metrics_generator import MetricsGenerator
 
 __all__ = [
-    'InsightGenerator'
+    'InsightGenerator',
+    'MetricsGenerator'
 ]

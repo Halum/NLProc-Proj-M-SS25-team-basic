@@ -8,5 +8,21 @@
         "question": "a movie with rating over 7 and has firefighter in the movie plot",
         "answer": "One Deadly Summer",
         "context": "In spring 1976, a 19-year-old beauty, her German-born mother, and her crippled father move to the town of a firefighter nicknamed Pin-Pon. Everyone notices the provocative Eliane. She singles out Pin-Pon and soon is crying on his shoulder (she's myopic and hates her reputation as a dunce and as easy); she moves in with him, knits baby clothes, and plans their wedding. Is this love or some kind of plot? She asks Pin-Pon's mother and aunt about the piano in the barn: who delivered it on a November night in 1955? Why does she want to know, and what does it have to do with her mother's sorrows, her father's injury, this quick marriage, and the last name on her birth certificate?"
+    },
+    {
+        "question": "What movies have overviews involving plane crashes or survival stories?",
+        "answer": "The Bermuda Triangle",
+        "context": "The Bermuda Triangle fits as it centers on a mysterious storm-caused disappearance in the Bermuda Triangle—an area notorious for unexplained plane crashes and survival tales."
+    },
+    {
+        "question": "Find horror movies with high ratings and a unique plot.",
+        "answer": "The Case of the Scorpion's Tail",
+        "context": "Set against a backdrop of murder and deceit, 'The Case of the Scorpion's Tail' delivers a suspenseful and original horror-thriller plot that justifies its high rating."
+    },
+    {
+        "question": "Are there movies that deal with the idea of destiny versus making your own choices?",
+        "answer": "The Oklahoma Kid, Black Beauty",
+        "context": "Both The Oklahoma Kid and Black Beauty touch on how characters face fate but still try to shape their own paths, which fits the idea of destiny versus choice."
     }
+    
 ]

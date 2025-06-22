@@ -40,16 +40,26 @@ class InsightGenerator:
         self.insight_path = insight_path
         self.flush_threshold = flush_threshold
         self.insight_df = pd.DataFrame(columns=[
-            "question", "gold_answer", "generated_answer", "context", 
-            "is_correct", "avg_similarity_score", "metadata_filters",
-            "parsed_query", "timestamp"
+            "question", 
+            "parsed_query",
+            "gold_answer",
+            "generated_answer", 
+            "is_correct",
+            "metadata_filters", 
+            "avg_similarity_score", 
+            "bert_score",
+            "rouge_score",
+            "timestamp",
+            "context", 
         ])
+        # this copy will be used to generate metrics in calculate_metrics
+        self.insight_df_copy = self.insight_df.copy()
         
         logger.info(f"InsightGenerator initialized with path: {insight_path}")
         
     def update_insight(self, question, gold_answer, generated_answer, context, 
                       is_correct, avg_similarity_score=None, metadata_filters=None,
-                      parsed_query=None):
+                      parsed_query=None, bert_score=None, rouge_score=None):
         """
         Update the insight DataFrame with the results of the query.
         
@@ -62,24 +72,32 @@ class InsightGenerator:
             avg_similarity_score (float, optional): Average similarity score of retrieved documents
             metadata_filters (dict, optional): Any filters applied during retrieval
             parsed_query (str, optional): The query after parsing and cleaning
-            
+            bert_score (dict, optional): Dictionary with bert precision, recall and f1 scores
+            rouge_score (dict, optional): Dictionary with rouge precision, recall and f1 scores
+
         Returns:
             pd.DataFrame: The updated DataFrame
         """            
-        # Update the DataFrame with the results
-        new_row = pd.DataFrame({
+        # Prepare basic row data
+        row_data = {
             "question": [question],
+            "parsed_query": [parsed_query],
             "gold_answer": [gold_answer],
             "generated_answer": [generated_answer],
-            "context": [context],
             "is_correct": [is_correct],
-            "avg_similarity_score": [avg_similarity_score],
             "metadata_filters": [metadata_filters],
-            "parsed_query": [parsed_query],
-            "timestamp": pd.Timestamp.now()
-        })
+            "avg_similarity_score": [avg_similarity_score],
+            "bert_score": [bert_score],
+            "rouge_score": [rouge_score],
+            "timestamp": pd.Timestamp.now(),
+            "context": [context],
+        }
+        
+        # Update the DataFrame with the results
+        new_row = pd.DataFrame(row_data)
         
         self.insight_df = pd.concat([self.insight_df, new_row], ignore_index=True)
+        self.insight_df_copy = pd.concat([self.insight_df_copy, new_row], ignore_index=True)
         
         if len(self.insight_df) >= self.flush_threshold:
             logger.info("Flushing insights to disk...")
@@ -117,22 +135,20 @@ class InsightGenerator:
             logger.error(f"Error saving insights: {e}")
             raise
             
-    def calculate_metrics(self):
+    def calculate_accuracy_metrics(self):
         """
         Calculate evaluation metrics from collected insights.
         
         Returns:
             dict: Dictionary of evaluation metrics
         """
-        if len(self.insight_df) == 0:
+        if len(self.insight_df_copy) == 0:
             return {"error": "No insights available for metric calculation"}
             
         metrics = {
-            "total_queries": len(self.insight_df),
-            "correct_answers": sum(self.insight_df["is_correct"]),
-            "accuracy": sum(self.insight_df["is_correct"]) / len(self.insight_df),
+            "total_queries": len(self.insight_df_copy),
+            "correct_answers": sum(self.insight_df_copy["is_correct"]),
+            "accuracy": sum(self.insight_df_copy["is_correct"]) / len(self.insight_df_copy),
         }
-        
-        # Add more metrics as needed based on EVALUATION_METRICS config
         
         return metrics

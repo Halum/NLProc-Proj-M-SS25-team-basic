@@ -21,6 +21,7 @@ Features:
 - Detailed logging of parsed queries, filters, and similarity scores
 """
 
+from math import log
 import os
 import sys
 import json
@@ -31,7 +32,8 @@ from typing import List, Dict, Any
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from specialization.pipelines.user_query import UserQueryPipeline
-from specialization.evaluation.insight_generator import InsightGenerator
+from specialization.evaluation import InsightGenerator
+from specialization.evaluation import MetricsGenerator
 from specialization.generator.query_parser import QueryParser
 from specialization.config.config import (
     GOLD_INPUT_PATH, 
@@ -139,18 +141,21 @@ class EvaluationPipeline:
         avg_similarity_score = None
         if context and len(context) > 0 and all('score' in doc for doc in context):
             avg_similarity_score = sum(doc['score'] for doc in context) / len(context)
-        
+        # Create insight data dictionary
+        insight_data = {
+            "question": question,
+            "gold_answer": gold_answer,
+            "generated_answer": generated_answer,
+            "context": context,
+            "is_correct": is_correct,
+            "avg_similarity_score": avg_similarity_score,
+            "metadata_filters": parsed_filters,
+            "parsed_query": parsed_query,
+            "bert_score": MetricsGenerator.calculate_bert_score(gold_answer, generated_answer),
+            "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer, generated_answer)
+        }
         # Add to insights
-        self.insight_generator.update_insight(
-            question=question,
-            gold_answer=gold_answer,
-            generated_answer=generated_answer,
-            context=context,
-            is_correct=is_correct,
-            avg_similarity_score=avg_similarity_score,
-            metadata_filters=parsed_filters,
-            parsed_query=parsed_query
-        )
+        self.insight_generator.update_insight(**insight_data)
         
         return {
             'question': question,
@@ -175,7 +180,7 @@ class EvaluationPipeline:
             results.append(result)
         
         # Use InsightGenerator's calculate_metrics method instead of manual calculation
-        metrics = self.insight_generator.calculate_metrics()
+        metrics = self.insight_generator.calculate_accuracy_metrics()
         
         # Add the detailed results to the metrics
         metrics['results'] = results
