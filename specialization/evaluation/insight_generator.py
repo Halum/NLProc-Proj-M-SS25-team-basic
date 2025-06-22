@@ -11,6 +11,7 @@ Based on the baseline insight generator but specialized for movie data retrieval
 import pandas as pd
 import os
 import logging
+from datetime import datetime
 
 # Import the document writer from baseline to maintain consistency
 from baseline.postprocessor.document_writer import DocumentWriter
@@ -37,7 +38,6 @@ class InsightGenerator:
             flush_threshold (int): Number of insights before auto-saving
         """
         self.create_new_insights = not APPEND_INSIGHTS
-        self.insight_path = insight_path
         self.flush_threshold = flush_threshold
         self.insight_df = pd.DataFrame(columns=[
             "question", 
@@ -55,9 +55,26 @@ class InsightGenerator:
         # this copy will be used to generate metrics in calculate_metrics
         self.insight_df_copy = self.insight_df.copy()
         
-        logger.info(f"InsightGenerator initialized with path: {insight_path}")
+        self.insight_dir, self.insight_path = self.generate_timestamped_filename(insight_path)
         
-    def update_insight(self, question, gold_answer, generated_answer, context, 
+        logger.info(f"InsightGenerator initialized with path: {self.insight_path}")
+        
+    def generate_timestamped_filename(self, insight_path):
+        # Extract directory and base filename from the path
+        insight_dir = os.path.dirname(insight_path)
+        insight_filename = os.path.basename(insight_path)
+        
+        # Create a timestamped filename by adding timestamp before extension
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename_parts = os.path.splitext(insight_filename)
+        timestamped_filename = f"{filename_parts[0]}_{timestamp}{filename_parts[1]}"
+        
+        # Full path to the timestamped file
+        timestamped_insight_path = os.path.join(insight_dir, timestamped_filename)
+
+        return insight_dir, timestamped_insight_path
+
+    def update_insight(self, question, gold_answer, generated_answer, context,
                       is_correct, avg_similarity_score=None, metadata_filters=None,
                       parsed_query=None, bert_score=None, rouge_score=None):
         """
@@ -109,28 +126,28 @@ class InsightGenerator:
         """
         Save the insight DataFrame using the DocumentWriter.
         Creates necessary directories if they don't exist.
+        Adds timestamp to the filename for historical tracking.
         """
         if len(self.insight_df) == 0:
             logger.info("No insights to save")
             return
             
-        try:
-            # Extract directory and filename from the path
-            insight_dir = os.path.dirname(self.insight_path)
-            insight_filename = os.path.basename(self.insight_path)
-            
+        try:            
             # Create directory if it doesn't exist
-            os.makedirs(insight_dir, exist_ok=True)
+            os.makedirs(self.insight_dir, exist_ok=True)
             
-            # Use DocumentWriter to save insights
-            DocumentWriter.df_to_json(self.insight_df, insight_dir, insight_filename, append=not self.create_new_insights)
+            # Get just the filename from the full path
+            filename = os.path.basename(self.insight_path)
+            
+            # Use DocumentWriter to save insights with just the filename
+            DocumentWriter.df_to_json(self.insight_df, self.insight_dir, filename, append=not self.create_new_insights )
             self.create_new_insights = False
             
             # Clear the DataFrame after saving
             self.insight_df = self.insight_df.iloc[0:0]
-            
+
             logger.info(f"Insights saved to {self.insight_path}")
-            
+
         except Exception as e:
             logger.error(f"Error saving insights: {e}")
             raise

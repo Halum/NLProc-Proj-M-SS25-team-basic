@@ -21,7 +21,6 @@ Features:
 - Detailed logging of parsed queries, filters, and similarity scores
 """
 
-from math import log
 import os
 import sys
 import json
@@ -196,6 +195,9 @@ class EvaluationPipeline:
 def main():
     """Main function to run the evaluation pipeline."""
     try:
+        import os
+        from datetime import datetime
+        
         # Initialize and run evaluation pipeline
         pipeline = EvaluationPipeline(
             gold_data_path=GOLD_INPUT_PATH,
@@ -214,7 +216,7 @@ def main():
         print(f"Accuracy: {metrics['accuracy']:.2f}")
         print("-"*80)
         print("Query parsing was used for all evaluation queries")
-        print(f"Evaluation insights saved to: {EVALUATION_INSIGHTS_PATH}")
+        print(f"Evaluation insights saved to: {pipeline.insight_generator.insight_path}")
         print("="*80)
         
     except Exception as e:

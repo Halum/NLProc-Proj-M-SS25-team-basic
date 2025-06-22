@@ -226,7 +226,7 @@ def plot_bert_scores(insights_df):
         
         # Update layout
         fig.update_layout(
-            title="BERT Scores (Higher scores indicate better semantic matching)",
+            title="BERT Scores <br>(Higher scores indicate better semantic matching)",
             height=max(450, len(bert_df) * 30),
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
@@ -354,7 +354,7 @@ def plot_rouge_scores(insights_df):
         
         # Update layout
         fig.update_layout(
-            title="ROUGE Scores (Higher scores indicate better text matching)",
+            title="ROUGE Scores <br>(Higher scores indicate better text matching)",
             height=max(450, len(rouge_df) * 30),
             barmode='group',
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),

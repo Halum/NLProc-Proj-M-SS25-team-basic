@@ -59,12 +59,42 @@ st.markdown("""
 def main():
     st.title("📊 RAG Performance Metrics Dashboard")
     
-    # Load evaluation insights
-    with st.spinner("Loading evaluation data..."):
-        insights_df = load_insight_data()
+    # Get available insight files (only timestamped ones)
+    from specialization.streamlit.utils.data_loader import get_available_insight_files
+    available_files = get_available_insight_files()
+    
+    if not available_files:
+        st.error("No timestamped insight files found. Please run the evaluation pipeline first.")
+        st.info("Note: Only insight files with timestamps in their filenames are displayed. Recent evaluation runs automatically create timestamped files.")
+        return
+    
+    # Create a dropdown for file selection
+    file_options = [(path, f"Evaluation from {display_name}") for path, display_name, _ in available_files]
+    selected_option = st.selectbox(
+        "Select insight file:", 
+        options=file_options,
+        format_func=lambda x: x[1]
+    )
+    
+    selected_file_path, selected_label = selected_option
+    
+    # Load the selected evaluation insights
+    with st.spinner(f"Loading {selected_label}..."):
+        insights_df = load_insight_data(selected_file_path)
         
     if insights_df is not None and not insights_df.empty:
-        st.success(f"Loaded {len(insights_df)} evaluation records")
+        # Create a container with a border for the file info
+        with st.container():
+            col1, col2 = st.columns([3, 1])
+            
+            with col1:
+                st.success(f"Loaded {len(insights_df)} evaluation records from {selected_label}")
+            
+            with col2:
+                if "timestamp" in insights_df.columns and not insights_df["timestamp"].empty:
+                    # Get the earliest timestamp from the dataset
+                    earliest_time = insights_df["timestamp"].min()
+                    st.info(f"⏱️ Run date: {earliest_time.strftime('%Y-%m-%d %H:%M:%S')}")
         
         # Display overall metrics in the top section
         display_overall_metrics(insights_df)
