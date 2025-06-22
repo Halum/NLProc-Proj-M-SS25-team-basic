@@ -26,7 +26,12 @@
     },
     {
         "question": "Looking for a few top rated thrillers after 2000.",
-        "answer": "limitless, ",
+        "answer": "limitless",
         "context": "A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film."
+    },
+    {
+        "question": "I just watched a movie named 'limitless'. Suggest me another movie like it.",
+        "answer": "Genius",
+        "context": "Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age."
     }
 ]
