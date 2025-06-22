@@ -20,9 +20,13 @@
         "context": "Set against a backdrop of murder and deceit, 'The Case of the Scorpion's Tail' delivers a suspenseful and original horror-thriller plot that justifies its high rating."
     },
     {
-        "question": "Are there movies that deal with the idea of destiny versus making your own choices?",
-        "answer": "The Oklahoma Kid, Black Beauty",
-        "context": "Both The Oklahoma Kid and Black Beauty touch on how characters face fate but still try to shape their own paths, which fits the idea of destiny versus choice."
+        "question": "Find me movies with animals as central characters.",
+        "answer": "Madagascar",
+        "context": "After completing his voyages Sindbad the Sailor and his hearty crew have come home to find a palace coup d'etat has occurred and his home city is being run by a brutal dictator played by Pedro Armendariz. He's got designs on the beautiful young princess, Heidi Bruhl both lustful and political."
+    },
+    {
+        "question": "Looking for a few top rated thrillers after 2000.",
+        "answer": "limitless, ",
+        "context": "A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film."
     }
-    
 ]
