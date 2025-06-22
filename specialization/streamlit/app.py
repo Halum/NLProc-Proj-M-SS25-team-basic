@@ -24,7 +24,8 @@ from specialization.streamlit.components.metrics_display import display_overall_
 from specialization.streamlit.components.charts import (
     plot_answer_correctness, 
     plot_similarity_distributions,
-    plot_bert_rouge_scores
+    plot_bert_scores,
+    plot_rouge_scores
 )
 
 # App configuration
@@ -86,15 +87,14 @@ def main():
             </style>
             """, unsafe_allow_html=True)
             
-            col1, col2 = st.columns([1, 1], gap="large")
+            st.subheader("Answer Correctness")
+            plot_answer_correctness(insights_df)
             
-            with col1:
-                st.subheader("Answer Correctness")
-                plot_answer_correctness(insights_df)
-                
-            with col2:
-                st.subheader("BERT & ROUGE Score Analysis")
-                plot_bert_rouge_scores(insights_df)
+            st.markdown("---")
+            st.subheader("Score Analysis")
+            plot_bert_scores(insights_df)
+            st.markdown("---")
+            plot_rouge_scores(insights_df)
                 
         with tab2:
             st.subheader("Similarity Score Distribution")

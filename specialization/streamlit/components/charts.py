@@ -4,10 +4,8 @@ Visualization components for RAG performance metrics.
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 def plot_answer_correctness(insights_df):
     """
@@ -113,9 +111,9 @@ def plot_similarity_distributions(insights_df):
     
     st.plotly_chart(fig, use_container_width=True)
     
-def plot_bert_rouge_scores(insights_df):
+def plot_bert_scores(insights_df):
     """
-    Create visualizations for BERT and ROUGE scores.
+    Create visualization for BERT scores.
     
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
@@ -124,14 +122,141 @@ def plot_bert_rouge_scores(insights_df):
     bert_scores = []
     for idx, row in insights_df.iterrows():
         if isinstance(row.get('bert_score'), dict):
+            # Ensure we're explicitly converting to float and handling potential string values
+            try:
+                precision = float(row['bert_score'].get('bert_precision', 0))
+                recall = float(row['bert_score'].get('bert_recall', 0))
+                f1 = float(row['bert_score'].get('bert_f1', 0))
+            except (ValueError, TypeError):
+                # Handle potential conversion issues
+                precision = 0.0
+                recall = 0.0
+                f1 = 0.0
+                
             bert_scores.append({
                 'Query': row['question'],
-                'Precision': row['bert_score'].get('bert_precision', 0),
-                'Recall': row['bert_score'].get('bert_recall', 0),
-                'F1': row['bert_score'].get('bert_f1', 0),
+                'Precision': precision,
+                'Recall': recall,
+                'F1': f1,
                 'Is Correct': 'Correct' if row['is_correct'] else 'Incorrect'
             })
+            
+    if bert_scores:
+        # Create dataframe
+        bert_df = pd.DataFrame(bert_scores)
+        
+        # Sort by F1 score to make the chart more readable
+        bert_df = bert_df.sort_values(by='F1', ascending=True)
+        
+        # Create figure for BERT scores
+        fig = go.Figure()
+        
+        # Add BERT score traces
+        fig.add_trace(
+            go.Bar(
+                y=bert_df['Query'].tolist(),
+                x=bert_df['Precision'].tolist(),
+                name='BERT Precision',
+                marker_color='#1f77b4',
+                orientation='h'
+            )
+        )
+        
+        fig.add_trace(
+            go.Bar(
+                y=bert_df['Query'].tolist(),
+                x=bert_df['Recall'].tolist(),
+                name='BERT Recall',
+                marker_color='#ff7f0e',
+                orientation='h'
+            )
+        )
+        
+        fig.add_trace(
+            go.Bar(
+                y=bert_df['Query'].tolist(),
+                x=bert_df['F1'].tolist(),
+                name='BERT F1',
+                marker_color='#2ca02c',
+                orientation='h'
+            )
+        )
+        
+        # Create a separate trace for correctness indicators
+        correct_markers = []
+        incorrect_markers = []
+        
+        for i, correct in enumerate(bert_df['Is Correct']):
+            if correct == 'Correct':
+                correct_markers.append(i)
+            else:
+                incorrect_markers.append(i)
+                
+        # Add markers for correct answers
+        if correct_markers:
+            fig.add_trace(
+                go.Scatter(
+                    x=[-0.05] * len(correct_markers),
+                    y=[bert_df['Query'].tolist()[i] for i in correct_markers],
+                    mode='markers+text',
+                    marker=dict(symbol='circle', color='#4CAF50', size=10),
+                    text=['✓'] * len(correct_markers),
+                    textposition='middle center',
+                    textfont=dict(color='white'),
+                    name='Correct',
+                    hoverinfo='none'
+                )
+            )
+            
+        # Add markers for incorrect answers
+        if incorrect_markers:
+            fig.add_trace(
+                go.Scatter(
+                    x=[-0.05] * len(incorrect_markers),
+                    y=[bert_df['Query'].tolist()[i] for i in incorrect_markers],
+                    mode='markers+text',
+                    marker=dict(symbol='circle', color='#F44336', size=10),
+                    text=['✗'] * len(incorrect_markers),
+                    textposition='middle center',
+                    textfont=dict(color='white'),
+                    name='Incorrect',
+                    hoverinfo='none'
+                )
+            )
+        
+        # Update layout
+        fig.update_layout(
+            title="BERT Scores (Higher scores indicate better semantic matching)",
+            height=max(400, len(bert_df) * 30),
+            barmode='group',
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            margin=dict(t=100, l=200),
+            annotations=[
+                dict(
+                    text="Precision: Accuracy of generated text<br>Recall: Completeness of information<br>F1: Overall quality (balance of precision & recall)",
+                    xref="paper", yref="paper",
+                    x=0, y=1.5,
+                    showarrow=False,
+                    align="left"
+                )
+            ]
+        )
+        
+        # Update axes with a wider x-axis range to accommodate markers
+        fig.update_xaxes(title_text="Score", range=[-0.1, 1])
+        fig.update_yaxes(title_text="Query")
+        
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("BERT score data is not available in the insights.")
+
+def plot_rouge_scores(insights_df):
+    """
+    Create visualization for ROUGE scores.
     
+    Args:
+        insights_df (pd.DataFrame): DataFrame containing evaluation insights
+    """
     # Extract ROUGE scores if available
     rouge_scores = []
     for idx, row in insights_df.iterrows():
@@ -144,102 +269,114 @@ def plot_bert_rouge_scores(insights_df):
                 'Is Correct': 'Correct' if row['is_correct'] else 'Incorrect'
             })
             
-    if bert_scores and rouge_scores:
-        # Create dataframes
-        bert_df = pd.DataFrame(bert_scores)
+    if rouge_scores:
+        # Create dataframe
         rouge_df = pd.DataFrame(rouge_scores)
         
-        # Create subplots
-        fig = make_subplots(rows=2, cols=1, subplot_titles=('BERT Scores', 'ROUGE Scores'))
-        
-        # Add BERT score traces
-        fig.add_trace(
-            go.Bar(
-                x=bert_df['Query'],
-                y=bert_df['Precision'],
-                name='BERT Precision',
-                marker_color='#1f77b4',
-                showlegend=True
-            ),
-            row=1, col=1
-        )
-        
-        fig.add_trace(
-            go.Bar(
-                x=bert_df['Query'],
-                y=bert_df['Recall'],
-                name='BERT Recall',
-                marker_color='#ff7f0e',
-                showlegend=True
-            ),
-            row=1, col=1
-        )
-        
-        fig.add_trace(
-            go.Bar(
-                x=bert_df['Query'],
-                y=bert_df['F1'],
-                name='BERT F1',
-                marker_color='#2ca02c',
-                showlegend=True
-            ),
-            row=1, col=1
-        )
+        # Sort by ROUGE-L F1 score to make the chart more readable
+        rouge_df = rouge_df.sort_values(by='ROUGE-L F1', ascending=True)
+
+        # Create figure for ROUGE scores
+        fig = go.Figure()
         
         # Add ROUGE score traces
         fig.add_trace(
             go.Bar(
-                x=rouge_df['Query'],
-                y=rouge_df['ROUGE-1 F1'],
+                y=rouge_df['Query'].tolist(),
+                x=rouge_df['ROUGE-1 F1'].tolist(),
                 name='ROUGE-1 F1',
                 marker_color='#d62728',
-                showlegend=True
-            ),
-            row=2, col=1
+                orientation='h'
+            )
         )
         
         fig.add_trace(
             go.Bar(
-                x=rouge_df['Query'],
-                y=rouge_df['ROUGE-2 F1'],
+                y=rouge_df['Query'].tolist(),
+                x=rouge_df['ROUGE-2 F1'].tolist(),
                 name='ROUGE-2 F1',
                 marker_color='#9467bd',
-                showlegend=True
-            ),
-            row=2, col=1
+                orientation='h'
+            )
         )
         
         fig.add_trace(
             go.Bar(
-                x=rouge_df['Query'],
-                y=rouge_df['ROUGE-L F1'],
+                y=rouge_df['Query'].tolist(),
+                x=rouge_df['ROUGE-L F1'].tolist(),
                 name='ROUGE-L F1',
                 marker_color='#8c564b',
-                showlegend=True
-            ),
-            row=2, col=1
+                orientation='h'
+            )
         )
+        
+        # Create a separate trace for correctness indicators
+        correct_markers = []
+        incorrect_markers = []
+        
+        for i, correct in enumerate(rouge_df['Is Correct']):
+            if correct == 'Correct':
+                correct_markers.append(i)
+            else:
+                incorrect_markers.append(i)
+                
+        # Add markers for correct answers
+        if correct_markers:
+            fig.add_trace(
+                go.Scatter(
+                    x=[-0.05] * len(correct_markers),
+                    y=[rouge_df['Query'].tolist()[i] for i in correct_markers],
+                    mode='markers+text',
+                    marker=dict(symbol='circle', color='#4CAF50', size=10),
+                    text=['✓'] * len(correct_markers),
+                    textposition='middle center',
+                    textfont=dict(color='white'),
+                    name='Correct',
+                    hoverinfo='none'
+                )
+            )
+            
+        # Add markers for incorrect answers
+        if incorrect_markers:
+            fig.add_trace(
+                go.Scatter(
+                    x=[-0.05] * len(incorrect_markers),
+                    y=[rouge_df['Query'].tolist()[i] for i in incorrect_markers],
+                    mode='markers+text',
+                    marker=dict(symbol='circle', color='#F44336', size=10),
+                    text=['✗'] * len(incorrect_markers),
+                    textposition='middle center',
+                    textfont=dict(color='white'),
+                    name='Incorrect',
+                    hoverinfo='none'
+                )
+            )
         
         # Update layout
         fig.update_layout(
-            height=800,
+            title="ROUGE Scores (Higher scores indicate better text matching)",
+            height=max(400, len(rouge_df) * 30),
             barmode='group',
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            margin=dict(t=100, l=200),
+            annotations=[
+                dict(
+                    text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",
+                    xref="paper", yref="paper",
+                    x=0, y=1.5,
+                    showarrow=False,
+                    align="left"
+                )
+            ]
         )
         
-        fig.update_xaxes(tickangle=45, title_text="Query")
-        fig.update_yaxes(title_text="Score", range=[0, 1])
+        # Update axes with a wider x-axis range to accommodate markers
+        fig.update_xaxes(title_text="Score", range=[-0.1, 1])
+        fig.update_yaxes(title_text="Query")
         
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("BERT and/or ROUGE score data is not available in the insights.")
-        
-        # If we have some data but not other, display what we have
-        if bert_scores:
-            bert_df = pd.DataFrame(bert_scores)
-            st.subheader("BERT Scores")
-            st.dataframe(bert_df[['Query', 'Precision', 'Recall', 'F1', 'Is Correct']])
-            
+        st.warning("ROUGE score data is not available in the insights.")
         if rouge_scores:
             rouge_df = pd.DataFrame(rouge_scores)
             st.subheader("ROUGE Scores")
