@@ -486,3 +486,161 @@ def plot_rouge_scores(insights_df):
             rouge_df = pd.DataFrame(rouge_scores)
             st.subheader("ROUGE Scores")
             st.dataframe(rouge_df[['Query', 'ROUGE-1 F1', 'ROUGE-2 F1', 'ROUGE-L F1', 'Is Correct']])
+
+def plot_gold_context_presence(insights_df):
+    """
+    Create visualization showing if gold_context is present in the retrieved context list.
+    
+    Args:
+        insights_df (pd.DataFrame): DataFrame containing evaluation insights
+    """
+    # Create a new list for tracking presence of gold context in retrieved contexts
+    gold_context_presence = []
+    
+    for idx, row in insights_df.iterrows():
+        # Check if both gold_context and context exist in the row
+        if 'gold_context' in row and 'context' in row:
+            gold_context = row['gold_context']
+            retrieved_contexts = row['context']
+            
+            # Initialize as not found
+            is_found = False
+            position = -1
+            
+            # We need to handle different formats of gold_context
+            gold_content = None
+            
+            # Extract content from gold context based on its structure
+            if isinstance(gold_context, list):
+                # If gold_context is a list, join all contents
+                gold_content = " ".join([
+                    ctx.get('content', '') if isinstance(ctx, dict) else str(ctx)
+                    for ctx in gold_context
+                ])
+            elif isinstance(gold_context, dict):
+                # If gold_context is a dict, get the content field
+                gold_content = gold_context.get('content', '')
+            else:
+                # If gold_context is a string or other type
+                gold_content = str(gold_context)
+                
+            # Check if gold context is present in any of the retrieved contexts
+            if isinstance(retrieved_contexts, list):
+                for i, ctx in enumerate(retrieved_contexts[:5]):  # Check only top 5 contexts
+                    if isinstance(ctx, dict) and 'content' in ctx:
+                        # Compare content
+                        if gold_content and gold_content in ctx['content']:
+                            is_found = True
+                            position = i
+                            break
+                    elif isinstance(ctx, str):
+                        # Direct string comparison
+                        if gold_content and gold_content in ctx:
+                            is_found = True
+                            position = i
+                            break
+            
+            # Add the result to our list
+            gold_context_presence.append({
+                'Query': row['question'],
+                'Gold Context Present': is_found,
+                'Position': position + 1 if position >= 0 else "Not found",  # Convert to 1-indexed
+                'Is Correct': row['is_correct']
+            })
+    
+    if gold_context_presence:
+        # Create dataframe for visualization
+        presence_df = pd.DataFrame(gold_context_presence)
+        
+        # Compute statistics
+        total_queries = len(presence_df)
+        found_count = sum(presence_df['Gold Context Present'])
+        found_percentage = found_count / total_queries * 100 if total_queries > 0 else 0
+        
+        # Create two separate visualizations in columns
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Create pie chart of gold context presence
+            fig_pie = go.Figure()
+            fig_pie.add_trace(
+                go.Pie(
+                    labels=['Present', 'Not Present'],
+                    values=[found_count, total_queries - found_count],
+                    marker_colors=['#4CAF50', '#F44336'],
+                    name="Gold Context Presence"
+                )
+            )
+            
+            fig_pie.update_layout(
+                title=f"Gold Context Presence<br>{found_count}/{total_queries} ({found_percentage:.1f}%)",
+                height=350
+            )
+            
+            st.plotly_chart(fig_pie, use_container_width=True)
+        
+        with col2:
+            # Create a horizontal bar chart with position information
+            position_counts = presence_df[presence_df['Gold Context Present']].groupby('Position').size().reset_index(name='Count')
+            position_counts = position_counts.sort_values('Position')
+            
+            fig_bar = go.Figure()
+            fig_bar.add_trace(
+                go.Bar(
+                    y=position_counts['Position'].astype(str),
+                    x=position_counts['Count'],
+                    orientation='h',
+                    marker_color='#2196F3',
+                    name="Position in Results",
+                    text=position_counts['Count'],
+                    textposition='auto'
+                )
+            )
+            
+            fig_bar.update_layout(
+                title="Position in Retrieved Results<br>(when found)",
+                xaxis_title="Count",
+                yaxis_title="Position",
+                height=350
+            )
+            
+            st.plotly_chart(fig_bar, use_container_width=True)
+        
+        # Update layout
+        # The layout is now handled separately for each figure (fig_pie and fig_bar)
+        
+        # Add a breakdown by correctness
+        st.subheader("Relationship with Answer Correctness")
+        
+        # Calculate presence rates for correct vs incorrect answers
+        correct_df = presence_df[presence_df['Is Correct']]
+        incorrect_df = presence_df[~presence_df['Is Correct']]
+        
+        # Only proceed if we have both correct and incorrect answers
+        if not correct_df.empty and not incorrect_df.empty:
+            correct_presence = correct_df['Gold Context Present'].mean() * 100
+            incorrect_presence = incorrect_df['Gold Context Present'].mean() * 100
+            
+            # Create a grouped bar chart
+            fig_corr = go.Figure()
+            fig_corr.add_trace(
+                go.Bar(
+                    x=['Correct Answers', 'Incorrect Answers'],
+                    y=[correct_presence, incorrect_presence],
+                    marker_color=['#4CAF50', '#F44336'],
+                    text=[f"{correct_presence:.1f}%", f"{incorrect_presence:.1f}%"],
+                    textposition='auto'
+                )
+            )
+            
+            fig_corr.update_layout(
+                title="Gold Context Presence by Answer Correctness",
+                yaxis_title="Gold Context Present (%)",
+                yaxis=dict(range=[0, 100])
+            )
+            
+            st.plotly_chart(fig_corr, use_container_width=True)
+        else:
+            st.info("Insufficient data to compare gold context presence between correct and incorrect answers.")
+    else:
+        st.warning("Gold context presence data could not be calculated. Please ensure gold_context and context fields are available in the insights data.")

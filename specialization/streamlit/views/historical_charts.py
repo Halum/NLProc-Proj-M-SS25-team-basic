@@ -2,7 +2,7 @@
 Historical Charts View
 
 This module provides visualizations for historical performance metrics across multiple evaluation runs.
-It shows trends in BERT scores, ROUGE scores, and similarity scores over time.
+It shows trends in retrieval accuracy, BERT scores, ROUGE scores, and similarity scores over time.
 """
 
 import streamlit as st
@@ -291,6 +291,176 @@ def plot_historical_similarity_scores(historical_data):
     
     st.plotly_chart(fig, use_container_width=True)
 
+def plot_historical_retrieval_accuracy(historical_data):
+    """
+    Create a line chart showing average context distance (retrieval accuracy) by iteration.
+    Lower values indicate better retrieval accuracy as context was found closer to the top.
+    
+    Args:
+        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    """
+    if historical_data.empty:
+        st.warning("No historical data available for retrieval accuracy.")
+        return
+    
+    # Make a copy to avoid modifying the original DataFrame
+    data_for_chart = historical_data.copy()
+    
+    # Check if we need to calculate the average context distance
+    if 'avg_context_distance' not in data_for_chart.columns:
+        # If the column doesn't exist, we'll calculate it
+        st.info("Calculating average context distance from retrieved chunk position data...")
+        
+        # Check if we have individual insight data files stored that we could load
+        # This would be implementation-specific, so we'll use the metrics we have
+        
+        # Check if we have retrieved_chunk_rank or retrieved_positions column
+        if 'avg_retrieved_position' in data_for_chart.columns:
+            # If we already have the average position, use it directly
+            data_for_chart['avg_context_distance'] = data_for_chart['avg_retrieved_position']
+        
+        # If there's insight_data available for calculations
+        elif 'insight_data' in data_for_chart.columns and isinstance(data_for_chart.iloc[0].get('insight_data'), pd.DataFrame):
+            # Try to calculate from insight data
+            distances = []
+            
+            for _, row in data_for_chart.iterrows():
+                avg_distance = calculate_avg_context_distance(row['insight_data'])
+                distances.append(avg_distance if avg_distance is not None else float('nan'))
+            
+            data_for_chart['avg_context_distance'] = distances
+        else:
+            # Default value if we can't calculate it
+            data_for_chart['avg_context_distance'] = [3.0] * len(data_for_chart)
+            st.warning("Could not calculate average context distance. Using placeholder values of 3.0.")
+    
+    # Create iteration labels with sample info
+    iterations = list(range(1, len(data_for_chart) + 1))
+    iteration_labels = []
+    hover_texts = []
+    
+    # Create both axis labels and hover text
+    for i, (_, row) in enumerate(data_for_chart.iterrows(), 1):
+        correct = row.get('correct_count', 0)
+        total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Format axis label as "Iteration n (correct/total)"
+        iteration_label = f"Iteration {i} ({correct}/{total})"
+        iteration_labels.append(iteration_label)
+        
+        # Format hover text with additional details
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        else:
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        
+        hover_texts.append(hover_text)
+    
+    fig = go.Figure()
+    
+    # Add trace for retrieval accuracy (context distance)
+    fig.add_trace(go.Scatter(
+        x=iterations,
+        y=data_for_chart['avg_context_distance'],
+        mode='lines+markers',
+        name='Avg Context Distance',
+        line=dict(color='#e377c2', width=2),
+        marker=dict(size=10),
+        text=hover_texts,
+        hovertemplate='Iteration %{x}<br>Avg Context Distance: %{y:.2f}<br>%{text}<extra></extra>'
+    ))
+    
+    # Calculate y-axis range for auto-zooming - start from 0, but we'll set a reasonable upper limit
+    y_values = data_for_chart['avg_context_distance'].dropna().tolist()
+    
+    if y_values:
+        y_min = 0  # Always start from 0
+        y_max = max(y_values) * 1.2  # Add 20% padding above
+    else:
+        y_min, y_max = 0, 5  # Default range if no data
+    
+    # Update layout
+    fig.update_layout(
+        title="Historical Retrieval Accuracy Trend (Average Context Distance)",
+        xaxis_title="Evaluation Iteration (correct/total)",
+        yaxis_title="Average Context Distance (lower is better)",
+        xaxis=dict(
+            tickmode='array',
+            tickvals=iterations,
+            ticktext=iteration_labels,
+            tickangle=0 if len(iterations) <= 5 else 45
+        ),
+        yaxis=dict(range=[y_min, y_max]),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        hovermode="x",
+        margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
+    )
+    
+    # Add a horizontal reference line representing "perfect" retrieval (context at position 1)
+    fig.add_shape(
+        type="line",
+        xref="paper",
+        yref="y",
+        x0=0,
+        y0=1,
+        x1=1,
+        y1=1,
+        line=dict(
+            color="green",
+            width=1,
+            dash="dash",
+        ),
+        name="Perfect Retrieval"
+    )
+    
+    # Add annotation for the reference line
+    fig.add_annotation(
+        xref="paper",
+        yref="y",
+        x=0.01,
+        y=1,
+        text="Ideal (position 1)",
+        showarrow=False,
+        font=dict(
+            color="green",
+            size=10
+        ),
+        bgcolor="rgba(255, 255, 255, 0.7)"
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+def calculate_avg_context_distance(insights_df):
+    """
+    Calculate the average context distance from retrieved_chunk_rank values.
+    
+    The context distance is the position where the relevant context was found.
+    For example, if contexts are found at positions 5, 5, 1, 4, 4, 1, the 
+    average context distance would be (5+5+1+4+4+1)/6 = 3.33.
+    
+    Args:
+        insights_df (pd.DataFrame): DataFrame containing evaluation insights
+        
+    Returns:
+        float: The calculated average context distance, or None if calculation fails
+    """
+    try:
+        # Filter out rows where context wasn't found (position = -1)
+        if 'retrieved_chunk_rank' in insights_df.columns:
+            context_found = insights_df[insights_df['retrieved_chunk_rank'] >= 0]
+            
+            if not context_found.empty:
+                # Calculate the average distance/position
+                avg_distance = context_found['retrieved_chunk_rank'].mean()
+                return avg_distance
+        
+        return None
+    except Exception as e:
+        st.warning(f"Error calculating average context distance: {str(e)}")
+        return None
+
 def display_historical_charts(historical_data):
     """
     Display all historical performance charts.
@@ -325,6 +495,17 @@ def display_historical_charts(historical_data):
     
     # Display each chart section sequentially
     st.markdown("---")
+    st.subheader("Retrieval Accuracy by Iteration")
+    st.write("This chart shows the average context distance (position) when found across all evaluation iterations. Lower values indicate better retrieval accuracy as relevant context was found closer to the top of the search results.")
+    
+    # We'll always try to display the chart, and let the function handle the calculation or warnings
+    try:
+        plot_historical_retrieval_accuracy(historical_data)
+    except Exception as e:
+        st.error(f"Error displaying retrieval accuracy chart: {str(e)}")
+        st.warning("Could not generate the retrieval accuracy chart. This may indicate missing data or a format issue.")
+    
+    st.markdown("---")
     st.subheader("BERT Scores by Iteration")
     st.write("This chart shows the average BERT precision, recall, and F1 scores across all evaluation iterations.")
     plot_historical_bert_scores(historical_data)
@@ -338,3 +519,8 @@ def display_historical_charts(historical_data):
     st.subheader("Similarity Scores by Iteration")
     st.write("This chart shows the average similarity scores across all evaluation iterations.")
     plot_historical_similarity_scores(historical_data)
+    
+    st.markdown("---")
+    st.subheader("Retrieval Accuracy by Iteration")
+    st.write("This chart shows the average context distance, indicating retrieval accuracy, across all evaluation iterations. Lower values are better.")
+    plot_historical_retrieval_accuracy(historical_data)

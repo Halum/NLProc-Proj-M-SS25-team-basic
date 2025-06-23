@@ -26,7 +26,8 @@ from specialization.streamlit.components.charts import (
     plot_answer_correctness, 
     plot_similarity_distributions,
     plot_bert_scores,
-    plot_rouge_scores
+    plot_rouge_scores,
+    plot_gold_context_presence
 )
 
 # App configuration
@@ -133,7 +134,7 @@ def main():
             
             st.subheader("Context Analysis")
             st.write("Analysis of retrieved context and its relevance to the query")
-            # Additional retrieval analysis will be added here
+            plot_gold_context_presence(insights_df)
             
         with tab3:
             st.subheader("Evaluation Records")
