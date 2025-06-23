@@ -91,7 +91,7 @@ def calculate_average_metrics(insight_data):
             'avg_rouge1_f1': 0.0,
             'avg_rouge2_f1': 0.0,
             'avg_rougeL_f1': 0.0,
-            'count': 0,
+            'avg_context_distance': 0.0,  # Added this for retrieval accuracy
             'correct_count': 0,
             'incorrect_count': 0,
             'total_samples': 0
@@ -101,6 +101,7 @@ def calculate_average_metrics(insight_data):
         bert_count = 0
         rouge_count = 0
         similarity_count = 0
+        context_distance_count = 0  # Added for retrieval accuracy
         
         # Sum up metrics
         for record in insight_data:
@@ -129,6 +130,60 @@ def calculate_average_metrics(insight_data):
                     metrics['avg_rougeL_f1'] += record['rouge_score']['rougeL_fmeasure']
                 rouge_count += 1
             
+            # Calculate context distance (retrieval position)
+            # Find the position of gold_context in the context list
+            if 'gold_context' in record and 'context' in record:
+                gold_context = record['gold_context']
+                retrieved_contexts = record['context']
+                
+                # Skip if either is missing
+                if gold_context and retrieved_contexts and isinstance(retrieved_contexts, list):
+                    # Initialize as not found
+                    found = False
+                    position = -1
+                    
+                    # We need to handle different formats of gold_context
+                    gold_content = None
+                    
+                    # Extract content from gold context based on its structure
+                    if isinstance(gold_context, list):
+                        # If gold_context is a list, join all contents
+                        gold_content = " ".join([
+                            ctx.get('content', '') if isinstance(ctx, dict) else str(ctx)
+                            for ctx in gold_context
+                        ])
+                    elif isinstance(gold_context, dict):
+                        # If gold_context is a dict, get the content field
+                        gold_content = gold_context.get('content', '')
+                    else:
+                        # If gold_context is a string or other type
+                        gold_content = str(gold_context)
+                    
+                    # Check if gold context is present in any of the retrieved contexts
+                    if isinstance(retrieved_contexts, list):
+                        for i, ctx in enumerate(retrieved_contexts[:5]):  # Check only top 5 contexts
+                            if isinstance(ctx, dict) and 'content' in ctx:
+                                # Compare content
+                                if gold_content and gold_content in ctx['content']:
+                                    found = True
+                                    position = i
+                                    break
+                            elif isinstance(ctx, str):
+                                # Direct string comparison
+                                if gold_content and gold_content in ctx:
+                                    found = True
+                                    position = i
+                                    break
+                    
+                    # If we found the gold context, add its position to the metrics
+                    if found:
+                        # Add 1 to convert to 1-indexed position (positions start at 1, not 0)
+                        metrics['avg_context_distance'] += (position + 1)
+                        context_distance_count += 1
+                        logging.debug(f"Found gold context at position {position+1}")
+                    else:
+                        logging.debug("Gold context not found in retrieved contexts")
+            
             # Count correct/incorrect answers
             metrics['total_samples'] += 1
             if 'is_correct' in record:
@@ -136,8 +191,6 @@ def calculate_average_metrics(insight_data):
                     metrics['correct_count'] += 1
                 else:
                     metrics['incorrect_count'] += 1
-                
-            metrics['count'] += 1
         
         # Calculate averages
         if similarity_count > 0:
@@ -152,6 +205,13 @@ def calculate_average_metrics(insight_data):
             metrics['avg_rouge1_f1'] /= rouge_count
             metrics['avg_rouge2_f1'] /= rouge_count
             metrics['avg_rougeL_f1'] /= rouge_count
+        
+        # Add average context distance if we have data
+        if context_distance_count > 0:
+            metrics['avg_context_distance'] /= context_distance_count
+        else:
+            # If no context distance found, leave it as None to indicate missing data
+            metrics['avg_context_distance'] = None
             
         return metrics
     
@@ -165,7 +225,7 @@ def calculate_average_metrics(insight_data):
             'avg_rouge1_f1': 0.0,
             'avg_rouge2_f1': 0.0,
             'avg_rougeL_f1': 0.0,
-            'count': 0
+            'avg_context_distance': None  # Set to None to indicate missing data
         }
 
 def get_historical_metrics():
@@ -194,6 +254,13 @@ def get_historical_metrics():
             metrics['timestamp'] = timestamp
             metrics['file_path'] = file_path
             metrics['record_count'] = len(insight_data)
+            
+            # Store the original insight data as a DataFrame for potential recalculation if needed
+            try:
+                metrics['insight_data'] = pd.DataFrame(insight_data)
+            except:
+                # If conversion fails, we'll leave it out
+                pass
             
             historical_data.append(metrics)
         

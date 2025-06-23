@@ -526,7 +526,7 @@ def plot_gold_context_presence(insights_df):
                 
             # Check if gold context is present in any of the retrieved contexts
             if isinstance(retrieved_contexts, list):
-                for i, ctx in enumerate(retrieved_contexts[:5]):  # Check only top 5 contexts
+                for i, ctx in enumerate(retrieved_contexts):  # Check all retrieved contexts
                     if isinstance(ctx, dict) and 'content' in ctx:
                         # Compare content
                         if gold_content and gold_content in ctx['content']:

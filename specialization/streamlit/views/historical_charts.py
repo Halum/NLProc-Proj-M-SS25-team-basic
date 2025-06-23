@@ -306,33 +306,10 @@ def plot_historical_retrieval_accuracy(historical_data):
     # Make a copy to avoid modifying the original DataFrame
     data_for_chart = historical_data.copy()
     
-    # Check if we need to calculate the average context distance
-    if 'avg_context_distance' not in data_for_chart.columns:
-        # If the column doesn't exist, we'll calculate it
-        st.info("Calculating average context distance from retrieved chunk position data...")
-        
-        # Check if we have individual insight data files stored that we could load
-        # This would be implementation-specific, so we'll use the metrics we have
-        
-        # Check if we have retrieved_chunk_rank or retrieved_positions column
-        if 'avg_retrieved_position' in data_for_chart.columns:
-            # If we already have the average position, use it directly
-            data_for_chart['avg_context_distance'] = data_for_chart['avg_retrieved_position']
-        
-        # If there's insight_data available for calculations
-        elif 'insight_data' in data_for_chart.columns and isinstance(data_for_chart.iloc[0].get('insight_data'), pd.DataFrame):
-            # Try to calculate from insight data
-            distances = []
-            
-            for _, row in data_for_chart.iterrows():
-                avg_distance = calculate_avg_context_distance(row['insight_data'])
-                distances.append(avg_distance if avg_distance is not None else float('nan'))
-            
-            data_for_chart['avg_context_distance'] = distances
-        else:
-            # Default value if we can't calculate it
-            data_for_chart['avg_context_distance'] = [3.0] * len(data_for_chart)
-            st.warning("Could not calculate average context distance. Using placeholder values of 3.0.")
+    # Check if we have context distance data
+    if 'avg_context_distance' not in data_for_chart.columns or data_for_chart['avg_context_distance'].isnull().all():
+        st.warning("No context distance data is available in the historical metrics. This means the gold context wasn't found in the retrieved contexts list.")
+        return
     
     # Create iteration labels with sample info
     iterations = list(range(1, len(data_for_chart) + 1))
@@ -383,9 +360,9 @@ def plot_historical_retrieval_accuracy(historical_data):
     
     # Update layout
     fig.update_layout(
-        title="Historical Retrieval Accuracy Trend (Average Context Distance)",
+        title="Historical Retrieval Accuracy Trend (Gold Context Position)",
         xaxis_title="Evaluation Iteration (correct/total)",
-        yaxis_title="Average Context Distance (lower is better)",
+        yaxis_title="Average Gold Context Position (lower is better)",
         xaxis=dict(
             tickmode='array',
             tickvals=iterations,
@@ -432,34 +409,7 @@ def plot_historical_retrieval_accuracy(historical_data):
     
     st.plotly_chart(fig, use_container_width=True)
 
-def calculate_avg_context_distance(insights_df):
-    """
-    Calculate the average context distance from retrieved_chunk_rank values.
-    
-    The context distance is the position where the relevant context was found.
-    For example, if contexts are found at positions 5, 5, 1, 4, 4, 1, the 
-    average context distance would be (5+5+1+4+4+1)/6 = 3.33.
-    
-    Args:
-        insights_df (pd.DataFrame): DataFrame containing evaluation insights
-        
-    Returns:
-        float: The calculated average context distance, or None if calculation fails
-    """
-    try:
-        # Filter out rows where context wasn't found (position = -1)
-        if 'retrieved_chunk_rank' in insights_df.columns:
-            context_found = insights_df[insights_df['retrieved_chunk_rank'] >= 0]
-            
-            if not context_found.empty:
-                # Calculate the average distance/position
-                avg_distance = context_found['retrieved_chunk_rank'].mean()
-                return avg_distance
-        
-        return None
-    except Exception as e:
-        st.warning(f"Error calculating average context distance: {str(e)}")
-        return None
+
 
 def display_historical_charts(historical_data):
     """
@@ -491,19 +441,26 @@ def display_historical_charts(historical_data):
             numeric_cols = display_df.select_dtypes(include=['float64']).columns
             display_df[numeric_cols] = display_df[numeric_cols].round(4)
             
+            # Remove insight_data column which contains full dataframes
+            if 'insight_data' in display_df.columns:
+                display_df = display_df.drop(columns=['insight_data'])
+            
             st.dataframe(display_df, use_container_width=True)
     
     # Display each chart section sequentially
     st.markdown("---")
     st.subheader("Retrieval Accuracy by Iteration")
-    st.write("This chart shows the average context distance (position) when found across all evaluation iterations. Lower values indicate better retrieval accuracy as relevant context was found closer to the top of the search results.")
+    st.write("This chart shows the average position where the gold context was found in the retrieved contexts list. Lower values indicate better retrieval accuracy, with 1.0 being ideal (gold context found as the first result).")
     
-    # We'll always try to display the chart, and let the function handle the calculation or warnings
-    try:
+    # Check if we have at least some context distance data
+    has_distance_data = ('avg_context_distance' in historical_data.columns and 
+                         not historical_data['avg_context_distance'].isnull().all())
+    
+    if not has_distance_data:
+        st.warning("No context distance data is available. This metric requires finding 'gold_context' within the list of retrieved contexts.")
+        st.info("To resolve this: ensure your evaluation pipeline includes both 'gold_context' and 'context' (list of retrieved contexts) in the evaluation insights.")
+    else:
         plot_historical_retrieval_accuracy(historical_data)
-    except Exception as e:
-        st.error(f"Error displaying retrieval accuracy chart: {str(e)}")
-        st.warning("Could not generate the retrieval accuracy chart. This may indicate missing data or a format issue.")
     
     st.markdown("---")
     st.subheader("BERT Scores by Iteration")
@@ -519,8 +476,3 @@ def display_historical_charts(historical_data):
     st.subheader("Similarity Scores by Iteration")
     st.write("This chart shows the average similarity scores across all evaluation iterations.")
     plot_historical_similarity_scores(historical_data)
-    
-    st.markdown("---")
-    st.subheader("Retrieval Accuracy by Iteration")
-    st.write("This chart shows the average context distance, indicating retrieval accuracy, across all evaluation iterations. Lower values are better.")
-    plot_historical_retrieval_accuracy(historical_data)
