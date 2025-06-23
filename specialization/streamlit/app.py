@@ -9,6 +9,7 @@ The app provides visualizations and insights on:
 2. Answer accuracy and quality metrics
 3. Detailed analysis of query parsing and filter performance
 4. Comparison of similarity scores across different types of queries
+5. Historical trends in performance metrics over time
 """
 
 import streamlit as st
@@ -253,6 +254,8 @@ def main():
                     for j, ctx in enumerate(record['context']):
                         st.markdown(f"**Document {j+1}** (Score: {ctx['score']:.4f}) - {ctx['metadata']['title']}")
                         st.text(ctx['content'])
+        
+        # Historical metrics now available as a separate page in the sidebar
     else:
         st.error("Failed to load evaluation insights data. Please check the data file.")
 

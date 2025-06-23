@@ -250,9 +250,6 @@ def plot_bert_scores(insights_df):
         # Create dataframe
         bert_df = pd.DataFrame(bert_scores)
         
-        # Sort by F1 score to make the chart more readable
-        bert_df = bert_df.sort_values(by='F1', ascending=True)
-        
         # Create figure for BERT scores
         fig = go.Figure()
         
@@ -381,9 +378,6 @@ def plot_rouge_scores(insights_df):
         # Create dataframe
         rouge_df = pd.DataFrame(rouge_scores)
         
-        # Sort by ROUGE-L F1 score to make the chart more readable
-        rouge_df = rouge_df.sort_values(by='ROUGE-L F1', ascending=True)
-
         # Create figure for ROUGE scores
         fig = go.Figure()
         
