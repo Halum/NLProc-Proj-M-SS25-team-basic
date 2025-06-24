@@ -27,7 +27,6 @@ from typing import List, Dict, Any, Optional
 # Add parent directories to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 from baseline.preprocessor.chunking_service import FixedSizeChunkingStrategy
@@ -80,7 +79,7 @@ class UserQueryPipeline:
             Guidelines:
             - Mention the all the movies relevant or partially relevant to the question.
             - Use precise and concise language.
-            - If the question is not answerable with the provided context, say "Unable to answer".
+            - If the question is not answerable with the provided context, say "No Data Found".
 
             Context:
             {context}

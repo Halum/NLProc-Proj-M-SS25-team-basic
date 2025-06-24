@@ -11,13 +11,13 @@
     },
     {
         "question": "What movies have overviews involving plane crashes or survival stories?",
-        "answer": "The Bermuda Triangle",
-        "context": "The Bermuda Triangle fits as it centers on a mysterious storm-caused disappearance in the Bermuda Triangle—an area notorious for unexplained plane crashes and survival tales."
+        "answer": "No Data Found",
+        "context": "After a strange storm in the Carribean causes a boat to sink, a family finds itself stranded on an island in the \"27th dimension\"."
     },
     {
         "question": "Find horror movies with high ratings and a unique plot.",
-        "answer": "The Case of the Scorpion's Tail",
-        "context": "Set against a backdrop of murder and deceit, 'The Case of the Scorpion's Tail' delivers a suspenseful and original horror-thriller plot that justifies its high rating."
+        "answer": "No Data Found",
+        "context": "The Case of the Scorpion's Tail begins with the mysterious death of a millionaire and spirals into the murder of his suddenly rich wife, which draws the attention of a dogged investigator, who follows a trail of blood to the bitter end."
     },
     {
         "question": "Find me movies with animals as central characters.",
@@ -37,15 +37,15 @@
     {
         "question": "Suggest me drama movies without violence or murder with rating over 5.",
         "answer": "hukkle",
-        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder. Starring with Ferec Bandi, Józsefné Rácz, Ági Margitai"
+        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder."
     },
     {
         "question": "Find the best-rated sequels in any genre.",
-        "answer": "Now You See Me 2",
+        "answer": "No Data Found",
         "context": "The answer 'Now You See Me 2' refers to a highly-rated sequel in the database, known for its thrilling plot and captivating performances, continuing the story from the first film and maintaining a high rating, making it one of the best-rated sequels."
     },
     {
-        "question": "Find family-friendly movies with highly rated plots related to mythological worlds.",
+        "question": "Find family-friendly movies with highly rated plots related to alternate universe.",
         "answer": "My Little Pony: Equestria Girls",
         "context": "Via a magic mirror, Twilight Sparkle travels into an alternate universe in order to recover a crown that was stolen from the Crystal Empire. Upon her arrival she is horrified to learn that she has turned into a human."
     },
@@ -55,8 +55,8 @@
         "context": "A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished."
     },
     {
-        "question": "Find all movies where the plot involves vampires or werewolves.",
-        "answer": "Blinker, Mad Monster Party?, and Open Season: Scared Silly.",
-        "context": "The movies where the plot involves vampires or werewolves, based on the database, are Blinker, Mad Monster Party?, and Open Season: Scared Silly, each featuring supernatural creatures like vampires or werewolves in their storylines."
+        "question": "Movies related to vampires or werewolves.",
+        "answer": "Mad Monster Party?",
+        "context": "When Dr Frankenstein decides to retire from the monster-making business, he calls an international roster of monsters to a creepy convention to elect his successor. Everyone is there including Dracula, The Werewolf, The Creature, Dr Jekyll &amp; Mr Hyde and many more. But Frankenstein's title is not all that is at stake. The famous doctor has also discovered the secret of total destruction that must not fall into the wrong hands!"
     }
 ]
