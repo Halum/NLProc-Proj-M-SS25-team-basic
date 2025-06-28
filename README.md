@@ -8,15 +8,24 @@
   - [System Architecture](#system-architecture)
     - [Data Processing Pipeline](#data-processing-pipeline)
     - [Suggestion Generation Pipeline](#suggestion-generation-pipeline)
-  - [Project Status: Working Components and Areas for Improvement](#project-status-working-components-and-areas-for-improvement)
-    - [What's Working Well](#whats-working-well)
-    - [Areas for Improvement](#areas-for-improvement)
-    - [Next Steps](#next-steps)
   - [Structure](#structure)
   - [Environment Setup with Conda](#environment-setup-with-conda)
   - [How to Use](#how-to-use)
-    - [Using the Streamlit UI](#using-the-streamlit-ui)
-    - [Using the Command Line Interface](#using-the-command-line-interface)
+    - [🎬 Specialization Overview](#-specialization-overview)
+    - [🚀 Getting Started with Specialization](#-getting-started-with-specialization)
+      - [1. Prepare Movie Data](#1-prepare-movie-data)
+      - [2. Interactive Pipeline Execution](#2-interactive-pipeline-execution)
+      - [3. Individual Pipeline Commands](#3-individual-pipeline-commands)
+    - [📊 Data Management](#-data-management)
+      - [Data Flow](#data-flow)
+    - [🔧 Pipeline Details](#-pipeline-details)
+      - [1. Raw to Processed Pipeline](#1-raw-to-processed-pipeline)
+      - [2. Processed to Embeddings Pipeline](#2-processed-to-embeddings-pipeline)
+      - [3. Evaluation Pipeline](#3-evaluation-pipeline)
+      - [4. User Query Pipeline](#4-user-query-pipeline)
+    - [🎯 Usage Examples](#-usage-examples)
+      - [Movie Question Examples](#movie-question-examples)
+      - [Evaluation Metrics](#evaluation-metrics)
   - [🛠 Development Guidelines](#-development-guidelines)
     - [Task Flow](#task-flow)
     - [Branching Strategy](#branching-strategy)
@@ -47,62 +56,25 @@ The data processing pipeline handles the ingestion and preparation of documents 
 
 The suggestion generation pipeline manages the retrieval and generation process, taking user queries through the retrieval phase and generating contextually relevant responses using the configured language model.
 
-## Project Status: Working Components and Areas for Improvement
-
-This section provides an overview of the current state of the RAG project, highlighting both the strengths and the areas that need further development.
-
-### What's Working Well
-
-| Component | Status | Description |
-|-----------|--------|-------------|
-| **Document Loader** | ✅ | Support for multiple file formats (PDF, DOCX, TXT) is implemented and functioning well, though more extensive testing with diverse document structures is needed. |
-| **Chunking Strategies** | ✅ | Multiple chunking strategies are implemented and working effectively, including fixed-size, sliding window, sentence-based, paragraph-based, semantic, and markdown header-based approaches. |
-| **Response Generation** | ✅ | The model consistently generates responses for all questions using the retrieved context. |
-| **Automated Testing** | ✅ | The testing pipeline successfully processes documents, runs queries, and evaluates responses against labeled data. |
-| **Insight Generation** | ✅ | The system generates detailed logs and insights about performance metrics for analysis. |
-| **Analytical Visualization** | ✅ | Tools for visualizing embeddings, similarity scores, and performance metrics are implemented and working. |
-
-### Areas for Improvement
-
-| Component | Status | Description |
-|-----------|--------|-------------|
-| **Context Matching** | ⚠️ | The current method for matching labeled context with retrieved chunks is rigid and inefficient. The `find_chunk_containing_context` function only checks for exact substring matches, which doesn't account for semantic similarity or partial matches. |
-| **Instruction Following** | ⚠️ | The current model struggles with complex instructions and chain-of-thought reasoning. Testing more advanced models or implementing specialized prompting techniques could improve performance. |
-| **Grounding Verification** | ⚠️ | There's no reliable mechanism to verify if the generated answer is actually grounded in the provided context, potentially allowing for hallucinations. |
-| **Answer Verification** | ⚠️ | Automated verification of generated answers remains a challenge, currently relying on human feedback which is not scalable for large-scale evaluation. |
-| **Reproducibility** | ⚠️ | System reproducibility hasn't been systematically tested to ensure consistent results across multiple runs with the same inputs. |
-| **Unknown Question Handling** | ⚠️ | The system lacks effective detection and handling of out-of-context questions, potentially leading to incorrect or misleading answers when information is not available in the source documents. |
-
-### Next Steps
-
-1. **Improve Context Matching**: Implement semantic similarity-based matching between labeled contexts and retrieved chunks.
-2. **Enhance Model Capabilities**: Test more advanced models or implement better prompting techniques to improve complex instruction handling and chain-of-thought reasoning.
-3. **Implement Grounding Verification**: Develop a mechanism to verify that generated answers are actually grounded in the provided context.
-4. **Automate Answer Verification**: Create an automated system for evaluating answer quality without human intervention.
-5. **Ensure Reproducibility**: Design and run tests to verify that the system produces consistent results across multiple runs.
-6. **Improve Unknown Question Handling**: Implement detection for questions that cannot be answered from the available context and craft appropriate responses.
-
-
-
 ## Structure
-- `baseline/`: Common starter system (retriever + generator)
-  - `config/`: Configuration settings for the RAG system
-  - `data/`: Holds different kinds of data files
-    - `db/`: Vector databases and indexes
-    - `insight/`: Storage for analytics data from experiments
-    - `raw/`: Original input text files
-    - `tests/`: Test data for system validation
-  - `evaluation/`: Tools for evaluating retriever and generator performance
-  - `generator/`: Text generation components using LLMs
-  - `postprocessor/`: Output formatting and document writing tools
-  - `preprocessor/`: Document reading and text chunking services
-  - `retriever/`: Vector store and retrieval components
-  - `pipeline.py`: Main execution script for the RAG pipeline
-- `evaluation/`: Common tools for comparing results
+- `baseline/`: Implementation before moving to specilization
 - `homeworks/`: Weekly assignment results and observations
-  - `week_2/`: Analysis of RAG system behavior with various questions
-  - `week_3/`: Comparison of different chunking strategies
-- `utils/`: Helper functions shared across code
+- `specialization/`: Extended RAG system with specialized features
+  - `config/`: Specialized configuration settings that extend baseline
+  - `data/`: Specialized data management (isolated from baseline)
+    - `raw/`: Raw CSV movie data files
+    - `processed/`: CSV data processed to JSON structure
+    - `db/`: ChromaDB databases
+    - `insight/`: Logs, Analytics and evaluation insights
+    - `tests/`: Test data and gold standard evaluations
+  - `evaluation/`: Specialized evaluation tools and metrics
+  - `generator/`: Enhanced text generation with specialized models
+  - `pipelines/`: Processing pipelines for data transformation
+  - `preprocessor/`: Extended document readers for CSV processing
+  - `retriever/`: Enhanced retrieval components
+  - `streamlit/`: Specialized Streamlit interface
+  - `main.py`: Interactive CLI for running specialized pipelines
+
 
 ## Environment Setup with Conda
 
@@ -123,17 +95,23 @@ For a more controlled environment, we recommend using Conda:
    pip install -r requirements.txt
    ```
 
-4. **Environment Management**
+4. **Environment Variables Setup**
+   - Copy `specialization/.env.example` as `specialization/.env`
+   - Edit the .env file and add your OpenAI API key
+
+5. **Environment Management**
    - Activate environment: `conda activate rag-project`
    - Deactivate environment: `conda deactivate`
    - List environments: `conda env list`
 
-5. **Running the Baseline Pipeline**
+6. **Running the Pipelines**
+
    ```bash
-   python baseline/pipeline.py
+   # Interactive CLI
+   python specialization/main.py
    ```
 
-6. **Managing Dependencies**
+7. **Managing Dependencies**
    - Whenever you install a new package, update requirements.txt:
    ```bash
    pip-chill > requirements.txt
@@ -143,47 +121,124 @@ For a more controlled environment, we recommend using Conda:
 
 ## How to Use
 
-### Using the Streamlit UI
+The specialization module extends the baseline RAG system with advanced features for movie data processing, enhanced retrieval strategies, and comprehensive evaluation frameworks. It processes CSV movie datasets and creates specialized embeddings for improved question-answering about films.
 
-The project includes a user-friendly Streamlit application that provides an interactive way to explore different chunking strategies for RAG:
+### 🎬 Specialization Overview
 
-1. **Start the Streamlit app**:
-   ```bash
-   streamlit run streamlit/app.py
-   ```
+The specialization track focuses on:
+- **Movie Data Processing**: Converting raw CSV movie datasets into processed JSON with genre filtering
+- **Enhanced Embeddings**: Creating specialized vector embeddings from movie metadata and descriptions
+- **Interactive Querying**: Providing a conversational interface for movie-related questions
+- **Comprehensive Evaluation**: Testing system performance with gold standard movie questions
 
-2. **Navigate the app's interface**:
-   - **Preprocessing Tab**: Select and configure chunking strategies, process documents, and view results
-   - **Interaction Tab**: Ask questions and compare answers across different chunking strategies
-   - **Chat Tab**: Interact with the RAG system in a conversational manner
-   - **Insights Tab**: Analyze performance metrics and visualizations of different strategies
+### 🚀 Getting Started with Specialization
 
-3. **Exploring chunking strategies**:
-   - Select one or more strategies from the sidebar (Fixed Size, Sliding Window, Sentence-Based, etc.)
-   - Adjust parameters like chunk size and overlap using the provided sliders
-   - Process documents with the selected strategies and compare their performance
+#### 1. Prepare Movie Data
 
-4. **Evaluating results**:
-   - Use predefined sample questions or enter your own queries
-   - Compare the answers generated using different strategies
-   - Analyze metrics like correctness rate and context retrieval success
+Place your raw movie CSV files in the `specialization/data/raw/` directory:
+- `movies_metadata.csv`: Main movie information
+- `credits.csv`: Cast and crew information  
+- `keywords.csv`: Movie keywords and tags
 
-### Using the Command Line Interface
+#### 2. Interactive Pipeline Execution
 
-For programmatic use or batch processing, you can run the RAG pipeline directly from the command line:
+Run the interactive CLI to execute pipelines:
 
-1. **Run the baseline pipeline**:
-   ```bash
-   python baseline/pipeline.py
-   ```
+```bash
+python specialization/main.py
+```
 
-2. **Options and configurations**:
-   - Use the `--withindex` flag to load existing vector indexes: `python baseline/pipeline.py --withindex`
+This will present you with an interactive menu:
+```
+Select a pipeline to execute:
+1. Raw to Processed - Convert raw CSV files to processed JSON
+2. Processed to Embeddings - Create vector embeddings from processed data  
+3. Evaluation Pipeline - Run system evaluation with gold standard data
+4. User Query Pipeline - Interactive query mode
+5. Run All Pipelines (1-3 in sequence)
+q. Quit
+```
 
-3. **Viewing results**:
-   - The pipeline outputs query results, expected and generated answers, and context information
-   - Retrieval statistics and performance metrics are displayed in the terminal
-   - Insights are saved automatically for later analysis
+#### 3. Individual Pipeline Commands
+
+You can also run specific pipelines directly:
+
+```python
+# Raw to Processed Pipeline
+python specialization/pipelines/raw_to_processed.py
+
+# Processed to Embeddings Pipeline  
+python specialization/pipelines/processed_to_embeddings
+
+# Evaluation Pipeline
+python specialization/pipelines/evaluation_pipeline
+```
+
+
+### 📊 Data Management
+
+The specialization module follows a strict data isolation principle:
+
+#### Data Flow
+1. **Raw CSV Files** → `specialization/data/raw/`
+   - Original movie datasets (metadata, credits, keywords)
+2. **Processed JSON** → `specialization/data/processed/`
+   - Filtered and joined movie data in JSON format
+3. **Vector Embeddings** → `specialization/data/db/`
+   - ChromaDB collections with movie embeddings
+4. **Evaluation Results** → `specialization/data/insight/`
+   - Performance metrics and analysis results
+5. **Test Data** → `specialization/data/tests/`
+   - Question sets and gold standard answers
+
+### 🔧 Pipeline Details
+
+#### 1. Raw to Processed Pipeline
+- Loads and joins multiple CSV files (movies, credits, keywords)
+- Filters by target genres (Family, Mystery, Western)
+- Samples data for manageable processing
+- Outputs structured JSON with movie metadata
+
+#### 2. Processed to Embeddings Pipeline
+- Creates vector embeddings from processed movie data
+- Stores embeddings in ChromaDB for efficient retrieval
+- Includes metadata for enhanced search capabilities
+- Batch processing for optimal performance
+
+#### 3. Evaluation Pipeline
+- Tests system performance against gold standard questions
+- Measures retrieval accuracy and answer quality
+- Generates detailed evaluation insights
+- Saves results with timestamps for comparison
+
+#### 4. User Query Pipeline
+- Interactive movie question-answering interface
+- Real-time retrieval and generation
+- Contextual responses based on movie database
+- Graceful handling of out-of-scope queries
+
+### 🎯 Usage Examples
+
+#### Movie Question Examples
+```
+Q: "What are some family-friendly Western movies?"
+Q: "Tell me about mystery movies with high ratings"
+Q: "Which movies star specific actors in family films?"
+Q: "What are the keywords associated with Western genres?"
+```
+
+#### Evaluation Metrics
+The system tracks:
+- **Retrieval Accuracy**: How well relevant movie information is found
+- **Answer Quality**: Relevance and accuracy of generated responses
+- **Context Utilization**: Whether answers are grounded in retrieved data
+- **Response Time**: Performance metrics for user experience
+
+The evaluation generates detailed insights including:
+- Precision, recall, and F1 scores
+- Response quality metrics
+- Retrieval effectiveness analysis
+- Error analysis and improvement suggestions
 
 ## 🛠 Development Guidelines
 
