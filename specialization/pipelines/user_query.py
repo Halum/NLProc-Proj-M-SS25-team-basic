@@ -75,7 +75,7 @@ class UserQueryPipeline:
         # Create custom RAG prompt template
         self.rag_prompt = PromptTemplate(
             input_variables=["context", "question"],
-            template="""You are a helpful movie expert assistant. Use the following context to answer the question about movies. 
+            template="""You are a helpful movie expert assistant. Use the following context to answer the question about movies in MarkDown format. 
             Guidelines:
             - Mention the all the movies relevant or partially relevant to the question.
             - Use precise and concise language.
