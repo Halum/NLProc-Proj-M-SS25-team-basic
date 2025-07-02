@@ -17,7 +17,7 @@ RAW_DOCUMENT_DIR_PATH = "specialization/data/raw/"
 PROCESSED_DOCUMENT_DIR_PATH = "specialization/data/processed/"
 
 # Processing pipeline configurations
-DATA_SAMPLE_SIZE = 100  # Number of rows to sample from each CSV file for processing
+DATA_SAMPLE_SIZE = 1000  # Number of rows to sample from each CSV file for processing
 RAW_DATA_FILES = [
     "movies_metadata.csv",
     "credits.csv",
