@@ -112,7 +112,7 @@ VECTOR_STORE_TYPE = "faiss"  # or 'chromadb'
 
 # Evaluation settings
 EVALUATION_METRICS = ["precision", "recall", "f1", "bleu", "rouge"]
-GOLD_INPUT_PATH = "specialization/data/tests/gold_input.json"
+GOLD_INPUT_PATH = "specialization/data/tests/gold_input_v2.json"
 # Base path for insights - actual files will be saved with timestamps (format: evaluation_insights_YYYYMMDD_HHMMSS.json)
 EVALUATION_INSIGHTS_PATH = "specialization/data/insight/evaluation_insights.json"
 APPEND_INSIGHTS = (
