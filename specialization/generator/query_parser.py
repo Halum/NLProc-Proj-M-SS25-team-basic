@@ -42,6 +42,8 @@ class FiltersInput(TypedDict, total=False):
     max_release_date: Optional[int]
     min_vote_average: Optional[float]
     max_vote_average: Optional[float]
+    min_budget: Optional[float]
+    max_budget: Optional[float]
     question: str
 
 
@@ -65,6 +67,8 @@ def extract_metadata_filters(
     max_release_date: Optional[int] = None,
     min_vote_average: Optional[float] = None,
     max_vote_average: Optional[float] = None,
+    min_budget: Optional[float] = None,
+    max_budget: Optional[float] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -89,6 +93,8 @@ def extract_metadata_filters(
         "max_release_date": max_release_date,
         "min_vote_average": min_vote_average,
         "max_vote_average": max_vote_average,
+        "min_budget": min_budget,
+        "max_budget": max_budget,
         "question": question,
     }
 
@@ -122,6 +128,7 @@ class QueryParser:
                 - title text (title_contains)
                 - release date (release_date, min_release_date, max_release_date)
                 - vote average/rating (min_vote_average, max_vote_average)
+                - budget (min_budget, max_budget)
             2. Extract the **core question** about movies. Do not remove the user's intent or thematic language (e.g., "with firefighter", "involving fate", "about survival").
             3. Preserve the user’s natural-language question to be used in semantic search or reasoning.
             
@@ -142,6 +149,7 @@ class QueryParser:
                 • "highly rated", "top rated", or "high ratings" → min_vote_average: 7.0
                 • "critically acclaimed", "great reviews" → min_vote_average: 8.0
             - The question should be the core information need about movies
+            - Budget should be in dollars (e.g., "under 10 million" = 10000000)
 
             Return structured output for:
                 - min_revenue (float)
@@ -154,6 +162,8 @@ class QueryParser:
                 - max_release_date (int)
                 - min_vote_average (float)
                 - max_vote_average (float)
+                - min_budget (float)
+                - max_budget (float)
                 - question (string)
             
             Examples:
@@ -191,7 +201,7 @@ class QueryParser:
 
             "Top rated movies from the 90s" →
             {{ 
-            "min_vote_average": 8.0,
+            "min_vote_average": 7.0,
             "min_release_date": 1990,
             "max_release_date": 1999,
             "question": "Top rated movies" 
@@ -203,8 +213,9 @@ class QueryParser:
             "question": "Movies with short runtime" 
             }}
 
-            "Comedy films rated above 7" →
+            "Comedy films made with a budget under 5 million rated above 7 " →
             {{ 
+            "max_budget": 5000000,
             "min_vote_average": 7.0,
             "question": "Comedy films" 
             }}
@@ -322,6 +333,12 @@ class QueryParser:
 
             elif key == "max_vote_average" and value is not None:
                 chroma_conditions.append({"vote_average": {"$lte": float(value)}})
+            
+            elif key == "min_budget" and value is not None:
+                chroma_conditions.append({"budget": {"$gte": float(value)}})
+
+            elif key == "max_budget" and value is not None:
+                chroma_conditions.append({"budget": {"$lte": float(value)}})
 
         # Wrap with $and if there are multiple conditions
         print(f"Final ChromaDB filters: {chroma_conditions}")

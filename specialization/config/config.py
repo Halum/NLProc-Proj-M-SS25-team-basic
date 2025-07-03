@@ -57,6 +57,9 @@ DATA_COLUMNS_TO_KEEP = [
     "genres",
     "keywords",
     "production_companies",
+    "budget",
+    "spoken_languages",
+    "production_countries"
 ]
 DATA_COLUMNS_TYPE_MAPPING = (
     [  # accepted types : int | float | str | bool | year (special)
@@ -64,14 +67,17 @@ DATA_COLUMNS_TYPE_MAPPING = (
         {"column": "runtime", "type": "int"},
         {"column": "release_date", "type": "year"},
         {"column": "vote_average", "type": "float"},
+        {"column": "budget", "type": "float"},
     ]
 )
-METADATA_COLUMNS = ["title", "revenue", "runtime", "release_date", "vote_average"]
+METADATA_COLUMNS = ["title", "revenue", "runtime", "release_date", "vote_average", "budget"]
 ADD_TO_CHUNKING_COLUMN = [
     {"column": "cast", "prefix": "Starring with "},
     {"column": "genres", "prefix": "The movie belongs to genres like "},
     {"column": "keywords", "prefix": "The movie has keywords like "},
     {"column": "production_companies", "prefix": "Produced by "},
+    {"column": "spoken_languages", "prefix": "The movie is available in languages like "},
+    {"column": "production_countries", "prefix": "Produced in countries like "},
 ]
 CHUNKING_COLUMN = "overview"
 
