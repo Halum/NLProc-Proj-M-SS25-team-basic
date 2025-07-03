@@ -2,8 +2,8 @@
     {
         "id": 1,
         "question": "Find me a movie where FBI is involved",
-        "answer": "Now You See Me 2",
-        "context": "One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet.",
+        "answer": "Formosa Betrayed",
+        "context": "In the early 1980s, an FBI Agent is assigned to investigate the murder of a respected professor. Through his investigation, he unearths a spider web of international secrets that has been thriving within college campuses across America for decades. His investigation takes him across the Pacific to the island nation of Taiwan, where with the help of the outspoken widow and an unlikely spy, he learns that the Professor's killing was not a random act, but a desperate move by a scandalous government intent on keeping its nefarious activities under wraps. Our detective soon finds himself on a collision course against the U.S. State Department, the Chinese Mafia, and the Nationalist Chinese Government - in a land where the truth is not what it seems and the only people he can trust, cannot be trusted at all. Inspired by actual events.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
@@ -101,8 +101,8 @@
     {
         "id": 8,
         "question": "Find me movies with animals as central characters.",
-        "answer": "Madagascar",
-        "context": "After completing his voyages Sindbad the Sailor and his hearty crew have come home to find a palace coup d'etat has occurred and his home city is being run by a brutal dictator played by Pedro Armendariz. He's got designs on the beautiful young princess, Heidi Bruhl both lustful and political.",
+        "answer": "The Adventures of Milo and Otis",
+        "context": "The story of two animals and their adventures. Milo, the cat, and Otis, the dog, are two animals who grew up together on the same farm. One day, the two are separated and begin a journey to find each other. The adventurous, and often perilous quest finds the two animals traveling across mountains, plains, and snow-covered lands searching for one another.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
@@ -128,8 +128,8 @@
     {
         "id": 10,
         "question": "I just watched a movie named 'limitless'. Suggest me another movie like it.",
-        "answer": "Genius",
-        "context": "Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age.",
+        "answer": " Dark City",
+        "context": "A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans.",
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
@@ -169,8 +169,8 @@
     {
         "id": 13,
         "question": "Movies related to vampires or werewolves.",
-        "answer": "Mad Monster Party",
-        "context": "When Dr Frankenstein decides to retire from the monster-making business, he calls an international roster of monsters to a creepy convention to elect his successor. Everyone is there including Dracula, The Werewolf, The Creature, Dr Jekyll &amp; Mr Hyde and many more. But Frankenstein's title is not all that is at stake. The famous doctor has also discovered the secret of total destruction that must not fall into the wrong hands!",
+        "answer": "White Skin",
+        "context": "Two roommates discover that the family of one of their girlfriends is populated with vampires.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
@@ -196,7 +196,7 @@
     {
         "id": 15,
         "question": "I have heard about the movie named 'Pinocchio'. What is the plot behind this movie? ",
-        "answer": "Pinocchio's adventures",
+        "answer": "Pinocchio",
         "context": "Roberto Benigni adapts the classic children's tale by Carlo Collodi for the big-budget family-oriented comedy Pinocchio.",
         "difficulty": "Easy",
         "test_case_tagging": [
@@ -211,7 +211,7 @@
     {
         "id": 16,
         "question": "I’ve come across references to the film Pinocchio on several occasions, and it appears to be quite a culturally significant narrative. Could you provide a detailed explanation of the underlying plot and thematic essence of the movie, particularly in terms of its moral or philosophical dimensions?",
-        "answer": "Pinocchio's adventures",
+        "answer": "Pinocchio",
         "context": "Roberto Benigni adapts the classic children's tale by Carlo Collodi for the big-budget family-oriented comedy Pinocchio.",
         "difficulty": "Easy",
         "test_case_tagging": [
@@ -368,7 +368,7 @@
     },
     {
         "id": 27,
-        "question": "List movies involving political corruption.",
+        "question": "List movies involving disadvantages of political corruption.",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -553,7 +553,7 @@
     },
     {
         "id": 40,
-        "question": "Suggest me good movies about time traveling",
+        "question": "Suggest me good movies about time traveling disadvantages",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -591,7 +591,7 @@
     },
     {
         "id": 43,
-        "question": "What movies have overviews involving plane crashes or survival stories?",
+        "question": "What movies have overviews involving plane crashes or survival stories where everybody died?",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -618,8 +618,8 @@
     {
         "id": 45,
         "question": "Movies with characters navigating multiple identities or secret lives.",
-        "answer": "Shelter",
-        "context": "A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished.",
+        "answer": "The Return of Martin Guerre",
+        "context": "During the medieval times, Martin Guerre returns to his hometown in the middle of France, after being away in the war since he was a child. Nobody recognise him, and the people who knew him suspect he is not Martin, but he knows all about his family and friends, even the most unusual things. Is this man really Martin Guerre?",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
@@ -648,7 +648,7 @@
     {
         "id": 47,
         "question": "Movies.",
-        "answer": "No Data Found",
+        "answer": "Any",
         "context": "No context available",
         "difficulty": "Negative",
         "test_case_tagging": [
@@ -694,8 +694,8 @@
     {
         "id": 50,
         "question": "Suggest me a movie on the theme of journalism ",
-        "answer": "Doug's 1st Movie",
-        "context": "Doug and his pal Skeeter set's out to find the monster of Lucky Duck Lake. Though things get really out of hand when some one blurts out that the monster is real.",
+        "answer": "The Pelican Brief",
+        "context": "Features an investigative journalist uncovering the truth about Supreme Court assassinations, involving media frenzy and legal intrigue.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
@@ -709,7 +709,7 @@
     {
         "id": 51,
         "question": "Movies for me ",
-        "answer": "No Data Found",
+        "answer": "Any",
         "context": "No context available",
         "difficulty": "Negative",
         "test_case_tagging": [
@@ -896,7 +896,7 @@
     {
         "id": 65,
         "question": "Any Sharon Stone movie after 2000?",
-        "answer": "Cold Creek Manor",
+        "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",
         "test_case_tagging": [
@@ -911,7 +911,7 @@
         "id": 66,
         "question": "Hukkle realease date?",
         "answer": "2002-10-24 00:00:00",
-        "context": "No specific context",
+        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata"
@@ -921,8 +921,8 @@
     {
         "id": 67,
         "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
-        "answer": "Kisaragi\t",
-        "context": "No specific context",
+        "answer": "Kiss Kiss Bang Bang",
+        "context": "A petty thief posing as an actor is brought to Los Angeles for an unlikely audition and finds himself in the middle of a murder investigation along with his high school dream girl and a detective who's been training him for his upcoming role...",
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
@@ -935,8 +935,8 @@
     {
         "id": 68,
         "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
-        "answer": "Hukkle",
-        "context": "No specific context",
+        "answer": "The Prestige",
+        "context": "A mysterious story of two magicians whose intense rivalry leads them on a life-long battle for supremacy -- full of obsession, deceit and jealousy with dangerous and deadly consequences.",
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
@@ -949,8 +949,8 @@
     {
         "id": 69,
         "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
-        "answer": "Silver City",
-        "context": "No specific context",
+        "answer": "Tipping Point",
+        "context": "A medical student is desperate to solve a murder to prove that she's not having a psychological breakdown, as her family and friends believe her to be.",
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
@@ -1061,7 +1061,7 @@
     {
         "id": 78,
         "question": "I was wondering what other tools Jerry Belson might use to kill students?",
-        "answer": "Knife, Scissors",
+        "answer": "No Data Found",
         "context": "Director Mickey Rose's zany send-up of teen slasher flicks features a maniacal psycho known as the Breather (played by Jerry Belson), who stalks –and murders– promiscuous students at a suburban high school. The fanatical killer's unusual weapons include paper clips, blackboard erasers and eggplants. Kristen Riter, Matthew Goldsby, Joe Flood, Kevin Mannis and Sara Eckhardt head the cast.",
         "difficulty": "Hard",
         "test_case_tagging": [
@@ -1069,7 +1069,7 @@
             "Multi-level reasoning",
             "Chain of thoughts"
         ],
-        "question_reasoning": "There is no direct data so the system has to generate insight"
+        "question_reasoning": "No data found"
     },
     {
         "id": 79,
@@ -1086,7 +1086,7 @@
     {
         "id": 80,
         "question": "If the accident did not happen in 중독 then would the younger brother ended up feeling like his older brother?",
-        "answer": "No",
+        "answer": "Did not",
         "context": "Two brothers get into a sudden tragic accident and they both fall into a coma at the same time. A year later, the younger brother Dae-jin wakes up believing he is his older brother Ho-jin.",
         "difficulty": "Hard",
         "test_case_tagging": [
@@ -1099,7 +1099,7 @@
     {
         "id": 81,
         "question": "Do you think the father, returning as a snowman in the movie of Jack Frost, actually gets the chance to fix things with his son, or is it too little, too late?",
-        "answer": "Yes",
+        "answer": "get an opportunity",
         "context": "A father, who can't keep his promises, dies in a car accident. One year later, he returns as a snowman, who has the final chance to put things right with his son before he is gone forever.",
         "difficulty": "Hard",
         "test_case_tagging": [
