@@ -212,7 +212,7 @@ def render_cluster_visualization(
     # Display the figure with proper container settings
     if dimensions == 3:
         # For 3D plots, use a centered container with padding to avoid scroll conflicts
-        col1, col2, col3 = st.columns([2, 6, 2])  # 1:8:1 ratio for padding
+        col1, col2, col3 = st.columns([1, 8, 1])  # 1:8:1 ratio for padding
         with col2:
             st.plotly_chart(fig, use_container_width=True)
     else:
@@ -229,15 +229,6 @@ def render_cluster_visualization(
     st.write(f"""
     ### Visualization Details
     - **Method**: {method.upper()} ({dimensions}D) - {method_explanations.get(method.lower(), 'Dimensionality reduction method')}
-    - **Total movies**: {viz_data['full_size']}
-    - **Sample size**: {viz_data['actual_sample_size']} ({viz_data['actual_sample_size']/viz_data['full_size']*100:.1f}% of total)
-    - **Target genres**: {', '.join(viz_data['target_genres'])}
-    
-    **Component Meanings:**
-    - Each axis represents a dimension that captures patterns in movie features
-    - {get_component_description(method, 1)} (Component 1)
-    - {get_component_description(method, 2)} (Component 2)
-    {'- ' + get_component_description(method, 3) + ' (Component 3)' if dimensions == 3 else ''}
     """)
     
     # Add detailed explanation of how 3D plotting works
@@ -440,16 +431,6 @@ def display_genre_distribution(viz_data: Dict) -> None:
     - Movies can belong to multiple genres, so percentages don't sum to 100%
     - Target genres are marked with ⭐
     """)
-    
-    # Show sampling statistics
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("Full Dataset", f"{full_total:,} movies")
-    with col2:
-        st.metric("Sample Dataset", f"{sample_total:,} movies")
-    with col3:
-        sample_ratio = (sample_total / full_total) * 100 if full_total > 0 else 0
-        st.metric("Sample Ratio", f"{sample_ratio:.1f}%")
 
 def display_dimension_reduction_explanation() -> None:
     """Display an explanation of the dimension reduction techniques."""

@@ -412,14 +412,14 @@ def plot_gold_context_presence(insights_df):
         st.warning("Gold context presence data could not be calculated. Please ensure gold_context and context fields are available in the insights data.")
         return
         
-    # First, ensure we're tracking all queries, even those without gold context
-    total_queries = len(insights_df)
+    # Calculate presence statistics
+    total_queries = len(presence_df)
     
     # Convert position to a format suitable for visualization
     presence_df['Gold Context Present'] = presence_df['Position'].notnull()
-    presence_df['Position'] = presence_df['Position'].apply(lambda x: x if pd.notnull(x) else "Not found")
+    presence_df['Position_Display'] = presence_df['Position'].apply(lambda x: str(int(x)) if pd.notnull(x) else "Not found")
     
-    # Compute statistics - note that we use the total number of queries from insights_df
+    # Compute statistics
     found_count = sum(presence_df['Gold Context Present'])
     found_percentage = found_count / total_queries * 100 if total_queries > 0 else 0
     not_found_count = total_queries - found_count
@@ -447,53 +447,88 @@ def plot_gold_context_presence(insights_df):
         st.plotly_chart(fig_pie, use_container_width=True)
     
     with col2:
-        # Create a horizontal bar chart with position information
-        position_counts = presence_df[presence_df['Gold Context Present']].groupby('Position').size().reset_index(name='Count')
-        position_counts = position_counts.sort_values('Position')
-        
-        fig_bar = go.Figure()
-        fig_bar.add_trace(
-            go.Bar(
-                y=position_counts['Position'].astype(str),
-                x=position_counts['Count'],
-                orientation='h',
-                marker_color='#2196F3',
-                name="Position in Results",
-                text=position_counts['Count'],
-                textposition='auto'
-            )
-        )
-        
-        fig_bar.update_layout(
-            title="Position in Retrieved Results<br>(when found)",
-            xaxis_title="Count",
-            yaxis_title="Position",
-            height=350
-        )
-        
-        st.plotly_chart(fig_bar, use_container_width=True)
+        # Create a horizontal bar chart with position information - only for found contexts
+        found_positions = presence_df[presence_df['Gold Context Present']]
+        if not found_positions.empty:
+            position_counts = found_positions.groupby('Position_Display').size().reset_index(name='Count')
+            # Sort by numeric position (convert back to int for sorting, excluding "Not found")
+            position_counts = position_counts[position_counts['Position_Display'] != "Not found"]
+            if not position_counts.empty:
+                position_counts['Position_Numeric'] = position_counts['Position_Display'].astype(int)
+                position_counts = position_counts.sort_values('Position_Numeric')
+            
+                fig_bar = go.Figure()
+                fig_bar.add_trace(
+                    go.Bar(
+                        y=position_counts['Position_Display'],
+                        x=position_counts['Count'],
+                        orientation='h',
+                        marker_color='#2196F3',
+                        name="Position in Results",
+                        text=position_counts['Count'],
+                        textposition='auto'
+                    )
+                )
+                
+                fig_bar.update_layout(
+                    title="Position in Retrieved Results<br>(when found)",
+                    xaxis_title="Count",
+                    yaxis_title="Position",
+                    height=350
+                )
+                
+                st.plotly_chart(fig_bar, use_container_width=True)
+            else:
+                st.info("No gold context found in retrieved results")
+        else:
+            st.info("No gold context found in retrieved results")
     
     # Add a breakdown by correctness
     st.subheader("Relationship with Answer Correctness")
     
-    # Calculate presence rates for correct vs incorrect answers
+    # Calculate presence rates for correct vs incorrect answers using ALL data
     correct_df = presence_df[presence_df['Is Correct'] == 'Correct']
     incorrect_df = presence_df[presence_df['Is Correct'] == 'Incorrect']
     
-    # Only proceed if we have both correct and incorrect answers
-    if not correct_df.empty and not incorrect_df.empty:
-        correct_presence = correct_df['Gold Context Present'].mean() * 100
-        incorrect_presence = incorrect_df['Gold Context Present'].mean() * 100
+    # Proceed with the analysis even if one group is empty
+    correct_count = len(correct_df)
+    incorrect_count = len(incorrect_df)
+    
+    if correct_count > 0 or incorrect_count > 0:
+        # Calculate presence rates
+        correct_presence = correct_df['Gold Context Present'].mean() * 100 if correct_count > 0 else 0
+        incorrect_presence = incorrect_df['Gold Context Present'].mean() * 100 if incorrect_count > 0 else 0
+        
+        # Create data for the grouped bar chart
+        categories = []
+        values = []
+        colors = []
+        texts = []
+        
+        if correct_count > 0:
+            categories.append('Correct Answers')
+            values.append(correct_presence)
+            colors.append('#4CAF50')
+            found_correct = correct_df['Gold Context Present'].sum()
+            texts.append(f"{correct_presence:.1f}%<br>({found_correct}/{correct_count})")
+        
+        if incorrect_count > 0:
+            categories.append('Incorrect Answers')
+            values.append(incorrect_presence)
+            colors.append('#F44336')
+            found_incorrect = incorrect_df['Gold Context Present'].sum()
+            texts.append(f"{incorrect_presence:.1f}%<br>({found_incorrect}/{incorrect_count})")
         
         # Create a grouped bar chart
         fig_corr = go.Figure()
         fig_corr.add_trace(
             go.Bar(
-                x=['Correct Answers', 'Incorrect Answers'],
-                y=[correct_presence, incorrect_presence],
-                marker_color=['#4CAF50', '#F44336'],
-                text=[f"{correct_presence:.1f}%", f"{incorrect_presence:.1f}%"],
-                textposition='auto'
+                x=categories,
+                y=values,
+                marker_color=colors,
+                text=texts,
+                textposition='auto',
+                hovertemplate='%{x}<br>Gold Context Present: %{text}<extra></extra>'
             )
         )
         
@@ -505,4 +540,4 @@ def plot_gold_context_presence(insights_df):
         
         st.plotly_chart(fig_corr, use_container_width=True)
     else:
-        st.info("Insufficient data to compare gold context presence between correct and incorrect answers.")
+        st.info("No data available to compare gold context presence between correct and incorrect answers.")

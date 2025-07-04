@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 # Import utilities for the dashboard
 from specialization.streamlit.utils.historical_data import get_historical_metrics
 from specialization.streamlit.views.historical_charts import display_historical_charts
+from specialization.streamlit.utils.styling import configure_page
 
 # Configure logging
 logging.basicConfig(
@@ -23,37 +24,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
-st.set_page_config(
-    page_title="Historical Analysis",
-    page_icon="📊",
-    layout="wide"
-)
-
-# Add custom CSS for consistent styling
-st.markdown("""
-<style>
-    /* Reduce sidebar width */
-    [data-testid="stSidebar"] {
-        min-width: 200px !important;
-        max-width: 200px !important;
-    }
-    /* Add extra spacing between horizontal blocks */
-    [data-testid="stHorizontalBlock"] {
-        gap: 3rem !important;
-    }
-    [data-testid="stHorizontalBlock"] > div:first-child {
-        margin-right: 4rem;
-        padding-right: 2rem;
-    }
-    /* Fix sidebar navigation text to be title case */
-    section[data-testid="stSidebarUserContent"] .css-17lntkn {
-        text-transform: capitalize !important;
-    }
-    section[data-testid="stSidebarUserContent"] .css-17lntkn:first-letter {
-        text-transform: uppercase !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Page configuration with consistent styling
+configure_page("Historical Analysis", "📊")
 
 # Title and description
 st.title("📈 Historical Performance Trends")
@@ -70,8 +42,6 @@ try:
         historical_data = get_historical_metrics()
 
         if historical_data is not None and not historical_data.empty:
-            # Show number of runs available
-            st.success(f"Loaded data from {len(historical_data)} evaluation runs")
             
             try:
                 # Display historical charts

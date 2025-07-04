@@ -31,6 +31,7 @@ from specialization.streamlit.components.charts import (
     plot_rouge_scores,
     plot_gold_context_presence
 )
+from specialization.streamlit.utils.styling import apply_main_page_styling
 
 # App configuration
 st.set_page_config(
@@ -38,27 +39,10 @@ st.set_page_config(
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
-)            # Custom CSS for consistent styling across the app
-st.markdown("""
-<style>
-    /* Reduce sidebar width */
-    [data-testid="stSidebar"] {
-        min-width: 200px !important;
-        max-width: 200px !important;
-    }
-    /* Add extra spacing between all horizontal blocks in the app */
-    [data-testid="stHorizontalBlock"] {
-        gap: 3rem !important;
-    }
-    /* Fix sidebar navigation text to be title case */
-    section[data-testid="stSidebarUserContent"] .css-17lntkn {
-        text-transform: capitalize !important;
-    }
-    section[data-testid="stSidebarUserContent"] .css-17lntkn:first-letter {
-        text-transform: uppercase !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+)
+
+# Apply consistent styling
+apply_main_page_styling()
 
 def main():
     st.title("📊 RAG Performance Metrics Dashboard")

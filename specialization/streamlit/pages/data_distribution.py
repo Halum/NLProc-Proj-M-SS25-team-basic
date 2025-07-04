@@ -19,13 +19,10 @@ from specialization.streamlit.views.data_distribution import (
     display_dimension_reduction_explanation
 )
 from specialization.streamlit.utils.dimension_reduction import prepare_cluster_visualization_data
+from specialization.streamlit.utils.styling import configure_page
 
-# Page configuration
-st.set_page_config(
-    page_title="Data Distribution Analysis",
-    page_icon="📊",
-    layout="wide"
-)
+# Page configuration with consistent styling
+configure_page("Data Distribution Analysis", "📊")
 
 def main():
     """Main function to render the data distribution visualization page."""
@@ -36,7 +33,52 @@ def main():
     The visualizations use dimensionality reduction techniques to project high-dimensional movie features into 2D/3D space.
     """)
 
-    # Controls
+    # Load initial data for dataset statistics (using default cache=True and PCA)
+    try:
+        with st.spinner("Loading dataset information..."):
+            viz_data = prepare_cluster_visualization_data(
+                n_components=2,  # Use 2D for initial loading
+                method='pca',    # Use PCA for initial loading as it's most reliable
+                cache=True,      # Always use cache for initial loading
+                random_state=42
+            )
+        
+        # Dataset Statistics Section
+        st.header("📊 Dataset Overview")
+        
+        # Show sampling statistics
+        full_total = len(viz_data["full_metadata"])
+        sample_total = len(viz_data["sample_metadata"])
+        sample_ratio = (sample_total / full_total) * 100 if full_total > 0 else 0
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("Full Dataset", f"{full_total:,} movies")
+        with col2:
+            st.metric("Sample Dataset", f"{sample_total:,} movies")
+        with col3:
+            st.metric("Sample Ratio", f"{sample_ratio:.1f}%")
+        
+        # About the Dataset section
+        st.subheader("About the Dataset")
+        st.markdown("""
+        The visualization compares:
+        
+        - **Full Dataset**: The complete movie dataset from `processed_movies_data.json`
+        - **Sample Dataset**: The filtered sample used for the RAG system from `processed_movies_data_sample.json`
+        
+        The sample is created by filtering movies from selected genres and taking a limited number of entries.
+        This visualization helps understand how representative the sample is of the full dataset.
+        """)
+        
+        st.markdown("---")  # Separator
+
+    except Exception as e:
+        st.error(f"Could not load dataset information: {str(e)}")
+        viz_data = None
+
+    # Controls - moved to just before Cluster Visualization
+    st.subheader("Visualization Controls")
     col1, col2, col3 = st.columns([2, 1, 1])
     
     with col1:
@@ -85,39 +127,30 @@ def main():
     # Additional analysis section
     st.header("Genre Distribution Analysis")
     
-    try:
-        # Load data (reusing cached data)
-        viz_data = prepare_cluster_visualization_data(
-            n_components=2,  # 2D is sufficient for the genre analysis
-            method='pca',    # PCA is more reliable and doesn't require additional packages
-            cache=cache_option,
-            random_state=42
-        )
-        
-        # Display genre distribution
-        display_genre_distribution(viz_data)
-    except Exception as e:
-        st.error(f"Could not generate genre distribution: {str(e)}")
+    if viz_data is not None:
+        try:
+            # For genre distribution, reload data if cache option changed or if we need different method/dimensions
+            # The genre distribution uses the data from the initial load, but we respect the cache option
+            if not cache_option:
+                # Reload data if user unchecked cache option
+                viz_data_fresh = prepare_cluster_visualization_data(
+                    n_components=2,  # 2D is sufficient for genre analysis
+                    method='pca',    # PCA is more reliable for this analysis
+                    cache=cache_option,
+                    random_state=42
+                )
+                display_genre_distribution(viz_data_fresh)
+            else:
+                # Use existing cached data
+                display_genre_distribution(viz_data)
+        except Exception as e:
+            st.error(f"Could not generate genre distribution: {str(e)}")
+    else:
+        st.error("Cannot display genre distribution - dataset loading failed")
     
     # Explanation
     st.header("Understanding the Visualization")
     display_dimension_reduction_explanation()
-    
-    # Data source information
-    st.subheader("About the Dataset")
-    st.markdown("""
-    The visualization compares:
-    
-    - **Full Dataset**: The complete movie dataset from `processed_movies_data.json`
-    - **Sample Dataset**: The filtered sample used for the RAG system from `processed_movies_data_sample.json`
-    
-    The sample is created by filtering movies from selected genres and taking a limited number of entries.
-    This visualization helps understand how representative the sample is of the full dataset.
-    """)
-    
-    # Footer
-    st.markdown("---")
-    st.caption("Data source: Processed movie dataset from the Movies Database")
 
 if __name__ == "__main__":
     main()

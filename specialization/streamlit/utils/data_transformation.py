@@ -254,13 +254,12 @@ def prepare_gold_context_presence_data(insights_df: pd.DataFrame) -> pd.DataFram
         else:
             continue
         
-        # Only include records where a position was actually found
-        if analysis['position'] is not None:
-            context_data.append({
-                'Query': analysis['query'],
-                'Position': analysis['position'],
-                'Is Correct': 'Correct' if analysis['is_correct'] else 'Incorrect'
-            })
+        # Include ALL records, not just those where gold context was found
+        context_data.append({
+            'Query': analysis['query'],
+            'Position': analysis['position'],  # This will be None if not found
+            'Is Correct': 'Correct' if analysis['is_correct'] else 'Incorrect'
+        })
     
     context_df = pd.DataFrame(context_data)
     return context_df
