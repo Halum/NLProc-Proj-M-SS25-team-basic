@@ -24,16 +24,22 @@ This dashboard helps analyze the performance of a RAG system by providing insigh
 streamlit/
 ├── app.py                 # Main application entry point
 ├── README.md              # Documentation (this file)
+├── REFACTORING.md         # Documentation of recent refactoring changes
 ├── components/            # Reusable UI components
 │   ├── charts.py          # Visualization components
 │   └── metrics_display.py # Metric display components
 ├── config/                # App configuration
 │   └── app_config.py      # Configuration settings
 ├── pages/                 # Additional pages for the Streamlit app
-│   ├── metrics_analysis.py # Detailed metrics analysis page
-│   └── query_explorer.py   # Query exploration page
-└── utils/                 # Utility functions
-    └── data_loader.py     # Data loading utilities
+│   ├── historical_analysis.py # Historical metrics trends page
+│   ├── metrics_analysis.py    # Detailed metrics analysis page
+│   └── query_explorer.py      # Query exploration page
+├── utils/                 # Utility functions
+│   ├── data_loader.py        # Data loading utilities
+│   ├── data_transformation.py # Data transformation utilities for charts and metrics
+│   └── historical_data.py    # Historical data processing
+└── views/                 # View components for page layouts
+    └── historical_charts.py  # Charts for historical analysis
 ```
 
 ## Requirements
@@ -68,6 +74,6 @@ The dashboard reads evaluation insights data from `specialization/data/insight/e
 
 To add new visualizations or analyses:
 
-1. Create a new component in the `components/` directory
-2. Import and use it in `app.py` or add a new page in the `pages/` directory
-3. Update this README to document the new feature
+1. Add data transformation logic to `utils/data_transformation.py`
+2. Create visualization components in the `components/` directory
+3. Import and use them in `app.py` or add a new page in the `pages/` directory

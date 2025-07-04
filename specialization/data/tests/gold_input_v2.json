@@ -8,8 +8,8 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "FBI is a common theme and finding out a movie from the title or overview that contains FBI is easy."
     },
@@ -21,8 +21,8 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "User might ask it, but every movie plot is unique. So, it's hard to tell specific name."
     },
@@ -34,10 +34,10 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Conditional reasoning",
-            "Short"
+            "Conditional Reasoning",
+            "Short Question"
         ],
         "question_reasoning": "Firefighter is an impactful role. The query needs filtering and plot level underesting."
     },
@@ -49,11 +49,11 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Multi-level reasoning",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Multi-Level Reasoning",
             "Insight generation",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Need filtering and insight generation"
     },
@@ -65,9 +65,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Finding good old movies wilth multiple filtering."
     },
@@ -78,23 +78,23 @@
         "context": "A legendary and friendly creature named Nessie lives happily in a small pond with her friend MacQuack, a rubber duck. When a rich developer takes the pond and land surrounding it to build a miniature golf course, Nessie is forced to search for a new home.",
         "difficulty": "Moderate",
         "test_case_tagging": [
-            "Filter parsing",
+            "Filter Parsing",
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer."
     },
     {
         "id": 7,
         "question": "Movies related to 'Alien' and less than 100 minutes",
-        "answer": "Short Circuit",
+        "answer": "Short Question Circuit",
         "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Simple question."
     },
@@ -107,7 +107,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Simple question."
     },
@@ -120,8 +120,8 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "Have multiple filters"
     },
@@ -133,9 +133,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Need plot level understanding."
     },
@@ -147,9 +147,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Have multiple filters"
     },
@@ -162,7 +162,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Asking about sequal is very common. But we don't have enough data to our dataset."
     },
@@ -175,21 +175,21 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Common topic and easy to find"
     },
     {
         "id": 14,
         "question": "Show movies where revenue exceeds budget by more than 100x.",
-        "answer": "Short Circuit",
+        "answer": "Short Question Circuit",
         "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Need calculation and understanding"
     },
@@ -202,9 +202,9 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short",
-            "Stability test",
-            "Filter parsing"
+            "Short Question",
+            "Stability Test",
+            "Filter Parsing"
         ],
         "question_reasoning": "Information about movie. Direct search."
     },
@@ -216,10 +216,10 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Long",
-            "Stability test"
+            "Stability Test"
         ],
         "question_reasoning": "Same question, but different language"
     },
@@ -232,7 +232,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Information about movie. Direct search."
     },
@@ -244,9 +244,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Find out data by timeline"
     },
@@ -259,8 +259,8 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "Production company related question with multiple filtering."
     },
@@ -272,9 +272,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Chain of thoughts",
+            "Chain of Thoughts",
             "Insight generation",
             "Long"
         ],
@@ -288,9 +288,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Multiple level of filtering"
     },
@@ -302,9 +302,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Same question with different answer."
     },
@@ -316,9 +316,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Multi-level reasoning",
+            "Multi-Level Reasoning",
             "Long"
         ],
         "question_reasoning": "Need query simplification and filtering from keywords."
@@ -331,9 +331,9 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Search a movie by actors name."
     },
@@ -346,9 +346,9 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Multi-level reasoning",
-            "Chain of thoughts",
-            "Conditional reasoning",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
             "Long"
         ],
         "question_reasoning": "Tired with extra information and expecting insight."
@@ -362,7 +362,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Not enough data in the dataset"
     },
@@ -375,7 +375,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Not enough data in the dataset"
     },
@@ -388,9 +388,9 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Multi-level reasoning",
-            "Chain of thoughts",
-            "Short"
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "Need analytics from the dataset."
     },
@@ -403,11 +403,11 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Multi-level reasoning",
-            "Chain of thoughts",
-            "Conditional reasoning",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
             "Insight generation",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Need insight from the whole dataset."
     },
@@ -419,9 +419,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Multi-level reasoning",
+            "Multi-Level Reasoning",
             "Long"
         ],
         "question_reasoning": "Full of extra and non-relavent information."
@@ -434,9 +434,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Conditional reasoning",
+            "Conditional Reasoning",
             "Insight generation",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Need comparison and insight generation."
     },
@@ -448,11 +448,11 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Multi-level reasoning",
-            "Chain of thoughts",
-            "Short"
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "Need comparison and insight generation."
     },
@@ -475,9 +475,9 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Finding good vintage movies."
     },
@@ -490,9 +490,9 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Filter parsing",
-            "Short",
-            "Stability test"
+            "Filter Parsing",
+            "Short Question",
+            "Stability Test"
         ],
         "question_reasoning": "Simple question, plot based"
     },
@@ -504,9 +504,9 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Long",
-            "Stability test"
+            "Stability Test"
         ],
         "question_reasoning": "Same question in different language "
     },
@@ -518,9 +518,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Conditional reasoning",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
             "Long"
         ],
         "question_reasoning": "Different kinds of information, but LLM has to figure out the exact filters I'm looking for."
@@ -533,9 +533,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "High budget films fail sometimes. Trying to find those. "
     },
@@ -547,7 +547,7 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "mental health' is a common problem. But there is no specific data in dataset."
     },
@@ -559,20 +559,20 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Time traveling' is a common theme. But there is no specific data in dataset."
     },
     {
         "id": 41,
         "question": "Suggest some good films featuring AI.",
-        "answer": "Short Circuit",
+        "answer": "Short Question Circuit",
         "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "AI is a common topic. "
     },
@@ -585,7 +585,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Science fiction films available in the dataset, but no movies explain or mention about space"
     },
@@ -597,7 +597,7 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Such events not directly mentioned"
     },
@@ -609,9 +609,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Multiple level of filtering"
     },
@@ -623,10 +623,10 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short",
-            "Stability test"
+            "Short Question",
+            "Stability Test"
         ],
         "question_reasoning": "Need plot level understanding with 'or' condition"
     },
@@ -638,10 +638,10 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Long",
-            "Stability test"
+            "Stability Test"
         ],
         "question_reasoning": "Same question, but long in length and using complex wording"
     },
@@ -653,9 +653,9 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "No extra information provided."
     },
@@ -667,11 +667,11 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Insight generation",
-            "Short",
-            "Stability test"
+            "Short Question",
+            "Stability Test"
         ],
         "question_reasoning": "Plot level understanding needed."
     },
@@ -683,11 +683,11 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Insight generation",
             "Long",
-            "Stability test"
+            "Stability Test"
         ],
         "question_reasoning": "same question but more complex language."
     },
@@ -699,10 +699,10 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Short",
+            "Short Question",
             "Embedding",
-            "Filter parsing",
-            "Conditional reasoning"
+            "Filter Parsing",
+            "Conditional Reasoning"
         ],
         "question_reasoning": "Straight forward question"
     },
@@ -725,11 +725,11 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Insight generation",
-            "Multi-level reasoning",
-            "Short"
+            "Multi-Level Reasoning",
+            "Short Question"
         ],
         "question_reasoning": "This question demands insights "
     },
@@ -740,9 +740,9 @@
         "context": "No specific context",
         "difficulty": "Hard",
         "test_case_tagging": [
-            "Short",
+            "Short Question",
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
             "Insight generation"
         ],
@@ -756,9 +756,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Short",
+            "Short Question",
             "Insight generation"
         ],
         "question_reasoning": "Needs insight generation"
@@ -770,7 +770,7 @@
         "context": "A group of hip retro teenage outsiders become involved in an interschool bowling rivalry.",
         "difficulty": "Easy",
         "test_case_tagging": [
-            "Conditional reasoning"
+            "Conditional Reasoning"
         ],
         "question_reasoning": "Straight forward "
     },
@@ -817,9 +817,9 @@
         "difficulty": "Easy",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Short"
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "System has to initiate extra level of filtering rather depending on the context provided"
     },
@@ -831,9 +831,9 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Short"
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "There is no data for this question"
     },
@@ -845,10 +845,10 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Conditional reasoning",
-            "Short"
+            "Conditional Reasoning",
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer"
     },
@@ -860,10 +860,10 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Conditional reasoning",
-            "Short"
+            "Conditional Reasoning",
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer"
     },
@@ -876,7 +876,7 @@
         "test_case_tagging": [
             "Metadata",
             "Embedding",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "Straight forward"
     },
@@ -888,8 +888,8 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Short",
-            "Filter parsing"
+            "Short Question",
+            "Filter Parsing"
         ],
         "question_reasoning": "No data found"
     },
@@ -901,9 +901,9 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Short",
+            "Short Question",
             "Embedding",
-            "Filter parsing"
+            "Filter Parsing"
         ],
         "question_reasoning": "No data found"
     },
@@ -926,9 +926,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Short"
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer "
     },
@@ -940,9 +940,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Short"
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer "
     },
@@ -954,9 +954,9 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Chain of thoughts",
-            "Short"
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
         ],
         "question_reasoning": "Same question, different answer "
     },
@@ -989,7 +989,7 @@
         "context": "No specific context",
         "difficulty": "Negative",
         "test_case_tagging": [
-            "Chain of thoughts"
+            "Chain of Thoughts"
         ],
         "question_reasoning": "No data found"
     },
@@ -1001,8 +1001,8 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "No data found"
     },
@@ -1014,8 +1014,8 @@
         "difficulty": "Negative",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "No data found"
     },
@@ -1028,8 +1028,8 @@
         "test_case_tagging": [
             "Metadata",
             "Insight generation",
-            "Filter parsing",
-            "Short"
+            "Filter Parsing",
+            "Short Question"
         ],
         "question_reasoning": "No data found"
     },
@@ -1042,7 +1042,7 @@
         "test_case_tagging": [
             "Insight generation",
             "Metadata",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "No data found"
     },
@@ -1054,7 +1054,7 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Multi-level reasoning"
+            "Multi-Level Reasoning"
         ],
         "question_reasoning": "System has to provide information weather the movie is actually Tragic"
     },
@@ -1066,8 +1066,8 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Insight generation",
-            "Multi-level reasoning",
-            "Chain of thoughts"
+            "Multi-Level Reasoning",
+            "Chain of Thoughts"
         ],
         "question_reasoning": "No data found"
     },
@@ -1079,7 +1079,7 @@
         "difficulty": "Moderate",
         "test_case_tagging": [
             "Metadata",
-            "Multi-level reasoning"
+            "Multi-Level Reasoning"
         ],
         "question_reasoning": "Need plot level understanding"
     },
@@ -1090,8 +1090,8 @@
         "context": "Two brothers get into a sudden tragic accident and they both fall into a coma at the same time. A year later, the younger brother Dae-jin wakes up believing he is his older brother Ho-jin.",
         "difficulty": "Hard",
         "test_case_tagging": [
-            "Conditional reasoning",
-            "Chain of thoughts",
+            "Conditional Reasoning",
+            "Chain of Thoughts",
             "Insight generation"
         ],
         "question_reasoning": "The model has to generate thoughtful insight"
@@ -1104,8 +1104,8 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Embedding",
-            "Filter parsing",
-            "Chain of thoughts",
+            "Filter Parsing",
+            "Chain of Thoughts",
             "Long",
             "Insight generation"
         ],
@@ -1119,9 +1119,9 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
-            "Multi-level reasoning",
-            "Chain of thoughts",
+            "Filter Parsing",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
             "Long"
         ],
         "question_reasoning": "The model has to generate thoughtful insight"
@@ -1134,8 +1134,8 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Multi-level reasoning",
-            "Chain of thoughts",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
             "Long",
             "Insight generation"
         ],
@@ -1149,12 +1149,12 @@
         "difficulty": "Hard",
         "test_case_tagging": [
             "Metadata",
-            "Filter parsing",
+            "Filter Parsing",
             "Embedding",
-            "Multi-level reasoning",
-            "Chain of thoughts",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
             "Insight generation",
-            "Short"
+            "Short Question"
         ],
         "question_reasoning": "The segments of German Angst are linked by themes of desire, perception, and Berlin’s dark side\n"
     }

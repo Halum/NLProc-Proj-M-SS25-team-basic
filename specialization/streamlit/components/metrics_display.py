@@ -3,7 +3,9 @@ Component for displaying overall RAG performance metrics.
 """
 
 import streamlit as st
-import numpy as np
+
+# Import data transformation utilities
+from specialization.streamlit.utils.data_transformation import calculate_overall_metrics
 
 def display_overall_metrics(insights_df):
     """
@@ -12,24 +14,16 @@ def display_overall_metrics(insights_df):
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
     """
-    # Calculate metrics
-    total_queries = len(insights_df)
-    correct_answers = insights_df['is_correct'].sum()
-    correct_percent = (correct_answers / total_queries) * 100 if total_queries > 0 else 0
+    # Use the data transformation function to calculate metrics
+    metrics = calculate_overall_metrics(insights_df)
     
-    avg_similarity = insights_df['avg_similarity_score'].mean()
-    
-    # Calculate average BERT score if available
-    if 'bert_score' in insights_df.columns and not insights_df['bert_score'].isna().all():
-        avg_bert_f1 = np.mean([score.get('bert_f1', 0) for score in insights_df['bert_score'] if isinstance(score, dict)])
-    else:
-        avg_bert_f1 = None
-    
-    # Calculate average ROUGE score if available
-    if 'rouge_score' in insights_df.columns and not insights_df['rouge_score'].isna().all():
-        avg_rouge_f1 = np.mean([score.get('rouge1_fmeasure', 0) for score in insights_df['rouge_score'] if isinstance(score, dict)])
-    else:
-        avg_rouge_f1 = None
+    # Extract metrics for display
+    total_queries = metrics['total_queries']
+    correct_answers = metrics['correct_answers']
+    correct_percent = metrics['accuracy_percent']
+    avg_similarity = metrics['avg_similarity']
+    avg_bert_f1 = metrics.get('avg_bert_f1')
+    avg_rouge_f1 = metrics.get('avg_rouge_f1')
     
     # Display metrics in a grid
     col1, col2, col3, col4 = st.columns(4)
