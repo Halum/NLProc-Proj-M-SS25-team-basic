@@ -188,3 +188,5 @@ specialization/data/db/chroma_db/*
 !specialization/data/db/chroma_db/.keep
 
 *.lock
+
+specialization/data/processed/cache/*

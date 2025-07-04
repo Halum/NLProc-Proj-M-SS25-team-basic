@@ -555,7 +555,7 @@ def plot_historical_rouge_scores_line(historical_data):
 
 def plot_historical_accuracy(historical_data):
     """
-    Create a line chart showing accuracy trends over time.
+    Create a line chart showing accuracy trends and context found percentage over time.
     
     Args:
         historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
@@ -563,7 +563,11 @@ def plot_historical_accuracy(historical_data):
     # Create iterations for x-axis
     iterations = list(range(1, len(historical_data) + 1))
     iteration_labels = []
-    hover_texts = []
+    hover_texts_accuracy = []
+    hover_texts_context = []
+    
+    # Check if we have context metrics available
+    has_context_metrics = 'context_found_percent' in historical_data.columns and not historical_data['context_found_percent'].isnull().all()
     
     # Create both axis labels and hover text
     for i, (_, row) in enumerate(historical_data.iterrows(), 1):
@@ -575,14 +579,20 @@ def plot_historical_accuracy(historical_data):
         iteration_label = f"Iteration {i} ({correct}/{total})"
         iteration_labels.append(iteration_label)
         
-        # Format hover text with additional details
+        # Format hover text for accuracy
         if total > 0:
             percent_correct = (correct / total) * 100
-            hover_text = f"Date: {date_str}<br>Accuracy: {percent_correct:.1f}%<br>Correct: {correct}/{total}"
+            hover_text_acc = f"Date: {date_str}<br>Accuracy: {percent_correct:.1f}%<br>Correct: {correct}/{total}"
         else:
-            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+            hover_text_acc = f"Date: {date_str}<br>Samples: {correct}/{total}"
         
-        hover_texts.append(hover_text)
+        hover_texts_accuracy.append(hover_text_acc)
+        
+        # Format hover text for context found
+        if has_context_metrics:
+            context_found = row.get('context_found_percent', 0)
+            hover_text_ctx = f"Date: {date_str}<br>Context Found: {context_found:.1f}%<br>Samples: {correct}/{total}"
+            hover_texts_context.append(hover_text_ctx)
     
     # Create the figure
     fig = go.Figure()
@@ -592,15 +602,31 @@ def plot_historical_accuracy(historical_data):
         x=iterations,
         y=historical_data['accuracy_percent'],
         mode='lines+markers',
-        name='Accuracy',
+        name='Answer Accuracy',
         line=dict(color='#1f77b4', width=3),
         marker=dict(size=10),
-        text=hover_texts,
+        text=hover_texts_accuracy,
         hovertemplate='Iteration %{x}<br>Accuracy: %{y:.1f}%<br>%{text}<extra></extra>'
     ))
     
+    # Add trace for context found percentage if available
+    if has_context_metrics:
+        fig.add_trace(go.Scatter(
+            x=iterations,
+            y=historical_data['context_found_percent'],
+            mode='lines+markers',
+            name='Context Found %',
+            line=dict(color='#2ca02c', width=3),
+            marker=dict(size=10),
+            text=hover_texts_context,
+            hovertemplate='Iteration %{x}<br>Found: %{y:.1f}%<br>%{text}<extra></extra>'
+        ))
+    
     # Calculate y-axis range for auto-zooming with padding
     y_values = historical_data['accuracy_percent'].dropna().tolist()
+    
+    if has_context_metrics:
+        y_values.extend(historical_data['context_found_percent'].dropna().tolist())
     
     if y_values:
         y_min = max(0, min(y_values) - 5)  # Subtract 5 percentage points, min 0
@@ -610,9 +636,9 @@ def plot_historical_accuracy(historical_data):
     
     # Update layout
     fig.update_layout(
-        title="Answer Accuracy Trend",
+        title="Answer Accuracy & Context Coverage Trend",
         xaxis_title="Evaluation Iteration",
-        yaxis_title="Accuracy (%)",
+        yaxis_title="Percentage (%)",
         xaxis=dict(
             tickmode='array',
             tickvals=iterations,
@@ -629,9 +655,8 @@ def plot_historical_accuracy(historical_data):
 
 def plot_historical_context_metrics(historical_data):
     """
-    Create a dual-axis chart showing context retrieval metrics over time:
-    1. Average position of gold context
-    2. Percentage of queries where gold context was found
+    Create a chart showing context retrieval position metrics over time:
+    Average position of gold context in retrieval results
     
     Args:
         historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
@@ -656,13 +681,13 @@ def plot_historical_context_metrics(historical_data):
         avg_position = row.get('avg_context_distance', None)
         
         if avg_position is not None:
-            hover_text = f"Date: {date_str}<br>Found in: {context_found:.1f}%<br>Avg Position: {avg_position:.2f}"
+            hover_text = f"Date: {date_str}<br>Avg Position: {avg_position:.2f}<br>Found in: {context_found:.1f}%"
         else:
-            hover_text = f"Date: {date_str}<br>Found in: {context_found:.1f}%<br>Avg Position: N/A"
+            hover_text = f"Date: {date_str}<br>Avg Position: N/A<br>Found in: {context_found:.1f}%"
         
         hover_texts.append(hover_text)
     
-    # Create a figure with secondary y-axis
+    # Create the figure
     fig = go.Figure()
     
     # Add trace for average context distance (lower is better)
@@ -677,50 +702,22 @@ def plot_historical_context_metrics(historical_data):
         hovertemplate='Iteration %{x}<br>Avg Position: %{y:.2f}<br>%{text}<extra></extra>'
     ))
     
-    # Add trace for context found percentage
-    fig.add_trace(go.Scatter(
-        x=iterations,
-        y=historical_data['context_found_percent'],
-        mode='lines+markers',
-        name='Found %',
-        line=dict(color='#2ca02c', width=3),
-        marker=dict(size=10),
-        text=hover_texts,
-        hovertemplate='Iteration %{x}<br>Found: %{y:.1f}%<br>%{text}<extra></extra>',
-        yaxis="y2"  # Use secondary y-axis
-    ))
-    
     # Calculate y-axis range for auto-zooming
     position_values = historical_data['avg_context_distance'].dropna().tolist()
-    percent_values = historical_data['context_found_percent'].dropna().tolist()
     
     if position_values:
-        y1_min = max(0, min(position_values) - 0.5)  # Subtract 0.5, min 0
-        y1_max = max(position_values) + 0.5  # Add 0.5
+        y_min = max(0, min(position_values) - 0.5)  # Subtract 0.5, min 0
+        y_max = max(position_values) + 0.5  # Add 0.5
     else:
-        y1_min, y1_max = 0, 5
+        y_min, y_max = 0, 5
     
-    if percent_values:
-        y2_min = max(0, min(percent_values) - 5)  # Subtract 5 percentage points, min 0
-        y2_max = min(100, max(percent_values) + 5)  # Add 5 percentage points, max 100
-    else:
-        y2_min, y2_max = 0, 100
-    
-    # Update layout with secondary y-axis
+    # Update layout
     fig.update_layout(
-        title="Context Retrieval Performance Trend",
+        title="Context Retrieval Position Trend",
         xaxis_title="Evaluation Iteration",
         yaxis=dict(
             title="Avg Gold Context Position (lower is better)",
-            range=[y1_min, y1_max],
-            side="left"
-        ),
-        yaxis2=dict(
-            title="Context Found (%)",
-            range=[y2_min, y2_max],
-            side="right",
-            overlaying="y",
-            tickmode="auto"
+            range=[y_min, y_max]
         ),
         xaxis=dict(
             tickmode='array',
@@ -729,7 +726,7 @@ def plot_historical_context_metrics(historical_data):
             tickangle=45 if len(iterations) > 5 else 0
         ),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x",
+        hovermode="closest",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
@@ -836,8 +833,8 @@ def display_historical_charts(historical_data):
     st.markdown("---")
     
     # Accuracy Section
-    st.subheader("Answer Accuracy Trend")
-    st.write("This chart shows how the overall accuracy of the RAG system has changed over time.")
+    st.subheader("Answer Accuracy & Context Coverage Trend")
+    st.write("This chart shows how the overall accuracy of the RAG system and the percentage of queries where gold context was found have changed over time.")
     
     # Check if we have accuracy metrics
     has_accuracy = 'accuracy_percent' in historical_data.columns and not historical_data['accuracy_percent'].isnull().all()
@@ -850,8 +847,8 @@ def display_historical_charts(historical_data):
     st.markdown("---")
     
     # Context Retrieval Section
-    st.subheader("Context Retrieval Trend")
-    st.write("This chart shows how retrieval performance has changed over time, measured by gold context position and presence.")
+    st.subheader("Context Position Trend")
+    st.write("This chart shows how the average position of gold context in retrieval results has changed over time (lower is better).")
     
     # Check if we have context metrics
     has_context_metrics = all(col in historical_data.columns for col in ['avg_context_distance', 'context_found_percent'])

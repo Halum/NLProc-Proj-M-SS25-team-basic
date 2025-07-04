@@ -16,8 +16,10 @@ import streamlit as st
 import sys
 from pathlib import Path
 
-# Add the project root to the path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Add the src directory to the path so we can import specialization package
+src_path = str(Path(__file__).parent.parent.parent)
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
 
 # Import utilities for the dashboard
 from specialization.streamlit.utils.data_loader import load_insight_data
