@@ -1,0 +1,22 @@
+{
+    "answer" : {
+        "No Data Found" : "No data available for the specified criteria.",
+        "Any" : "Anything will be accepted."
+    },
+    "context" : {
+        "No context available" : "No context is available in the dataset.",
+        "No specific context" : "There is no specific context available for this request."
+    },
+    "test_case_tagging" : {
+        "Metadata" : "The question should retrieve metadata related to the dataset.",
+        "Filter parsing" : "The question should parse filters.",
+        "Embedding" : "The question should retrieve from embeddings.",
+        "Multi-level reasoning" : "More than one level of reasoning is required to answer the question.",
+        "Chain of thoughts" : "The question requires multi-level thoughts of its own to arrive at the answer.",
+        "Conditional reasoning" : "One reasoning is dependent on another.",
+        "Insight generation" : "The question should generate insights from the data.",
+        "Long" : "The question size is long.",
+        "Short" : "The question size is short.",
+        "Stability test" : "The question is used to test the stability of the solution. (Same question in different paraphrases should yield the same answer.)"
+    }
+}
