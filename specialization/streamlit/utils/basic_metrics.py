@@ -230,6 +230,133 @@ def prepare_rouge_score_data(insights_df: pd.DataFrame) -> Tuple[pd.DataFrame, b
     
     return rouge_df, not rouge_df.empty
 
+def prepare_bert_score_by_groups_data(insights_df: pd.DataFrame, group_by: str = 'difficulty') -> pd.DataFrame:
+    """
+    Prepare BERT score data (Precision, Recall, F1) grouped by difficulty or tags.
+    """
+    if group_by not in ['difficulty', 'tags']:
+        raise ValueError("group_by must be either 'difficulty' or 'tags'")
+        
+    data = []
+    
+    for _, record in insights_df.iterrows():
+        if isinstance(record, pd.Series):
+            record_dict = record.to_dict()
+            
+            # Extract BERT scores
+            bert_scores = record_dict.get('bert_score', {})
+            if not isinstance(bert_scores, dict):
+                continue
+                
+            scores = {
+                'BERT Precision': bert_scores.get('bert_precision'),
+                'BERT Recall': bert_scores.get('bert_recall'),
+                'BERT F1': bert_scores.get('bert_f1')
+            }
+            
+            if not all(isinstance(score, (int, float)) for score in scores.values()):
+                continue
+                
+            # Handle the grouping based on the specified field
+            if group_by == 'difficulty':
+                group = record_dict.get('difficulty', 'Unknown')
+                for score_type, score in scores.items():
+                    data.append({
+                        'Group': group,
+                        'Score': score,
+                        'Type': score_type
+                    })
+            else:  # tags
+                tags = record_dict.get('tags', [])
+                if isinstance(tags, list):
+                    for tag in tags:
+                        for score_type, score in scores.items():
+                            data.append({
+                                'Group': tag,
+                                'Score': score,
+                                'Type': score_type
+                            })
+                    continue
+                else:
+                    group = 'Untagged'
+                    for score_type, score in scores.items():
+                        data.append({
+                            'Group': group,
+                            'Score': score,
+                            'Type': score_type
+                        })
+    
+    # Convert to DataFrame and calculate statistics
+    df = pd.DataFrame(data)
+    if not df.empty:
+        grouped = df.groupby(['Group', 'Type'])['Score'].agg(['mean', 'count']).reset_index()
+        grouped.columns = ['Group', 'Type', 'Score', 'Count']
+        return grouped
+    return pd.DataFrame(columns=['Group', 'Type', 'Score', 'Count'])
+
+def prepare_rouge_score_by_groups_data(insights_df: pd.DataFrame, group_by: str = 'difficulty') -> pd.DataFrame:
+    """
+    Prepare ROUGE score data grouped by difficulty or tags.
+    """
+    if group_by not in ['difficulty', 'tags']:
+        raise ValueError("group_by must be either 'difficulty' or 'tags'")
+        
+    data = []
+    
+    for _, record in insights_df.iterrows():
+        if isinstance(record, pd.Series):
+            record_dict = record.to_dict()
+            
+            # Extract ROUGE scores
+            rouge_scores = record_dict.get('rouge_score', {})
+            if not isinstance(rouge_scores, dict):
+                continue
+                
+            # Get F1 scores for each ROUGE metric
+            rouge1_f1 = rouge_scores.get('rouge1_fmeasure')
+            rouge2_f1 = rouge_scores.get('rouge2_fmeasure')
+            rougeL_f1 = rouge_scores.get('rougeL_fmeasure')
+            
+            if not all(isinstance(score, (int, float)) for score in [rouge1_f1, rouge2_f1, rougeL_f1]):
+                continue
+                
+            # Handle the grouping based on the specified field
+            if group_by == 'difficulty':
+                group = record_dict.get('difficulty', 'Unknown')
+                for score, name in [(rouge1_f1, 'ROUGE-1'), (rouge2_f1, 'ROUGE-2'), (rougeL_f1, 'ROUGE-L')]:
+                    data.append({
+                        'Group': group,
+                        'Score': score,
+                        'Type': name
+                    })
+            else:  # tags
+                tags = record_dict.get('tags', [])
+                if isinstance(tags, list):
+                    for tag in tags:
+                        for score, name in [(rouge1_f1, 'ROUGE-1'), (rouge2_f1, 'ROUGE-2'), (rougeL_f1, 'ROUGE-L')]:
+                            data.append({
+                                'Group': tag,
+                                'Score': score,
+                                'Type': name
+                            })
+                    continue
+                else:
+                    group = 'Untagged'
+                    for score, name in [(rouge1_f1, 'ROUGE-1'), (rouge2_f1, 'ROUGE-2'), (rougeL_f1, 'ROUGE-L')]:
+                        data.append({
+                            'Group': group,
+                            'Score': score,
+                            'Type': name
+                        })
+    
+    # Convert to DataFrame and calculate statistics
+    df = pd.DataFrame(data)
+    if not df.empty:
+        grouped = df.groupby(['Group', 'Type'])['Score'].agg(['mean', 'count']).reset_index()
+        grouped.columns = ['Group', 'Type', 'Score', 'Count']
+        return grouped
+    return pd.DataFrame(columns=['Group', 'Type', 'Score', 'Count'])
+
 def calculate_overall_metrics(insights_df: pd.DataFrame) -> Dict[str, float]:
     """
     Calculate overall performance metrics for the RAG system.

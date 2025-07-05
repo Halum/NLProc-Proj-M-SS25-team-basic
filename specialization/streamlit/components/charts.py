@@ -9,11 +9,10 @@ import pandas as pd
 # Import data transformation utilities
 from specialization.streamlit.utils import (
     calculate_dynamic_chart_height, 
-    prepare_correctness_data,
     prepare_correctness_by_groups_data,
     prepare_similarity_distribution_data,
-    prepare_bert_score_data,
-    prepare_rouge_score_data,
+    prepare_bert_score_by_groups_data,
+    prepare_rouge_score_by_groups_data,
     prepare_gold_context_presence_data
 )
 
@@ -80,20 +79,6 @@ def plot_answer_correctness(insights_df):
     
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
-    
-    # Add text summary of the data
-    with st.expander("Detailed Counts"):
-        # Calculate total for each group and percentage correct
-        summary = stacked_data.copy()
-        summary['Total'] = summary['Correct'] + summary['Incorrect']
-        summary['Correct %'] = (summary['Correct'] / summary['Total'] * 100).round(1)
-        
-        # Reformat for display
-        summary_display = summary[['Group', 'Correct', 'Incorrect', 'Total', 'Correct %']]
-        summary_display['Correct %'] = summary_display['Correct %'].apply(lambda x: f"{x}%")
-        
-        # Show the summary table
-        st.dataframe(summary_display, hide_index=True, use_container_width=True)
     
 def plot_similarity_distributions(insights_df):
     """
@@ -209,235 +194,157 @@ def plot_similarity_distributions(insights_df):
     
 def plot_bert_scores(insights_df):
     """
-    Create visualization for BERT scores.
+    Create visualization for BERT scores grouped by difficulty or tags.
+    Shows Precision, Recall, and F1 scores for each group.
     
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
     """
-    # Use the data transformation function to prepare the data
-    bert_df, has_bert_data = prepare_bert_score_data(insights_df)
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="bert_group_by"
+    )
     
-    if not has_bert_data:
-        st.warning("No BERT scores available in this dataset.")
+    group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
+    # Get the prepared data
+    grouped_df = prepare_bert_score_by_groups_data(insights_df, group_by)
+    
+    if grouped_df.empty:
+        st.warning(f"No BERT scores available for visualization by {group_option.lower()}.")
         return
-    
-    # Create figure for BERT scores
+        
+    # Create the vertical bar chart
     fig = go.Figure()
     
-    # Add BERT score traces
-    fig.add_trace(
-        go.Bar(
-            y=bert_df['Query'].tolist(),
-            x=bert_df['Precision'].tolist(),
-            name='BERT Precision',
-            marker_color='#1f77b4',
-            orientation='h'
-        )
-    )
+    # Define colors for consistency
+    color_map = {
+        'BERT Precision': '#1f77b4',
+        'BERT Recall': '#ff7f0e',
+        'BERT F1': '#2ca02c'
+    }
     
-    fig.add_trace(
-        go.Bar(
-            y=bert_df['Query'].tolist(),
-            x=bert_df['Recall'].tolist(),
-            name='BERT Recall',
-            marker_color='#ff7f0e',
-            orientation='h'
-        )
-    )
-    
-    fig.add_trace(
-        go.Bar(
-            y=bert_df['Query'].tolist(),
-            x=bert_df['F1'].tolist(),
-            name='BERT F1',
-            marker_color='#2ca02c',
-            orientation='h'
-        )
-    )
-    
-    # Create a separate trace for correctness indicators
-    correct_markers = []
-    incorrect_markers = []
-    
-    for i, correct in enumerate(bert_df['Is Correct']):
-        if correct == 'Correct':
-            correct_markers.append(i)
-        else:
-            incorrect_markers.append(i)
-            
-    # Add markers for correct answers
-    if correct_markers:
-        fig.add_trace(
-            go.Scatter(
-                x=[-0.05] * len(correct_markers),
-                y=[bert_df['Query'].tolist()[i] for i in correct_markers],
-                mode='markers+text',
-                marker=dict(symbol='circle', color='#4CAF50', size=10),
-                text=['✓'] * len(correct_markers),
-                textposition='middle center',
-                textfont=dict(color='white'),
-                name='Correct',
-                hoverinfo='none'
-            )
-        )
-        
-    # Add markers for incorrect answers
-    if incorrect_markers:
-        fig.add_trace(
-            go.Scatter(
-                x=[-0.05] * len(incorrect_markers),
-                y=[bert_df['Query'].tolist()[i] for i in incorrect_markers],
-                mode='markers+text',
-                marker=dict(symbol='circle', color='#F44336', size=10),
-                text=['✗'] * len(incorrect_markers),
-                textposition='middle center',
-                textfont=dict(color='white'),
-                name='Incorrect',
-                hoverinfo='none'
-            )
-        )
-    
-    # Calculate dynamic height based on number of entries and query text length
-    chart_height = calculate_dynamic_chart_height(bert_df)
+    # Add bars for each BERT metric
+    for metric_type in ['BERT Precision', 'BERT Recall', 'BERT F1']:
+        metric_df = grouped_df[grouped_df['Type'] == metric_type]
+        if not metric_df.empty:
+            fig.add_trace(go.Bar(
+                x=metric_df['Group'],
+                y=metric_df['Score'],
+                name=metric_type,
+                marker_color=color_map[metric_type],
+                text=[f"{score:.3f}<br>n={count}" for score, count in zip(metric_df['Score'], metric_df['Count'])],
+                textposition='auto',
+                hovertemplate='%{x}<br>' + metric_type + ': %{y:.3f}<br>Sample size: %{text}<extra></extra>'
+            ))
     
     # Update layout
     fig.update_layout(
-        title="BERT Scores <br>(Higher scores indicate better semantic matching)",
-        height=chart_height,
+        title=f"Average BERT Scores by {group_option}",
+        xaxis_title=group_option,
+        yaxis_title="Score",
+        yaxis=dict(range=[0, 1]),
         barmode='group',
+        bargap=0.15,
+        bargroupgap=0.1,
+        showlegend=True,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        margin=dict(t=170, l=200),
+        margin=dict(t=100, l=50, r=50, b=100),
         annotations=[
             dict(
-                text="Precision: Accuracy of generated text<br>Recall: Completeness of information<br>F1: Overall quality (balance of precision & recall)",
+                text="BERT scores measure semantic similarity between generated and gold standard answers",
                 xref="paper", yref="paper",
-                x=0, y=1.5,
+                x=0, y=1.15,
                 showarrow=False,
                 align="left"
             )
         ]
     )
     
-    # Update axes with a wider x-axis range to accommodate markers
-    fig.update_xaxes(title_text="Score", range=[-0.1, 1])
-    fig.update_yaxes(title_text="Query")
+    # Rotate x-axis labels if there are many groups
+    if len(grouped_df['Group'].unique()) > 5:
+        fig.update_layout(xaxis_tickangle=-45)
     
     st.plotly_chart(fig, use_container_width=True)
 
+
 def plot_rouge_scores(insights_df):
     """
-    Create visualization for ROUGE scores.
+    Create visualization for ROUGE scores grouped by difficulty or tags.
     
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
     """
-    # Use the data transformation function to prepare the data
-    rouge_df, has_rouge_data = prepare_rouge_score_data(insights_df)
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="rouge_group_by"
+    )
     
-    if not has_rouge_data:
-        st.warning("No ROUGE scores available in this dataset.")
+    group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
+    # Get the prepared data
+    grouped_df = prepare_rouge_score_by_groups_data(insights_df, group_by)
+    
+    if grouped_df.empty:
+        st.warning(f"No ROUGE scores available for visualization by {group_option.lower()}.")
         return
-    
-    # Create figure for ROUGE scores
+        
+    # Create the vertical bar chart
     fig = go.Figure()
     
-    # Add ROUGE score traces
-    fig.add_trace(
-        go.Bar(
-            y=rouge_df['Query'].tolist(),
-            x=rouge_df['ROUGE-1'].tolist(),  # Updated to match the new column name
-            name='ROUGE-1 F1',
-            marker_color='#d62728',
-            orientation='h'
-        )
-    )
+    # Define colors for consistency
+    color_map = {
+        'ROUGE-1': '#d62728',
+        'ROUGE-2': '#9467bd',
+        'ROUGE-L': '#8c564b'
+    }
     
-    fig.add_trace(
-        go.Bar(
-            y=rouge_df['Query'].tolist(),
-            x=rouge_df['ROUGE-2'].tolist(),  # Updated to match the new column name
-            name='ROUGE-2 F1',
-            marker_color='#9467bd',
-            orientation='h'
-        )
-    )
-    
-    fig.add_trace(
-        go.Bar(
-            y=rouge_df['Query'].tolist(),
-            x=rouge_df['ROUGE-L'].tolist(),  # Updated to match the new column name
-            name='ROUGE-L F1',
-            marker_color='#8c564b',
-            orientation='h'
-        )
-    )
-        
-    # Create a separate trace for correctness indicators
-    correct_markers = []
-    incorrect_markers = []
-    
-    for i, correct in enumerate(rouge_df['Is Correct']):
-        if correct == 'Correct':
-            correct_markers.append(i)
-        else:
-            incorrect_markers.append(i)
-                
-    # Add markers for correct answers
-    if correct_markers:
-        fig.add_trace(
-            go.Scatter(
-                x=[-0.05] * len(correct_markers),
-                y=[rouge_df['Query'].tolist()[i] for i in correct_markers],
-                mode='markers+text',
-                marker=dict(symbol='circle', color='#4CAF50', size=10),
-                text=['✓'] * len(correct_markers),
-                textposition='middle center',
-                textfont=dict(color='white'),
-                name='Correct',
-                hoverinfo='none'
-            )
-        )
-        
-    # Add markers for incorrect answers
-    if incorrect_markers:
-        fig.add_trace(
-            go.Scatter(
-                x=[-0.05] * len(incorrect_markers),
-                y=[rouge_df['Query'].tolist()[i] for i in incorrect_markers],
-                mode='markers+text',
-                marker=dict(symbol='circle', color='#F44336', size=10),
-                text=['✗'] * len(incorrect_markers),
-                textposition='middle center',
-                textfont=dict(color='white'),
-                name='Incorrect',
-                hoverinfo='none'
-            )
-        )
-        
-    # Calculate dynamic height based on number of entries and query text length
-    chart_height = calculate_dynamic_chart_height(rouge_df)
+    # Add bars for each ROUGE metric
+    for rouge_type in ['ROUGE-1', 'ROUGE-2', 'ROUGE-L']:
+        metric_df = grouped_df[grouped_df['Type'] == rouge_type]
+        if not metric_df.empty:
+            fig.add_trace(go.Bar(
+                x=metric_df['Group'],
+                y=metric_df['Score'],
+                name=rouge_type,
+                marker_color=color_map[rouge_type],
+                text=[f"{score:.3f}<br>n={count}" for score, count in zip(metric_df['Score'], metric_df['Count'])],
+                textposition='auto',
+                hovertemplate='%{x}<br>' + rouge_type + ': %{y:.3f}<br>Sample size: %{text}<extra></extra>'
+            ))
     
     # Update layout
     fig.update_layout(
-        title="ROUGE Scores <br>(Higher scores indicate better text matching)",
-        height=chart_height,
+        title=f"Average ROUGE Scores by {group_option}",
+        xaxis_title=group_option,
+        yaxis_title="ROUGE Score",
+        yaxis=dict(range=[0, 1]),
         barmode='group',
+        bargap=0.15,
+        bargroupgap=0.1,
+        showlegend=True,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        margin=dict(t=170, l=200),
+        margin=dict(t=100, l=50, r=50, b=100),
         annotations=[
             dict(
                 text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",
                 xref="paper", yref="paper",
-                x=0, y=1.5,
+                x=0, y=1.15,
                 showarrow=False,
                 align="left"
             )
         ]
     )
     
-    # Update axes with a wider x-axis range to accommodate markers
-    fig.update_xaxes(title_text="Score", range=[-0.1, 1])
-    fig.update_yaxes(title_text="Query")
+    # Rotate x-axis labels if there are many groups
+    if len(grouped_df['Group'].unique()) > 5:
+        fig.update_layout(xaxis_tickangle=-45)
     
     st.plotly_chart(fig, use_container_width=True)
 

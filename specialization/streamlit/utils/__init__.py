@@ -8,11 +8,10 @@ evaluation data for visualization in the Streamlit dashboard.
 from .basic_metrics import (
     calculate_dynamic_chart_height,
     extract_nested_score,
-    prepare_correctness_data,
     prepare_correctness_by_groups_data,
     prepare_similarity_distribution_data,
-    prepare_bert_score_data,
-    prepare_rouge_score_data,
+    prepare_bert_score_by_groups_data,
+    prepare_rouge_score_by_groups_data,
     calculate_overall_metrics
 )
 
@@ -31,11 +30,10 @@ from .historical_metrics import (
 __all__ = [
     'calculate_dynamic_chart_height',
     'extract_nested_score',
-    'prepare_correctness_data',
     'prepare_correctness_by_groups_data',
     'prepare_similarity_distribution_data',
-    'prepare_bert_score_data',
-    'prepare_rouge_score_data',
+    'prepare_bert_score_by_groups_data',
+    'prepare_rouge_score_by_groups_data',
     'calculate_overall_metrics',
     'analyze_context_retrieval',
     'prepare_gold_context_presence_data',
