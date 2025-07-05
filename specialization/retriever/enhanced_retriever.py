@@ -46,10 +46,8 @@ class EnhancedRetriever:
         """
         self.chunking_strategy = chunking_strategy
 
-        # Initialize ChromaDB vector store with proper dimensions
-        embedding_dim = self._get_embedding_dimensions()
+        # Initialize ChromaDB vector store
         self.__vector_store = VectorStoreChroma(
-            embedding_dim=embedding_dim,
             collection_name=VECTOR_COLLECTION_NAME,
             persist_directory=VECTOR_PERSIST_DIRECTORY
         )
@@ -57,13 +55,6 @@ class EnhancedRetriever:
         if fresh_db:
             # If fresh_db is True, reset the vector store
             self.__reset__()
-        
-    def _get_embedding_dimensions(self) -> int:
-        """Get the embedding dimensions from the EnhancedLLM module."""
-        try:
-            return EnhancedLLM.embedding_dimensions()
-        except (AttributeError, ImportError, Exception) as e:
-            raise e
         
     def __reset__(self):
         """

@@ -35,23 +35,12 @@ class EnhancedLLM:
         if not OPENAI_API_KEY or OPENAI_API_KEY == 'your_openai_api_key_here':
             raise ValueError("OpenAI API key is required. Please set OPENAI_API_KEY in your .env file.")
         
-        embedding_model = EnhancedLLM.embedding_model()
-        embeddings = embedding_model.embed_documents(chunks)
+        embedding_function = EnhancedLLM.embedding_function()
+        embeddings = embedding_function.embed_documents(chunks)
         return embeddings
     
     @staticmethod
-    def embedding_dimensions():
-        """
-        Get the dimensions of the OpenAI embedding vectors.
-        
-        Returns:
-            int: The dimensionality of the embedding vectors (1536 for text-embedding-ada-002).
-        """
-        # OpenAI text-embedding-ada-002 has 1536 dimensions
-        return 1536
-    
-    @staticmethod
-    def embedding_model():
+    def embedding_function():
         """
         Get the OpenAI embedding model instance.
         

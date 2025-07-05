@@ -27,12 +27,11 @@ from typing import List, Dict, Any, Optional
 # Add parent directories to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from langchain.prompts import PromptTemplate
-
 from baseline.preprocessor.chunking_service import FixedSizeChunkingStrategy
 from specialization.retriever.enhanced_retriever import EnhancedRetriever
 from specialization.generator.enhanced_llm import EnhancedLLM
 from specialization.generator.query_parser import QueryParser
+from specialization.generator.prompts import get_movie_rag_prompt
 from specialization.config.config import (
     CHUNK_SIZE,
     LOG_LEVEL
@@ -72,22 +71,8 @@ class UserQueryPipeline:
         # Initialize query parser for metadata extraction
         self.query_parser = QueryParser()
         
-        # Create custom RAG prompt template
-        self.rag_prompt = PromptTemplate(
-            input_variables=["context", "question"],
-            template="""You are a helpful movie expert assistant. Use the following context to answer the question about movies in MarkDown format. 
-            Guidelines:
-            - Mention the all the movies relevant or partially relevant to the question.
-            - Use precise and concise language.
-            - If the question is not answerable with the provided context, say "No Data Found".
-
-            Context:
-            {context}
-            
-            Question: {question}
-            
-            Answer:"""
-        )
+        # Get custom RAG prompt template
+        self.rag_prompt = get_movie_rag_prompt()
         
         logger.info("User Query Pipeline initialized successfully")
         logger.info(f"Using chunk size: {self.chunk_size}")
