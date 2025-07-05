@@ -393,19 +393,20 @@ def calculate_overall_metrics(insights_df: pd.DataFrame) -> Dict[str, float]:
         ])
         metrics['avg_rouge_f1'] = avg_rouge_f1
     
-    # Add context metrics from context_metrics module
-    from .context_metrics import analyze_context_retrieval
-    
+    # Add context metrics using gold_context_pos field
     context_positions = []
     total_analyzed = 0
     
     for _, record in insights_df.iterrows():
         if isinstance(record, pd.Series):
             record_dict = record.to_dict()
-            analysis = analyze_context_retrieval(record_dict)
-            total_analyzed += 1
-            if analysis['position']:
-                context_positions.append(analysis['position'])
+        else:
+            record_dict = record
+            
+        pos = record_dict.get('gold_context_pos', -1)
+        total_analyzed += 1
+        if pos > 0:  # Positive values indicate gold context was found
+            context_positions.append(pos)
     
     if context_positions and total_analyzed > 0:
         metrics['context_found_percent'] = len(context_positions) / total_analyzed * 100

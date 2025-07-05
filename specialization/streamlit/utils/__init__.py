@@ -15,10 +15,7 @@ from .basic_metrics import (
     calculate_overall_metrics
 )
 
-from .context_metrics import (
-    analyze_context_retrieval,
-    prepare_gold_context_presence_data
-)
+from .gold_context_analysis import prepare_gold_context_presence_data
 
 from .historical_metrics import (
     load_all_insight_files,
@@ -35,7 +32,6 @@ __all__ = [
     'prepare_bert_score_by_groups_data',
     'prepare_rouge_score_by_groups_data',
     'calculate_overall_metrics',
-    'analyze_context_retrieval',
     'prepare_gold_context_presence_data',
     'load_all_insight_files',
     'calculate_average_metrics',

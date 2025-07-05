@@ -15,7 +15,7 @@ import logging
 
 # Import project configuration
 from specialization.config.config import EVALUATION_INSIGHTS_PATH, LOG_LEVEL
-from .context_metrics import analyze_context_retrieval
+
 
 # Configure logging
 logging.basicConfig(
@@ -188,10 +188,10 @@ def calculate_average_metrics(insight_data: List[Dict[str, Any]]) -> Dict[str, A
             context_positions = []
             total_analyzed = 0
             for _, row in df.iterrows():
-                analysis = analyze_context_retrieval(row.to_dict())
+                pos = row.get('gold_context_pos', -1)
                 total_analyzed += 1
-                if analysis['position']:
-                    context_positions.append(analysis['position'])
+                if pos > 0:  # Positive values indicate gold context was found
+                    context_positions.append(pos)
             
             if context_positions and total_analyzed > 0:
                 metrics['avg_context_distance'] = np.mean(context_positions)
@@ -280,9 +280,9 @@ def extract_score_distributions(historical_data: pd.DataFrame, score_type: str) 
         elif score_type == 'similarity':
             scores = row['insight_data']['avg_similarity_score'].dropna().tolist()
         elif score_type == 'context':
-            scores = [analyze_context_retrieval(rec.to_dict())['position'] 
+            scores = [rec.get('gold_context_pos', -1) 
                      for _, rec in row['insight_data'].iterrows()
-                     if analyze_context_retrieval(rec.to_dict())['position'] is not None]
+                     if rec.get('gold_context_pos', -1) > 0]
         else:
             scores = []
             

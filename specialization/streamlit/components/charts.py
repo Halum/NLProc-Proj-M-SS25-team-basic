@@ -12,9 +12,9 @@ from specialization.streamlit.utils import (
     prepare_correctness_by_groups_data,
     prepare_similarity_distribution_data,
     prepare_bert_score_by_groups_data,
-    prepare_rouge_score_by_groups_data,
-    prepare_gold_context_presence_data
+    prepare_rouge_score_by_groups_data
 )
+from specialization.streamlit.utils.gold_context_analysis import prepare_gold_context_presence_data
 
 def plot_answer_correctness(insights_df):
     """
