@@ -143,9 +143,11 @@ class EvaluationPipeline:
             avg_similarity_score = sum(doc['score'] for doc in context) / len(context)
         # Create insight data dictionary
         insight_data = {
+            "id": gold_item['id'],
             "question": question,
             "gold_answer": gold_answer,
             "generated_answer": generated_answer,
+            "difficulty": gold_item['difficulty'],
             "context": context,
             "is_correct": is_correct,
             "avg_similarity_score": avg_similarity_score,
@@ -153,7 +155,9 @@ class EvaluationPipeline:
             "parsed_question": parsed_question,
             "bert_score": MetricsGenerator.calculate_bert_score(gold_answer, generated_answer),
             "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer, generated_answer),
-            "gold_context": gold_context
+            "gold_context": gold_context,
+            "tags": gold_item['tags'],
+            "question_reasoning": gold_item['question_reasoning']
         }
         # Add to insights
         self.insight_generator.update_insight(**insight_data)

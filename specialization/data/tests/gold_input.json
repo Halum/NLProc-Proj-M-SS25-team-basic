@@ -1,62 +1,1161 @@
 [
     {
-        "question": "A movie where FBI is involved",
-        "answer": "Now You See Me 2",
-        "context": "One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet."
+        "id": 1,
+        "question": "Find me a movie where FBI is involved",
+        "answer": "Formosa Betrayed",
+        "context": "In the early 1980s, an FBI Agent is assigned to investigate the murder of a respected professor. Through his investigation, he unearths a spider web of international secrets that has been thriving within college campuses across America for decades. His investigation takes him across the Pacific to the island nation of Taiwan, where with the help of the outspoken widow and an unlikely spy, he learns that the Professor's killing was not a random act, but a desperate move by a scandalous government intent on keeping its nefarious activities under wraps. Our detective soon finds himself on a collision course against the U.S. State Department, the Chinese Mafia, and the Nationalist Chinese Government - in a land where the truth is not what it seems and the only people he can trust, cannot be trusted at all. Inspired by actual events.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "FBI is a common theme and finding out a movie from the title or overview that contains FBI is easy."
     },
     {
-        "question": "a movie with rating over 7 and has firefighter in the movie plot",
-        "answer": "One Deadly Summer",
-        "context": "In spring 1976, a 19-year-old beauty, her German-born mother, and her crippled father move to the town of a firefighter nicknamed Pin-Pon. Everyone notices the provocative Eliane. She singles out Pin-Pon and soon is crying on his shoulder (she's myopic and hates her reputation as a dunce and as easy); she moves in with him, knits baby clothes, and plans their wedding. Is this love or some kind of plot? She asks Pin-Pon's mother and aunt about the piano in the barn: who delivered it on a November night in 1955? Why does she want to know, and what does it have to do with her mother's sorrows, her father's injury, this quick marriage, and the last name on her birth certificate?"
-    },
-    {
-        "question": "What movies have overviews involving plane crashes or survival stories?",
-        "answer": "No Data Found",
-        "context": "After a strange storm in the Carribean causes a boat to sink, a family finds itself stranded on an island in the \"27th dimension\"."
-    },
-    {
+        "id": 2,
         "question": "Find horror movies with high ratings and a unique plot.",
         "answer": "No Data Found",
-        "context": "The Case of the Scorpion's Tail begins with the mysterious death of a millionaire and spirals into the murder of his suddenly rich wife, which draws the attention of a dogged investigator, who follows a trail of blood to the bitter end."
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "User might ask it, but every movie plot is unique. So, it's hard to tell specific name."
     },
     {
+        "id": 3,
+        "question": "A movie with rating over 7 and has firefighter in the movie plot",
+        "answer": "One Deadly Summer",
+        "context": "In spring 1976, a 19-year-old beauty, her German-born mother, and her crippled father move to the town of a firefighter nicknamed Pin-Pon. Everyone notices the provocative Eliane. She singles out Pin-Pon and soon is crying on his shoulder (she's myopic and hates her reputation as a dunce and as easy); she moves in with him, knits baby clothes, and plans their wedding. Is this love or some kind of plot? She asks Pin-Pon's mother and aunt about the piano in the barn: who delivered it on a November night in 1955? Why does she want to know, and what does it have to do with her mother's sorrows, her father's injury, this quick marriage, and the last name on her birth certificate?",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Conditional Reasoning",
+            "Short Question"
+        ],
+        "question_reasoning": "Firefighter is an impactful role. The query needs filtering and plot level underesting."
+    },
+    {
+        "id": 4,
+        "question": "Which movies under $10M budget earned more than $500M revenue? Include ROI calculation.",
+        "answer": "Alice in Wonderland",
+        "context": "On a golden afternoon, young Alice follows a White Rabbit, who disappears down a nearby rabbit hole. Quickly following him, she tumbles into the burrow - and enters the merry, topsy-turvy world of Wonderland! Memorable songs and whimsical escapades highlight Alice's journey, which culminates in a madcap encounter with the Queen of Hearts - and her army of playing cards!",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Multi-Level Reasoning",
+            "Insight generation",
+            "Short Question"
+        ],
+        "question_reasoning": "Need filtering and insight generation"
+    },
+    {
+        "id": 5,
+        "question": "Movies released before 80s with user ratings over 4.5.",
+        "answer": "The Duchess and the Dirtwater Fox",
+        "context": "A female hustler is chasing after rich men, but becomes repeatedly mixed up with a suave con man and card shark through a series of misadventures before falling in love with him.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Finding good old movies wilth multiple filtering."
+    },
+    {
+        "id": 6,
+        "question": "Movies released before 1980 with user ratings over 4.5.",
+        "answer": "The Ballad of Nessie",
+        "context": "A legendary and friendly creature named Nessie lives happily in a small pond with her friend MacQuack, a rubber duck. When a rich developer takes the pond and land surrounding it to build a miniature golf course, Nessie is forced to search for a new home.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Filter Parsing",
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer."
+    },
+    {
+        "id": 7,
+        "question": "Movies related to 'Alien' and less than 100 minutes",
+        "answer": "Short Question Circuit",
+        "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Simple question."
+    },
+    {
+        "id": 8,
         "question": "Find me movies with animals as central characters.",
-        "answer": "Madagascar",
-        "context": "After completing his voyages Sindbad the Sailor and his hearty crew have come home to find a palace coup d'etat has occurred and his home city is being run by a brutal dictator played by Pedro Armendariz. He's got designs on the beautiful young princess, Heidi Bruhl both lustful and political."
+        "answer": "The Adventures of Milo and Otis",
+        "context": "The story of two animals and their adventures. Milo, the cat, and Otis, the dog, are two animals who grew up together on the same farm. One day, the two are separated and begin a journey to find each other. The adventurous, and often perilous quest finds the two animals traveling across mountains, plains, and snow-covered lands searching for one another.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Simple question."
     },
     {
+        "id": 9,
         "question": "Looking for a few top rated thrillers after 2000.",
-        "answer": "limitless",
-        "context": "A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \"smart drug\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film."
+        "answer": "Limitless",
+        "context": "A paranoia-fueled action thriller about an unsuccessful writer whose life is transformed by a top-secret \\\"smart drug\\\" that allows him to use 100% of his brain and become a perfect version of himself. His enhanced abilities soon attract shadowy forces that threaten his new life in this darkly comic and provocative film.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "Have multiple filters"
     },
     {
+        "id": 10,
         "question": "I just watched a movie named 'limitless'. Suggest me another movie like it.",
-        "answer": "Genius",
-        "context": "Charlie Boyle finds that even his high IQ can't solve all of his problems when he takes on a double life in order to make friends his own age."
+        "answer": " Dark City",
+        "context": "A man struggles with memories of his past, including a wife he cannot remember, in a nightmarish world with no sun and run by beings with telekinetic powers who seek the souls of humans.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Need plot level understanding."
     },
     {
+        "id": 11,
         "question": "Suggest me drama movies without violence or murder with rating over 5.",
-        "answer": "hukkle",
-        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder."
+        "answer": "Hukkle",
+        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Have multiple filters"
     },
     {
+        "id": 12,
         "question": "Find the best-rated sequels in any genre.",
         "answer": "No Data Found",
-        "context": "The answer 'Now You See Me 2' refers to a highly-rated sequel in the database, known for its thrilling plot and captivating performances, continuing the story from the first film and maintaining a high rating, making it one of the best-rated sequels."
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Asking about sequal is very common. But we don't have enough data to our dataset."
     },
     {
+        "id": 13,
+        "question": "Movies related to vampires or werewolves.",
+        "answer": "White Skin",
+        "context": "Two roommates discover that the family of one of their girlfriends is populated with vampires.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Common topic and easy to find"
+    },
+    {
+        "id": 14,
+        "question": "Show movies where revenue exceeds budget by more than 100x.",
+        "answer": "Short Question Circuit",
+        "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Need calculation and understanding"
+    },
+    {
+        "id": 15,
+        "question": "I have heard about the movie named 'Pinocchio'. What is the plot behind this movie? ",
+        "answer": "Pinocchio",
+        "context": "Roberto Benigni adapts the classic children's tale by Carlo Collodi for the big-budget family-oriented comedy Pinocchio.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question",
+            "Stability Test",
+            "Filter Parsing"
+        ],
+        "question_reasoning": "Information about movie. Direct search."
+    },
+    {
+        "id": 16,
+        "question": "I’ve come across references to the film Pinocchio on several occasions, and it appears to be quite a culturally significant narrative. Could you provide a detailed explanation of the underlying plot and thematic essence of the movie, particularly in terms of its moral or philosophical dimensions?",
+        "answer": "Pinocchio",
+        "context": "Roberto Benigni adapts the classic children's tale by Carlo Collodi for the big-budget family-oriented comedy Pinocchio.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Long",
+            "Stability Test"
+        ],
+        "question_reasoning": "Same question, but different language"
+    },
+    {
+        "id": 17,
+        "question": "Who are the main actors of the movie, 'Captain Sindbad'?",
+        "answer": "Guy Williams",
+        "context": "After completing his voyages Sindbad the Sailor and his hearty crew have come home to find a palace coup d'etat has occurred and his home city is being run by a brutal dictator played by Pedro Armendariz. He's got designs on the beautiful young princess, Heidi Bruhl both lustful and political.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Information about movie. Direct search."
+    },
+    {
+        "id": 18,
+        "question": "Find a top-rated movie under 80 minutes long.",
+        "answer": "Ritual in Transfigured Time",
+        "context": "A social event choreographed in the manner of a dance, illuminated by concepts drawn from Greek legend; one of filmmaker Maya Deren’s most intriguing works.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Find out data by timeline"
+    },
+    {
+        "id": 19,
+        "question": "Looking for a top rated movie from Walt Disney Pictures after 2000.",
+        "answer": "The Ballad of Nessie",
+        "context": "A legendary and friendly creature named Nessie lives happily in a small pond with her friend MacQuack, a rubber duck. When a rich developer takes the pond and land surrounding it to build a miniature golf course, Nessie is forced to search for a new home.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "Production company related question with multiple filtering."
+    },
+    {
+        "id": 20,
+        "question": "I have recently seen a movie named Murder by Natural Causes. I loved the acting of the lead actress of that movie. Can you find me another movie of her.",
+        "answer": "The Stepford Wives",
+        "context": "The urban aspirant photographer Joanna Eberhart moves from Manhattan to Stepford, Connecticut with her family. Her husband Walter Eberhart decided to live in a calm suburb, but Joanna did not like the neighborhood with beautiful and perfect housewives. She becomes friend of Bobbie Markowe and Charmaine Wimperis, and when they change Joanna tries to escape.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Chain of Thoughts",
+            "Insight generation",
+            "Long"
+        ],
+        "question_reasoning": "Hard to find actor or actress by name and also role."
+    },
+    {
+        "id": 21,
+        "question": "What is the highest budget film produced by Walt Disney? Tell me the name and the budget.",
+        "answer": "The Haunted Mansion",
+        "context": "Workaholic Jim Evers and his wife\\/business partner, Sara get a call one night from mansion owner, Edward Gracey wants to sell his house. Once the Evers family arrive at the mansion a butler takes them to dine with Gracey. Gracey takes one look at Sara and he thinks she's his lost lover.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Multiple level of filtering"
+    },
+    {
+        "id": 22,
+        "question": "What is the highest budget film produced by Walt Disney? Tell me the name and the budget.",
+        "answer": "90000000",
+        "context": "Workaholic Jim Evers and his wife\\/business partner, Sara get a call one night from mansion owner, Edward Gracey wants to sell his house. Once the Evers family arrive at the mansion a butler takes them to dine with Gracey. Gracey takes one look at Sara and he thinks she's his lost lover.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question with different answer."
+    },
+    {
+        "id": 23,
+        "question": "I've seen a movie recently and that amazed me. I want to watch more. Suggest me another top rated turkish film.",
+        "answer": "A Small September Affair",
+        "context": "A beautiful girl who has everything. Charming, playful, in her own words: 'too joyful to fall in love.' A sudden car crash, and her heart stops for a few minutes. When she wakes up, everyone assures 'every-thing's alright.' But she knows it isn't. Because she cant remember her final month; a September of her life is missing. Leading a trail of hastily covered clues she finds herself in a remote Aegean island. A weird looking, grubby recluse, comes up-to him and proclaims: 'Don't you remember me? I'm the man you fell in love with.' Everything sensible about her screams 'get out of there' but she follows her memories right onto the tragic end of a miraculous affair.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Long"
+        ],
+        "question_reasoning": "Need query simplification and filtering from keywords."
+    },
+    {
+        "id": 24,
+        "question": "Jesse Eisenberg's films after 2010.",
+        "answer": "Now You See Me 2",
+        "context": "One year after outwitting the FBI and winning the public’s adulation with their mind-bending spectacles, the Four Horsemen resurface only to find themselves face to face with a new enemy who enlists them to pull off their most dangerous heist yet.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Search a movie by actors name."
+    },
+    {
+        "id": 25,
+        "question": "Walt Disney produced too many films. Some of them are very popular and they earned good money from those. Is there anything common on those movies?",
+        "answer": "Animal",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
+            "Long"
+        ],
+        "question_reasoning": "Tired with extra information and expecting insight."
+    },
+    {
+        "id": 26,
+        "question": "Any movies that really dive into the ethics of artificial intelligence?",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Not enough data in the dataset"
+    },
+    {
+        "id": 27,
+        "question": "List movies involving disadvantages of political corruption.",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Not enough data in the dataset"
+    },
+    {
+        "id": 28,
+        "question": "Does Huge budget means huge revenue? what is your openion?",
+        "answer": "No",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "Need analytics from the dataset."
+    },
+    {
+        "id": 29,
+        "question": "What is the name of most successful production company?",
+        "answer": "Walt Disney Productions",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
+            "Insight generation",
+            "Short Question"
+        ],
+        "question_reasoning": "Need insight from the whole dataset."
+    },
+    {
+        "id": 30,
+        "question": "My friend suggested me a movie today. I suppose it's name is Small Fry or fish. I heard it released around 12-15 years ago. I told her to suggest me a thriller? Is that a thriller? What is this movie about? ",
+        "answer": "fast food",
+        "context": "A fast food restaurant mini variant of Buzz forcibly switches places with the real Buzz and his friends have to deal with the obnoxious impostor.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Long"
+        ],
+        "question_reasoning": "Full of extra and non-relavent information."
+    },
+    {
+        "id": 31,
+        "question": "What are the common things between Pixar and Walt Disney production?",
+        "answer": "Animation",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Conditional Reasoning",
+            "Insight generation",
+            "Short Question"
+        ],
+        "question_reasoning": "Need comparison and insight generation."
+    },
+    {
+        "id": 32,
+        "question": "A lot of movies come form different genres each year. Which genres are most successful comparing to revenue and rating after 60s? ",
+        "answer": "Thriller",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "Need comparison and insight generation."
+    },
+    {
+        "id": 33,
+        "question": "Name some movies about pandemics, viruses, or global disease outbreaks?",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata"
+        ],
+        "question_reasoning": "These are current hot topics."
+    },
+    {
+        "id": 34,
+        "question": "List movies released before 1980 with user ratings over 5.",
+        "answer": "The Duchess and the Dirtwater Fox",
+        "context": "A female hustler is chasing after rich men, but becomes repeatedly mixed up with a suave con man and card shark through a series of misadventures before falling in love with him.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Finding good vintage movies."
+    },
+    {
+        "id": 35,
+        "question": "Suggest me a historical event based film",
+        "answer": "Savannah",
+        "context": "Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Filter Parsing",
+            "Short Question",
+            "Stability Test"
+        ],
+        "question_reasoning": "Simple question, plot based"
+    },
+    {
+        "id": 36,
+        "question": "Could you recommend a film that intricately portrays a significant historical event, ideally one that not only dramatizes the occurrence itself but also delves into the broader social, political, or human implications surrounding it?",
+        "answer": "Savannah",
+        "context": "Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Long",
+            "Stability Test"
+        ],
+        "question_reasoning": "Same question in different language "
+    },
+    {
+        "id": 37,
+        "question": "I just finished watching Alice in Wonderland movie. I loved the movie , mainly the rabbit was cute. I want to watch another similar category film. On the other hand, the rating have to be good.",
+        "answer": "The Ballad of Nessie\"",
+        "context": "A legendary and friendly creature named Nessie lives happily in a small pond with her friend MacQuack, a rubber duck. When a rich developer takes the pond and land surrounding it to build a miniature golf course, Nessie is forced to search for a new home.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Conditional Reasoning",
+            "Long"
+        ],
+        "question_reasoning": "Different kinds of information, but LLM has to figure out the exact filters I'm looking for."
+    },
+    {
+        "id": 38,
+        "question": "Which movies had high production budgets but poor user ratings?",
+        "answer": "The Legend of the Lone Ranger",
+        "context": "When the young Texas Ranger, John Reid, is the sole survivor of an ambush arranged by the militaristic outlaw leader, Butch Cavendich, he is rescued by an old childhood Comanche friend, Tonto. When he recovers from his wounds, he dedicates his life to fighting the evil that Cavendich represents. To this end, John Reid becomes the great masked western hero, The Lone Ranger. With the help of Tonto, the pair go to rescue President Grant when Cavendich takes him hostage.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "High budget films fail sometimes. Trying to find those. "
+    },
+    {
+        "id": 39,
+        "question": "Find highly rated movies with plots describing mental health issues.",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Short Question"
+        ],
+        "question_reasoning": "mental health' is a common problem. But there is no specific data in dataset."
+    },
+    {
+        "id": 40,
+        "question": "Suggest me good movies about time traveling disadvantages",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Short Question"
+        ],
+        "question_reasoning": "Time traveling' is a common theme. But there is no specific data in dataset."
+    },
+    {
+        "id": 41,
+        "question": "Suggest some good films featuring AI.",
+        "answer": "Short Question Circuit",
+        "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "AI is a common topic. "
+    },
+    {
+        "id": 42,
+        "question": "List science fiction films with high ratings and themes of space exploration.",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Science fiction films available in the dataset, but no movies explain or mention about space"
+    },
+    {
+        "id": 43,
+        "question": "What movies have overviews involving plane crashes or survival stories where everybody died?",
+        "answer": "No Data Found",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Short Question"
+        ],
+        "question_reasoning": "Such events not directly mentioned"
+    },
+    {
+        "id": 44,
         "question": "Find family-friendly movies with highly rated plots related to alternate universe.",
         "answer": "My Little Pony: Equestria Girls",
-        "context": "Via a magic mirror, Twilight Sparkle travels into an alternate universe in order to recover a crown that was stolen from the Crystal Empire. Upon her arrival she is horrified to learn that she has turned into a human."
+        "context": "Via a magic mirror, Twilight Sparkle travels into an alternate universe in order to recover a crown that was stolen from the Crystal Empire. Upon her arrival she is horrified to learn that she has turned into a human.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Multiple level of filtering"
     },
     {
+        "id": 45,
         "question": "Movies with characters navigating multiple identities or secret lives.",
-        "answer": "Shelter",
-        "context": "A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished."
+        "answer": "The Return of Martin Guerre",
+        "context": "During the medieval times, Martin Guerre returns to his hometown in the middle of France, after being away in the war since he was a child. Nobody recognise him, and the people who knew him suspect he is not Martin, but he knows all about his family and friends, even the most unusual things. Is this man really Martin Guerre?",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question",
+            "Stability Test"
+        ],
+        "question_reasoning": "Need plot level understanding with 'or' condition"
     },
     {
-        "question": "Movies related to vampires or werewolves.",
-        "answer": "Mad Monster Party?",
-        "context": "When Dr Frankenstein decides to retire from the monster-making business, he calls an international roster of monsters to a creepy convention to elect his successor. Everyone is there including Dracula, The Werewolf, The Creature, Dr Jekyll &amp; Mr Hyde and many more. But Frankenstein's title is not all that is at stake. The famous doctor has also discovered the secret of total destruction that must not fall into the wrong hands!"
+        "id": 46,
+        "question": "Which films delve into the psychological or narrative complexities of characters juggling dual identities or concealed lives?",
+        "answer": "Shelter",
+        "context": "A female forensic psychiatrist discovers that all of one of her patient's multiple personalities are murder victims. She will have to find out what's happening before her time is finished.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Long",
+            "Stability Test"
+        ],
+        "question_reasoning": "Same question, but long in length and using complex wording"
+    },
+    {
+        "id": 47,
+        "question": "Movies.",
+        "answer": "Any",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "No extra information provided."
+    },
+    {
+        "id": 48,
+        "question": "I'm a bit fan of superheros. But they are mostly seen in comics and animations. Is there any character from any movie who is a human and real life superhero.",
+        "answer": "Melissa",
+        "context": "Melissa has a bad case of sibling rivalry, only her competition is a fictional character in her father's best-selling novel about a teenage super spy. When her father is \\\"dadnapped\\\" by a group of overzealous fans, it's up to Melissa to help him by tapping her inner superhero.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Insight generation",
+            "Short Question",
+            "Stability Test"
+        ],
+        "question_reasoning": "Plot level understanding needed."
+    },
+    {
+        "id": 49,
+        "question": "As an enthusiastic admirer of superheroes—figures most commonly celebrated in comic books and animated series for their fantastical abilities and larger-than-life personas—I often find myself wondering whether the cinematic world has produced characters who, despite lacking supernatural powers, rise to the level of real-life superheroes. Specifically, are there films that portray human beings who, through sheer willpower, unwavering moral integrity, physical endurance, or self-sacrificial heroism, come to embody the ideals we typically associate with caped crusaders? I'm interested in narratives where heroism is grounded in reality, driven not by special effects or magic, but by the complexity and courage of the human spirit.",
+        "answer": "Melissa",
+        "context": "Melissa has a bad case of sibling rivalry, only her competition is a fictional character in her father's best-selling novel about a teenage super spy. When her father is \\\"dadnapped\\\" by a group of overzealous fans, it's up to Melissa to help him by tapping her inner superhero.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Insight generation",
+            "Long",
+            "Stability Test"
+        ],
+        "question_reasoning": "same question but more complex language."
+    },
+    {
+        "id": 50,
+        "question": "Suggest me a movie on the theme of journalism ",
+        "answer": "The Pelican Brief",
+        "context": "Features an investigative journalist uncovering the truth about Supreme Court assassinations, involving media frenzy and legal intrigue.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Short Question",
+            "Embedding",
+            "Filter Parsing",
+            "Conditional Reasoning"
+        ],
+        "question_reasoning": "Straight forward question"
+    },
+    {
+        "id": 51,
+        "question": "Movies for me ",
+        "answer": "Any",
+        "context": "No context available",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata"
+        ],
+        "question_reasoning": "Question without context"
+    },
+    {
+        "id": 52,
+        "question": "The production company Warner Bros started their jorney of making films long time ago. During their jorney, they made a lot of movies. What type of movies they mostly make? ",
+        "answer": "noir ",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Insight generation",
+            "Multi-Level Reasoning",
+            "Short Question"
+        ],
+        "question_reasoning": "This question demands insights "
+    },
+    {
+        "id": 53,
+        "question": "Comparing between Warner Bros and Walt Disney, which one produced highest top rated films?",
+        "answer": "Warner Bros",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Short Question",
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Insight generation"
+        ],
+        "question_reasoning": "This question demands insights "
+    },
+    {
+        "id": 54,
+        "question": "Which production house mostly invests on amimated movies?",
+        "answer": "Walt Disney",
+        "context": "No specific context",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Short Question",
+            "Insight generation"
+        ],
+        "question_reasoning": "Needs insight generation"
+    },
+    {
+        "id": 55,
+        "question": "Is 'Alley Cats Strike' really about a high school bowling competition?",
+        "answer": "Yes",
+        "context": "A group of hip retro teenage outsiders become involved in an interschool bowling rivalry.",
+        "difficulty": "Easy",
+        "tags": [
+            "Conditional Reasoning"
+        ],
+        "question_reasoning": "Straight forward "
+    },
+    {
+        "id": 56,
+        "question": "Did Ryan Doom die in 'Circle of Eight'?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Insight generation"
+        ],
+        "question_reasoning": "The information is not provided in the context on dataset"
+    },
+    {
+        "id": 57,
+        "question": "Did Ryan Doom die in the movie?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Insight generation"
+        ],
+        "question_reasoning": "The information is not provided in the context on dataset"
+    },
+    {
+        "id": 58,
+        "question": "Which romantic drama follows an artist-turned-shopper and a corporate exec learning about love and meaningful gifts?",
+        "answer": "12 Gifts of Christmas",
+        "context": "When Anna Parisi, an unemployed fine arts painter, is unable to make ends meet, she is hired to become a personal Christmas shopper for Marc, an uptight corporate exec.  As they begin working together, Marc learns that Christmas giving has less to do with the amount of money spent and more to do with the importance of the gift, while Anna discovers she might find success as an artist in a way she never expected.  The best gift of all of course is the love they discover with one another.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Long",
+            "Embedding"
+        ],
+        "question_reasoning": "Direct question, simple answer"
+    },
+    {
+        "id": 59,
+        "question": "Why did the Army fight against the Machines in Sgt. Bilko? ",
+        "answer": "To protect the nation",
+        "context": "The army is known for churning out lean mean fighting machines intent on protecting our great nation. Martin is the inexplicable the incorrigible the invicible sgt. Ernie bilko leader of a ragtag group of the sorriest soldiers ever to enlist in the armed forces.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "System has to initiate extra level of filtering rather depending on the context provided"
+    },
+    {
+        "id": 60,
+        "question": "Which difficulties the producer faced to produce the film - Silver City?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "There is no data for this question"
+    },
+    {
+        "id": 61,
+        "question": "What type of Movie is 'Murder by Natural Causes'?",
+        "answer": "Mystery ",
+        "context": "Allison, the unfaithful wife of a famous mentalist with a heart problem, together with her lover tries to kill him by scaring him to death, but the whole thing goes downhill when it turns out that he knew about it all along.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Conditional Reasoning",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer"
+    },
+    {
+        "id": 62,
+        "question": "What type of Movie is 'Murder by Natural Causes'?",
+        "answer": "Crime",
+        "context": "Allison, the unfaithful wife of a famous mentalist with a heart problem, together with her lover tries to kill him by scaring him to death, but the whole thing goes downhill when it turns out that he knew about it all along.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Conditional Reasoning",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer"
+    },
+    {
+        "id": 63,
+        "question": "Realease date for An Extremely Goofy Movie? ",
+        "answer": "2000-02-29 00:00:00",
+        "context": "It's all extreme sports and a life of freedom as Max sets off for college -- but Goofy misses Max so much he loses his job and goes to finish college alongside Max and his friends. But as Goofy tries to get closer to Max, both must go to the extreme to learn how to live their own lives together.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata",
+            "Embedding",
+            "Short Question"
+        ],
+        "question_reasoning": "Straight forward"
+    },
+    {
+        "id": 64,
+        "question": "Why should I watch Last of the Comanches?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Short Question",
+            "Filter Parsing"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 65,
+        "question": "Any Sharon Stone movie after 2000?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Short Question",
+            "Embedding",
+            "Filter Parsing"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 66,
+        "question": "Hukkle realease date?",
+        "answer": "2002-10-24 00:00:00",
+        "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata"
+        ],
+        "question_reasoning": "Straight forward"
+    },
+    {
+        "id": 67,
+        "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
+        "answer": "Kiss Kiss Bang Bang",
+        "context": "A petty thief posing as an actor is brought to Los Angeles for an unlikely audition and finds himself in the middle of a murder investigation along with his high school dream girl and a detective who's been training him for his upcoming role...",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer "
+    },
+    {
+        "id": 68,
+        "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
+        "answer": "The Prestige",
+        "context": "A mysterious story of two magicians whose intense rivalry leads them on a life-long battle for supremacy -- full of obsession, deceit and jealousy with dangerous and deadly consequences.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer "
+    },
+    {
+        "id": 69,
+        "question": "Could you suggest me some high rated films in 2000s Mystery genre?",
+        "answer": "Tipping Point",
+        "context": "A medical student is desperate to solve a murder to prove that she's not having a psychological breakdown, as her family and friends believe her to be.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Short Question"
+        ],
+        "question_reasoning": "Same question, different answer "
+    },
+    {
+        "id": 70,
+        "question": "High rated movies that women directed?",
+        "answer": "Ritual in Transfigured Time",
+        "context": "A social event choreographed in the manner of a dance, illuminated by concepts drawn from Greek legend; one of filmmaker Maya Deren’s most intriguing works.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata"
+        ],
+        "question_reasoning": "Moderate filtering"
+    },
+    {
+        "id": 71,
+        "question": "What is the plot for Deux hommes dans Manhattan?",
+        "answer": "Criminal Plot",
+        "context": "Two French journalists become embroiled in a criminal plot in New York City involving a disappeared United Nations diplomat.",
+        "difficulty": "Easy",
+        "tags": [
+            "Metadata"
+        ],
+        "question_reasoning": "Straight forward context retrieve "
+    },
+    {
+        "id": 72,
+        "question": "What is the title of the movie where Tom Cruise and Robert De Niro acted together?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Chain of Thoughts"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 73,
+        "question": "Leonardo DiCaprio in russian movie?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 74,
+        "question": "Is there any movie over 5 hours runtime?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 75,
+        "question": "Why did'nt they cast Matthew McConaughey in Titanic as the role for Jack?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Metadata",
+            "Insight generation",
+            "Filter Parsing",
+            "Short Question"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 76,
+        "question": "How many movies like Freelancer released in 2012?",
+        "answer": "No Data Found",
+        "context": "No specific context",
+        "difficulty": "Negative",
+        "tags": [
+            "Insight generation",
+            "Metadata",
+            "Short Question"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 77,
+        "question": "Any turkish tragic drama movie suggestions with rating over 7?",
+        "answer": "Bi Küçük Eylül Meselesi",
+        "context": "A beautiful girl who has everything. Charming, playful, in her own words: 'too joyful to fall in love.' A sudden car crash, and her heart stops for a few minutes. When she wakes up, everyone assures 'every-thing's alright.' But she knows it isn't. Because she cant remember her final month; a September of her life is missing. Leading a trail of hastily covered clues she finds herself in a remote Aegean island. A weird looking, grubby recluse, comes up-to him and proclaims: 'Don't you remember me? I'm the man you fell in love with.' Everything sensible about her screams 'get out of there' but she follows her memories right onto the tragic end of a miraculous affair.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Multi-Level Reasoning"
+        ],
+        "question_reasoning": "System has to provide information weather the movie is actually Tragic"
+    },
+    {
+        "id": 78,
+        "question": "I was wondering what other tools Jerry Belson might use to kill students?",
+        "answer": "No Data Found",
+        "context": "Director Mickey Rose's zany send-up of teen slasher flicks features a maniacal psycho known as the Breather (played by Jerry Belson), who stalks –and murders– promiscuous students at a suburban high school. The fanatical killer's unusual weapons include paper clips, blackboard erasers and eggplants. Kristen Riter, Matthew Goldsby, Joe Flood, Kevin Mannis and Sara Eckhardt head the cast.",
+        "difficulty": "Hard",
+        "tags": [
+            "Insight generation",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts"
+        ],
+        "question_reasoning": "No data found"
+    },
+    {
+        "id": 79,
+        "question": "Any Korean Thriller involving sibilings?",
+        "answer": "중독",
+        "context": "Two brothers get into a sudden tragic accident and they both fall into a coma at the same time. A year later, the younger brother Dae-jin wakes up believing he is his older brother Ho-jin.",
+        "difficulty": "Moderate",
+        "tags": [
+            "Metadata",
+            "Multi-Level Reasoning"
+        ],
+        "question_reasoning": "Need plot level understanding"
+    },
+    {
+        "id": 80,
+        "question": "If the accident did not happen in 중독 then would the younger brother ended up feeling like his older brother?",
+        "answer": "Did not",
+        "context": "Two brothers get into a sudden tragic accident and they both fall into a coma at the same time. A year later, the younger brother Dae-jin wakes up believing he is his older brother Ho-jin.",
+        "difficulty": "Hard",
+        "tags": [
+            "Conditional Reasoning",
+            "Chain of Thoughts",
+            "Insight generation"
+        ],
+        "question_reasoning": "The model has to generate thoughtful insight"
+    },
+    {
+        "id": 81,
+        "question": "Do you think the father, returning as a snowman in the movie of Jack Frost, actually gets the chance to fix things with his son, or is it too little, too late?",
+        "answer": "get an opportunity",
+        "context": "A father, who can't keep his promises, dies in a car accident. One year later, he returns as a snowman, who has the final chance to put things right with his son before he is gone forever.",
+        "difficulty": "Hard",
+        "tags": [
+            "Embedding",
+            "Filter Parsing",
+            "Chain of Thoughts",
+            "Long",
+            "Insight generation"
+        ],
+        "question_reasoning": "The model has to generate thoughtful insight"
+    },
+    {
+        "id": 82,
+        "question": "Given the emotional significance of the diary, how do you think the diary’s contents influence the twins' sense of identity and their actions toward saving the ranch in the movie of How The West Was Fun?",
+        "answer": "Emotional connection",
+        "context": "Twins Suzy and Jessica visit granny Natty's dude ranch in the Wild West. The ranch has too few paying visitors and granny may have to sell the ranch to evil developer Bart unless \"\"somebody\"\" can help her. The twins also find the diary of their deceased mother.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Long"
+        ],
+        "question_reasoning": "The model has to generate thoughtful insight"
+    },
+    {
+        "id": 83,
+        "question": "In Zebra in the Kitchen, how does the boy’s act of freeing the animals highlight the unpredictable results of acting on good intentions?",
+        "answer": "Unintended consequences",
+        "context": "A young boy lets the animals out of their cages at the Zoo, to set them free, but the animals start taking over the town.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Long",
+            "Insight generation"
+        ],
+        "question_reasoning": "The model has to generate thoughtful insight"
+    },
+    {
+        "id": 84,
+        "question": "Is there any connection in the 3 separated segments in the movie of German Angst?",
+        "answer": "Yes",
+        "context": "Horror anthology consisting of three episodes directed by Jörg Buttgereit, Andreas Marschall and Michal Kosakowski.",
+        "difficulty": "Hard",
+        "tags": [
+            "Metadata",
+            "Filter Parsing",
+            "Embedding",
+            "Multi-Level Reasoning",
+            "Chain of Thoughts",
+            "Insight generation",
+            "Short Question"
+        ],
+        "question_reasoning": "The segments of German Angst are linked by themes of desire, perception, and Berlin’s dark side\n"
     }
 ]
