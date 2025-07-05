@@ -8,13 +8,11 @@ import pandas as pd
 
 # Import data transformation utilities
 from specialization.streamlit.utils import (
-    calculate_dynamic_chart_height, 
     prepare_correctness_by_groups_data,
-    prepare_similarity_distribution_data,
     prepare_bert_score_by_groups_data,
     prepare_rouge_score_by_groups_data
 )
-from specialization.streamlit.utils.gold_context_analysis import prepare_gold_context_presence_data
+from specialization.streamlit.utils.common import prepare_common_grouping
 
 def plot_answer_correctness(insights_df):
     """
@@ -80,117 +78,7 @@ def plot_answer_correctness(insights_df):
     # Display the chart
     st.plotly_chart(fig, use_container_width=True)
     
-def plot_similarity_distributions(insights_df):
-    """
-    Create visualizations for similarity score distributions.
-    
-    Args:
-        insights_df (pd.DataFrame): DataFrame containing evaluation insights
-    """
-    # Use the data transformation function to prepare the data
-    plot_df = prepare_similarity_distribution_data(insights_df)
-    
-    # Split data by correctness
-    correct_df = plot_df[plot_df['Is Correct'] == 'Correct']
-    incorrect_df = plot_df[plot_df['Is Correct'] == 'Incorrect']
-    
-    # Define bin parameters for the histogram (0 to 1 with steps of 0.05)
-    
-    # Create figure manually with go.Histogram for more control
-    fig = go.Figure()
-    
-    # Add histogram for correct answers
-    if not correct_df.empty:
-        fig.add_trace(go.Histogram(
-            x=correct_df['Average Similarity'],
-            name='Correct',
-            marker_color='#4CAF50',
-            xbins=dict(start=0, end=1, size=0.05),  # Explicit bin definition
-            opacity=0.7,
-            hovertemplate='Similarity: %{x:.4f}<br>Count: %{y}<extra></extra>'
-        ))
-    
-    # Add histogram for incorrect answers
-    if not incorrect_df.empty:
-        fig.add_trace(go.Histogram(
-            x=incorrect_df['Average Similarity'],
-            name='Incorrect',
-            marker_color='#F44336',
-            xbins=dict(start=0, end=1, size=0.05),  # Explicit bin definition
-            opacity=0.7,
-            hovertemplate='Similarity: %{x:.4f}<br>Count: %{y}<extra></extra>'
-        ))
-    
-    # Update layout
-    fig.update_layout(
-        title='Distribution of Similarity Scores by Answer Correctness',
-        xaxis_title='Average Similarity Score',
-        yaxis_title='Count',
-        barmode='group',  # Group bars side by side
-        bargap=0.1,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    
-    # Format x-axis to show decimals
-    fig.update_xaxes(tickformat=".2f")
-    
-    st.plotly_chart(fig, use_container_width=True)
-    
-    # Calculate dynamic height based on number of entries and query text length
-    chart_height = calculate_dynamic_chart_height(plot_df)
-    
-    # Sort by Average Similarity for better visualization
-    plot_df = plot_df.sort_values(by='Average Similarity', ascending=True)
-    
-    # Create horizontal bar chart of similarity scores vs. query
-    fig = go.Figure()
-    
-    # Split data by correctness to create separate bars
-    correct_df = plot_df[plot_df['Is Correct'] == 'Correct']
-    incorrect_df = plot_df[plot_df['Is Correct'] == 'Incorrect']
-    
-    # Add bars for correct answers
-    if not correct_df.empty:
-        fig.add_trace(
-            go.Bar(
-                y=correct_df['Query'].tolist(),
-                x=correct_df['Average Similarity'].tolist(),
-                name='Correct',
-                marker_color='#4CAF50',
-                orientation='h',
-                text=[f"{x:.4f}" for x in correct_df['Average Similarity'].tolist()],  # Format to 4 decimal places
-                textposition='auto'
-            )
-        )
-    
-    # Add bars for incorrect answers
-    if not incorrect_df.empty:
-        fig.add_trace(
-            go.Bar(
-                y=incorrect_df['Query'].tolist(),
-                x=incorrect_df['Average Similarity'].tolist(),
-                name='Incorrect',
-                marker_color='#F44336',
-                orientation='h',
-                text=[f"{x:.4f}" for x in incorrect_df['Average Similarity'].tolist()],  # Format to 4 decimal places
-                textposition='auto'
-            )
-        )
-    
-    # Update layout
-    fig.update_layout(
-        title='Similarity Scores by Query',
-        height=chart_height,
-        xaxis_title='Average Similarity Score',
-        yaxis_title='Query',
-        yaxis={'categoryorder': 'total ascending'},
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    
-    # Ensure x-axis shows proper decimal formatting
-    fig.update_xaxes(tickformat=".4f")
-    
-    st.plotly_chart(fig, use_container_width=True)
+
     
 def plot_bert_scores(insights_df):
     """
@@ -355,139 +243,251 @@ def plot_gold_context_presence(insights_df):
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
     """
-    # Use the data transformation function to prepare the data
-    presence_df = prepare_gold_context_presence_data(insights_df)
-    
-    if presence_df.empty:
-        st.warning("Gold context presence data could not be calculated. Please ensure gold_context and context fields are available in the insights data.")
+    if 'gold_context_pos' not in insights_df.columns:
+        st.warning("Gold context position data not found in the insights.")
         return
         
-    # Calculate presence statistics
-    total_queries = len(presence_df)
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="presence_group_by"
+    )
     
-    # Convert position to a format suitable for visualization
-    presence_df['Gold Context Present'] = presence_df['Position'].notnull()
-    presence_df['Position_Display'] = presence_df['Position'].apply(lambda x: str(int(x)) if pd.notnull(x) else "Not found")
+    # Use common grouping logic
+    insights_df_grouped, actual_group = prepare_common_grouping(insights_df.copy(), group_option)
     
-    # Compute statistics
-    found_count = sum(presence_df['Gold Context Present'])
-    found_percentage = found_count / total_queries * 100 if total_queries > 0 else 0
-    not_found_count = total_queries - found_count
+    # Determine context presence based on gold_context_pos field
+    insights_df_grouped['context_found'] = insights_df_grouped['gold_context_pos'] > 0
     
-    # Create two separate visualizations in columns
-    col1, col2 = st.columns(2)
+    # Group by the selected option and calculate presence
+    grouped_data = (
+        insights_df_grouped.groupby(actual_group)['context_found']
+        .agg(['sum', 'size'])
+        .reset_index()
+        .rename(columns={'sum': 'Found', 'size': 'Total'})
+    )
     
-    with col1:
-        # Create pie chart of gold context presence
-        fig_pie = go.Figure()
-        fig_pie.add_trace(
-            go.Pie(
-                labels=['Present', 'Not Present'],
-                values=[found_count, not_found_count],
-                marker_colors=['#4CAF50', '#F44336'],
-                name="Gold Context Presence"
+    grouped_data['Not Found'] = grouped_data['Total'] - grouped_data['Found']
+    
+    if grouped_data.empty:
+        st.warning(f"No data available for grouping by {group_option}")
+        return
+
+    # Sort by Found count in descending order
+    grouped_data = grouped_data.sort_values('Found', ascending=False)
+
+    # Create stacked bar chart
+    fig = go.Figure()
+
+    # Add Found bars
+    fig.add_trace(go.Bar(
+        x=grouped_data[actual_group],
+        y=grouped_data['Found'],
+        name='Found',
+        marker_color='#4CAF50',
+        text=grouped_data.apply(lambda x: f"{x['Found']}/{x['Total']}", axis=1),
+        textposition='auto',
+        hovertemplate='%{x}<br>Found: %{y}<br>%{text}<extra></extra>'
+    ))
+    
+    # Add Not Found bars
+    fig.add_trace(go.Bar(
+        x=grouped_data[actual_group],
+        y=grouped_data['Not Found'],
+        name='Not Found',
+        marker_color='#F44336',
+        text=grouped_data.apply(lambda x: f"{x['Not Found']}/{x['Total']}", axis=1),
+        textposition='auto',
+        hovertemplate='%{x}<br>Not Found: %{y}<br>%{text}<extra></extra>'
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title=f'Gold Context Presence by {group_option}',
+        barmode='stack',
+        xaxis_title=group_option,
+        yaxis_title='Count',
+        legend_title=None,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=400
+    )
+
+    # Display the chart
+    st.plotly_chart(fig, use_container_width=True)
+
+def plot_position_distribution(insights_df):
+    """
+    Create visualization showing the distribution of gold context positions in retrieved results.
+    
+    Args:
+        insights_df (pd.DataFrame): DataFrame containing evaluation insights
+    """
+    if 'gold_context_pos' not in insights_df.columns:
+        st.warning("Gold context position data not found in the insights.")
+        return
+
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="position_group_by"
+    )
+    
+    # Use common grouping logic
+    insights_df_grouped, actual_group = prepare_common_grouping(insights_df.copy(), group_option)
+    
+    # Filter for found contexts
+    position_data = insights_df_grouped[insights_df_grouped['gold_context_pos'] > 0]
+    
+    if position_data.empty:
+        st.warning("No gold context found in retrieved results")
+        return
+        
+    # Group by both the selected option and position
+    position_data = (
+        position_data.groupby([actual_group, 'gold_context_pos'])
+        .size()
+        .reset_index(name='count')
+    )
+    
+    if position_data.empty:
+        st.warning("No gold context found in retrieved results")
+        return
+
+    # Sort groups by total count for consistent coloring
+    group_totals = position_data.groupby(actual_group)['count'].sum().sort_values(ascending=False)
+    
+    # Create color scale for groups
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f']
+    color_map = {group: colors[i % len(colors)] for i, group in enumerate(group_totals.index)}
+
+    # Create figure
+    fig = go.Figure()
+
+    # Add a bar trace for each group
+    for group in group_totals.index:
+        group_data = position_data[position_data[actual_group] == group]
+        
+        fig.add_trace(go.Bar(
+            x=group_data['gold_context_pos'],
+            y=group_data['count'],
+            name=group,
+            marker_color=color_map[group],
+            text=group_data['count'],
+            textposition='auto',
+            hovertemplate=(
+                f"{group}<br>" +
+                "Position: %{x}<br>" +
+                "Count: %{y}<br>" +
+                "<extra></extra>"
             )
-        )
-        
-        fig_pie.update_layout(
-            title=f"Gold Context Presence<br>{found_count}/{total_queries} ({found_percentage:.1f}%)",
-            height=350
-        )
-        
-        st.plotly_chart(fig_pie, use_container_width=True)
+        ))
+
+    # Update layout
+    fig.update_layout(
+        title=f"Position Distribution by {group_option}",
+        barmode='group',
+        xaxis_title="Position in Retrieved Results",
+        xaxis=dict(
+            tickmode='linear',
+            tick0=1,
+            dtick=1
+        ),
+        yaxis_title="Count",
+        showlegend=True,
+        legend_title=group_option,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=400,
+        bargap=0.2,
+        bargroupgap=0.1
+    )
+
+    # Display the chart
+    st.plotly_chart(fig, use_container_width=True)
+
+def plot_presence_by_correctness(insights_df):
+    """
+    Create visualization showing gold context presence rates by answer correctness.
     
-    with col2:
-        # Create a horizontal bar chart with position information - only for found contexts
-        found_positions = presence_df[presence_df['Gold Context Present']]
-        if not found_positions.empty:
-            position_counts = found_positions.groupby('Position_Display').size().reset_index(name='Count')
-            # Sort by numeric position (convert back to int for sorting, excluding "Not found")
-            position_counts = position_counts[position_counts['Position_Display'] != "Not found"]
-            if not position_counts.empty:
-                position_counts['Position_Numeric'] = position_counts['Position_Display'].astype(int)
-                position_counts = position_counts.sort_values('Position_Numeric')
-            
-                fig_bar = go.Figure()
-                fig_bar.add_trace(
-                    go.Bar(
-                        y=position_counts['Position_Display'],
-                        x=position_counts['Count'],
-                        orientation='h',
-                        marker_color='#2196F3',
-                        name="Position in Results",
-                        text=position_counts['Count'],
-                        textposition='auto'
-                    )
-                )
-                
-                fig_bar.update_layout(
-                    title="Position in Retrieved Results<br>(when found)",
-                    xaxis_title="Count",
-                    yaxis_title="Position",
-                    height=350
-                )
-                
-                st.plotly_chart(fig_bar, use_container_width=True)
-            else:
-                st.info("No gold context found in retrieved results")
-        else:
-            st.info("No gold context found in retrieved results")
+    Args:
+        insights_df (pd.DataFrame): DataFrame containing evaluation insights
+    """
+    if not all(col in insights_df.columns for col in ['gold_context_pos', 'is_correct']):
+        st.warning("Required data (gold_context_pos or is_correct) not found in the insights.")
+        return
+
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="presence_correctness_group_by"
+    )
     
-    # Add a breakdown by correctness
-    st.subheader("Relationship with Answer Correctness")
+    # Use common grouping logic
+    insights_df_grouped, actual_group = prepare_common_grouping(insights_df.copy(), group_option)
     
-    # Calculate presence rates for correct vs incorrect answers using ALL data
-    correct_df = presence_df[presence_df['Is Correct'] == 'Correct']
-    incorrect_df = presence_df[presence_df['Is Correct'] == 'Incorrect']
+    # Determine context presence
+    insights_df_grouped['context_found'] = insights_df_grouped['gold_context_pos'] > 0
     
-    # Proceed with the analysis even if one group is empty
-    correct_count = len(correct_df)
-    incorrect_count = len(incorrect_df)
+    # Group by both the selected option and correctness
+    grouped_data = (
+        insights_df_grouped.groupby([actual_group, 'is_correct'])['context_found']
+        .agg(['sum', 'size'])
+        .reset_index()
+        .rename(columns={'sum': 'Found', 'size': 'Total'})
+    )
     
-    if correct_count > 0 or incorrect_count > 0:
-        # Calculate presence rates
-        correct_presence = correct_df['Gold Context Present'].mean() * 100 if correct_count > 0 else 0
-        incorrect_presence = incorrect_df['Gold Context Present'].mean() * 100 if incorrect_count > 0 else 0
-        
-        # Create data for the grouped bar chart
-        categories = []
-        values = []
-        colors = []
-        texts = []
-        
-        if correct_count > 0:
-            categories.append('Correct Answers')
-            values.append(correct_presence)
-            colors.append('#4CAF50')
-            found_correct = correct_df['Gold Context Present'].sum()
-            texts.append(f"{correct_presence:.1f}%<br>({found_correct}/{correct_count})")
-        
-        if incorrect_count > 0:
-            categories.append('Incorrect Answers')
-            values.append(incorrect_presence)
-            colors.append('#F44336')
-            found_incorrect = incorrect_df['Gold Context Present'].sum()
-            texts.append(f"{incorrect_presence:.1f}%<br>({found_incorrect}/{incorrect_count})")
-        
-        # Create a grouped bar chart
-        fig_corr = go.Figure()
-        fig_corr.add_trace(
-            go.Bar(
-                x=categories,
-                y=values,
-                marker_color=colors,
-                text=texts,
-                textposition='auto',
-                hovertemplate='%{x}<br>Gold Context Present: %{text}<extra></extra>'
-            )
-        )
-        
-        fig_corr.update_layout(
-            title="Gold Context Presence by Answer Correctness",
-            yaxis_title="Gold Context Present (%)",
-            yaxis=dict(range=[0, 100])
-        )
-        
-        st.plotly_chart(fig_corr, use_container_width=True)
-    else:
-        st.info("No data available to compare gold context presence between correct and incorrect answers.")
+    if grouped_data.empty:
+        st.warning(f"No data available for grouping by {group_option}")
+        return
+
+    # Get the correct answers data and sort it by Found count
+    correct_data = grouped_data[grouped_data['is_correct']].sort_values('Found', ascending=False)
+    # Get the incorrect answers data in the same order as correct data
+    incorrect_data = grouped_data[~grouped_data['is_correct']]
+    incorrect_data = incorrect_data.set_index(actual_group).reindex(
+        correct_data[actual_group]
+    ).reset_index()
+
+    # Create figure
+    fig = go.Figure()
+
+    # Add bars for correct answers
+    fig.add_trace(go.Bar(
+        x=correct_data[actual_group],
+        y=correct_data['Found'],
+        name='Correct Answers',
+        marker_color='#4CAF50',
+        text=correct_data.apply(lambda x: f"{x['Found']}/{x['Total']}", axis=1),
+        textposition='auto',
+        hovertemplate='%{x}<br>Found: %{y}<br>Total: %{text}<extra></extra>'
+    ))
+
+    # Add bars for incorrect answers
+    fig.add_trace(go.Bar(
+        x=incorrect_data[actual_group],
+        y=incorrect_data['Found'],
+        name='Incorrect Answers',
+        marker_color='#F44336',
+        text=incorrect_data.apply(lambda x: f"{x['Found']}/{x['Total']}", axis=1),
+        textposition='auto',
+        hovertemplate='%{x}<br>Found: %{y}<br>Total: %{text}<extra></extra>'
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title=f'Gold Context Presence by Answer Correctness and {group_option}',
+        barmode='group',
+        xaxis_title=group_option,
+        yaxis_title='Count',
+        legend_title=None,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=400
+    )
+
+    # Display the chart
+    st.plotly_chart(fig, use_container_width=True)

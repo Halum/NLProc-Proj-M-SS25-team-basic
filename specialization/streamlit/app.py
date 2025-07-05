@@ -19,28 +19,12 @@ from specialization.streamlit.utils.data_loader import load_insight_data
 from specialization.streamlit.utils.filtering import filter_insights_data, get_available_filters, style_record_header
 from specialization.streamlit.components.metrics_display import display_overall_metrics
 from specialization.streamlit.components.charts import (
-    plot_answer_correctness, 
-    plot_similarity_distributions,
+    plot_answer_correctness,
     plot_bert_scores,
     plot_rouge_scores,
-    plot_gold_context_presence
-)
-
-# Add the src directory to the path so we can import specialization package
-src_path = str(Path(__file__).parent.parent.parent)
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
-
-# Import utilities for the dashboard
-from specialization.streamlit.utils.data_loader import load_insight_data
-from specialization.streamlit.utils.filtering import filter_insights_data, get_available_filters, style_record_header
-from specialization.streamlit.components.metrics_display import display_overall_metrics
-from specialization.streamlit.components.charts import (
-    plot_answer_correctness, 
-    plot_similarity_distributions,
-    plot_bert_scores,
-    plot_rouge_scores,
-    plot_gold_context_presence
+    plot_gold_context_presence,
+    plot_position_distribution,
+    plot_presence_by_correctness
 )
 from specialization.streamlit.utils.styling import apply_main_page_styling
 
@@ -126,12 +110,23 @@ def main():
             plot_rouge_scores(insights_df)
                 
         with tab2:
-            st.subheader("Similarity Score Distribution")
-            plot_similarity_distributions(insights_df)
-            
             st.subheader("Context Analysis")
             st.write("Analysis of retrieved context and its relevance to the query")
+            
+            # Gold Context Presence Chart
+            st.markdown("### Gold Context Presence")
             plot_gold_context_presence(insights_df)
+            st.markdown("---")
+            
+            # Position Distribution Chart
+            st.markdown("### Position in Retrieved Results")
+            plot_position_distribution(insights_df)
+            st.markdown("---")
+            
+            # Presence by Correctness Chart
+            st.markdown("### Gold Context Presence by Answer Correctness")
+            plot_presence_by_correctness(insights_df)
+            st.markdown("---")
             
         with tab3:
             st.subheader("Evaluation Records")

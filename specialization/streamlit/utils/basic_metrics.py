@@ -144,31 +144,6 @@ def prepare_group_data(data: List[Dict[str, Any]]) -> pd.DataFrame:
     
     return pivot_df
 
-def prepare_similarity_distribution_data(insights_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Prepare data for similarity score distribution visualization.
-    """
-    data = []
-    
-    for _, record in insights_df.iterrows():
-        if isinstance(record, pd.Series):
-            record_dict = record.to_dict()
-            similarity_score = record_dict.get('avg_similarity_score', None)
-            is_correct = record_dict.get('is_correct', False)
-            query = record_dict.get('question', '') or record_dict.get('query', 'Unknown Query')
-            
-            if similarity_score is not None:
-                data.append({
-                    'Query': query,
-                    'Average Similarity': similarity_score,
-                    'Is Correct': 'Correct' if is_correct else 'Incorrect'
-                })
-    
-    plot_df = pd.DataFrame(data)
-    plot_df['Average Similarity'] = pd.to_numeric(plot_df['Average Similarity'], errors='coerce')
-    plot_df = plot_df.dropna(subset=['Average Similarity'])
-    
-    return plot_df
 
 def prepare_bert_score_data(insights_df: pd.DataFrame) -> Tuple[pd.DataFrame, bool]:
     """
