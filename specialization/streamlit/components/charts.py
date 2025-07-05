@@ -104,6 +104,10 @@ def plot_bert_scores(insights_df):
     if grouped_df.empty:
         st.warning(f"No BERT scores available for visualization by {group_option.lower()}.")
         return
+
+    # Get F1 scores and sort groups by F1 score descending
+    f1_scores = grouped_df[grouped_df['Type'] == 'BERT F1'].sort_values('Score', ascending=False)
+    sorted_groups = f1_scores['Group'].tolist()
         
     # Create the vertical bar chart
     fig = go.Figure()
@@ -119,6 +123,9 @@ def plot_bert_scores(insights_df):
     for metric_type in ['BERT Precision', 'BERT Recall', 'BERT F1']:
         metric_df = grouped_df[grouped_df['Type'] == metric_type]
         if not metric_df.empty:
+            # Sort according to F1 scores order
+            metric_df = metric_df.set_index('Group').loc[sorted_groups].reset_index()
+            
             fig.add_trace(go.Bar(
                 x=metric_df['Group'],
                 y=metric_df['Score'],
@@ -183,6 +190,10 @@ def plot_rouge_scores(insights_df):
         st.warning(f"No ROUGE scores available for visualization by {group_option.lower()}.")
         return
         
+    # Get ROUGE-1 scores and sort groups by ROUGE-1 score descending
+    rouge1_scores = grouped_df[grouped_df['Type'] == 'ROUGE-1'].sort_values('Score', ascending=False)
+    sorted_groups = rouge1_scores['Group'].tolist()
+
     # Create the vertical bar chart
     fig = go.Figure()
     
@@ -197,6 +208,9 @@ def plot_rouge_scores(insights_df):
     for rouge_type in ['ROUGE-1', 'ROUGE-2', 'ROUGE-L']:
         metric_df = grouped_df[grouped_df['Type'] == rouge_type]
         if not metric_df.empty:
+            # Sort according to ROUGE-1 scores order
+            metric_df = metric_df.set_index('Group').loc[sorted_groups].reset_index()
+            
             fig.add_trace(go.Bar(
                 x=metric_df['Group'],
                 y=metric_df['Score'],
