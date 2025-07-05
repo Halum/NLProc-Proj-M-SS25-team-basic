@@ -27,6 +27,7 @@ import json
 import logging
 from typing import List, Dict, Any
 
+
 # Add parent directories to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -34,6 +35,7 @@ from specialization.pipelines.user_query import UserQueryPipeline
 from specialization.evaluation import InsightGenerator
 from specialization.evaluation import MetricsGenerator
 from specialization.generator.query_parser import QueryParser
+from specialization.utils.data_utils import get_gold_context_pos, is_answer_correct
 from specialization.config.config import (
     GOLD_INPUT_PATH, 
     EVALUATION_INSIGHTS_PATH,
@@ -135,7 +137,8 @@ class EvaluationPipeline:
         
         # Determine if answer is correct through automatic evaluation
         # Simple substring match - could be enhanced with NLP techniques
-        is_correct = gold_answer.lower() in generated_answer.lower()
+        is_correct = is_answer_correct(gold_answer, generated_answer)
+        gold_context_pos = get_gold_context_pos(gold_context, context)
         
         # Extract the average similarity score from the context if available
         avg_similarity_score = None
@@ -146,6 +149,7 @@ class EvaluationPipeline:
             "id": gold_item['id'],
             "question": question,
             "gold_answer": gold_answer,
+            "gold_context_pos": gold_context_pos,
             "generated_answer": generated_answer,
             "difficulty": gold_item['difficulty'],
             "context": context,

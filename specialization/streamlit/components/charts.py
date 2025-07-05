@@ -10,6 +10,7 @@ import pandas as pd
 from specialization.streamlit.utils.data_transformation import (
     calculate_dynamic_chart_height, 
     prepare_correctness_data,
+    prepare_correctness_by_groups_data,
     prepare_similarity_distribution_data,
     prepare_bert_score_data,
     prepare_rouge_score_data,
@@ -18,39 +19,81 @@ from specialization.streamlit.utils.data_transformation import (
 
 def plot_answer_correctness(insights_df):
     """
-    Create a visualizations for answer correctness.
+    Create a visualization for answer correctness grouped by difficulty or tags.
     
     Args:
         insights_df (pd.DataFrame): DataFrame containing evaluation insights
     """
+    # Add a toggle to switch between difficulty and tags
+    group_option = st.radio(
+        "Group by:",
+        ["Difficulty", "Tags"],
+        horizontal=True,
+        key="correctness_group_by"
+    )
+    
+    group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
     # Use the data transformation function to prepare the data
-    correct_counts = prepare_correctness_data(insights_df)
+    stacked_data = prepare_correctness_by_groups_data(insights_df, group_by)
     
-    # Extract data for the chart
-    values = correct_counts['Count'].tolist()
-    labels = correct_counts['Is Correct'].tolist()
+    if stacked_data.empty:
+        st.warning(f"No {group_option.lower()} data available for visualization.")
+        return
     
-    # Create color map making sure Incorrect is always red
+    # Create color map for consistent colors
     color_map = {
         'Correct': '#4CAF50',
         'Incorrect': '#F44336'
     }
-    colors = [color_map[label] for label in labels]
     
-    # Create pie chart manually with go.Pie
-    fig = go.Figure(data=[go.Pie(
-        labels=labels, 
-        values=values,
-        marker_colors=colors
-    )])
+    # Create the stacked bar chart
+    fig = go.Figure()
     
+    # Add Correct bars
+    fig.add_trace(go.Bar(
+        x=stacked_data['Group'],
+        y=stacked_data['Correct'],
+        name='Correct',
+        marker_color=color_map['Correct'],
+        hovertemplate='%{y} Correct<extra></extra>'
+    ))
+    
+    # Add Incorrect bars
+    fig.add_trace(go.Bar(
+        x=stacked_data['Group'],
+        y=stacked_data['Incorrect'],
+        name='Incorrect',
+        marker_color=color_map['Incorrect'],
+        hovertemplate='%{y} Incorrect<extra></extra>'
+    ))
+    
+    # Update layout
     fig.update_layout(
-        title='Answer Correctness Distribution',
+        title=f'Answer Correctness by {group_option}',
+        barmode='stack',
+        xaxis_title=group_option,
+        yaxis_title='Count',
         legend_title=None,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
     )
     
+    # Display the chart
     st.plotly_chart(fig, use_container_width=True)
+    
+    # Add text summary of the data
+    with st.expander("Detailed Counts"):
+        # Calculate total for each group and percentage correct
+        summary = stacked_data.copy()
+        summary['Total'] = summary['Correct'] + summary['Incorrect']
+        summary['Correct %'] = (summary['Correct'] / summary['Total'] * 100).round(1)
+        
+        # Reformat for display
+        summary_display = summary[['Group', 'Correct', 'Incorrect', 'Total', 'Correct %']]
+        summary_display['Correct %'] = summary_display['Correct %'].apply(lambda x: f"{x}%")
+        
+        # Show the summary table
+        st.dataframe(summary_display, hide_index=True, use_container_width=True)
     
 def plot_similarity_distributions(insights_df):
     """

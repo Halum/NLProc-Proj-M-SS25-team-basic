@@ -115,6 +115,83 @@ def prepare_correctness_data(insights_df: pd.DataFrame) -> pd.DataFrame:
     
     return correct_counts
 
+def prepare_correctness_by_groups_data(insights_df: pd.DataFrame, group_by: str = 'difficulty') -> pd.DataFrame:
+    """
+    Prepare data for answer correctness by groups (difficulty or tags) stacked bar chart visualization.
+    
+    Args:
+        insights_df: DataFrame containing evaluation insights
+        group_by: Either 'difficulty' or 'tags' to group the data by
+        
+    Returns:
+        DataFrame with counts of correct and incorrect answers grouped by the specified field
+    """
+    if group_by not in ['difficulty', 'tags']:
+        raise ValueError("group_by must be either 'difficulty' or 'tags'")
+        
+    # Prepare data for grouping
+    data = []
+    
+    for _, record in insights_df.iterrows():
+        if isinstance(record, pd.Series):
+            record_dict = record.to_dict()
+            
+            is_correct = record_dict.get('is_correct', False)
+            correctness_label = 'Correct' if is_correct else 'Incorrect'
+            
+            if group_by == 'difficulty':
+                # Group by difficulty
+                difficulty = record_dict.get('difficulty', 'Unknown')
+                data.append({
+                    'Group': difficulty,
+                    'Correctness': correctness_label,
+                    'Count': 1
+                })
+            elif group_by == 'tags':
+                # Group by each tag (one record per tag)
+                tags = record_dict.get('tags', [])
+                if not tags:
+                    tags = ['No Tags']
+                
+                for tag in tags:
+                    data.append({
+                        'Group': tag,
+                        'Correctness': correctness_label,
+                        'Count': 1
+                    })
+    
+    # Convert to DataFrame and aggregate
+    df = pd.DataFrame(data)
+    
+    if df.empty:
+        return pd.DataFrame(columns=['Group', 'Correctness', 'Count'])
+    
+    # Group by Group and Correctness, sum the counts
+    grouped_df = df.groupby(['Group', 'Correctness'])['Count'].sum().reset_index()
+    
+    # Pivot to create columns for Correct and Incorrect
+    pivot_df = grouped_df.pivot(index='Group', columns='Correctness', values='Count').fillna(0)
+    
+    # Ensure both Correct and Incorrect columns exist
+    if 'Correct' not in pivot_df.columns:
+        pivot_df['Correct'] = 0
+    if 'Incorrect' not in pivot_df.columns:
+        pivot_df['Incorrect'] = 0
+    
+    # Reset index to make Group a column
+    pivot_df = pivot_df.reset_index()
+    
+    # Sort by correct answers count (descending) for better visualization
+    pivot_df = pivot_df.sort_values('Correct', ascending=False)
+    
+    # Calculate totals for reference (though we're not using it for sorting anymore)
+    pivot_df['Total'] = pivot_df['Correct'] + pivot_df['Incorrect']
+    
+    # Remove the Total column as it's not needed for visualization
+    pivot_df = pivot_df.drop('Total', axis=1)
+    
+    return pivot_df
+
 def prepare_similarity_distribution_data(insights_df: pd.DataFrame) -> pd.DataFrame:
     """
     Prepare data for similarity score distribution visualization.

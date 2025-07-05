@@ -44,6 +44,7 @@ class InsightGenerator:
             "question", 
             "parsed_question",
             "gold_answer",
+            "gold_context_pos",
             "generated_answer", 
             "difficulty",
             "context",
@@ -82,7 +83,7 @@ class InsightGenerator:
     def update_insight(self, id, question, gold_answer, generated_answer, difficulty, context,
                       is_correct, avg_similarity_score=None, metadata_filters=None,
                       parsed_question=None, bert_score=None, rouge_score=None,
-                      gold_context=None, tags=None, question_reasoning=None):
+                      gold_context=None, tags=None, question_reasoning=None, gold_context_pos=None):
         """
         Update the insight DataFrame with the results of the query.
         
@@ -102,6 +103,7 @@ class InsightGenerator:
             gold_context (list, optional): The gold standard context for the question
             tags (list, optional): Tags associated with the question
             question_reasoning (str, optional): Reasoning behind the question
+            gold_context_pos (int, optional): Position of the gold context in retrieved results
 
         Returns:
             pd.DataFrame: The updated DataFrame
@@ -112,6 +114,7 @@ class InsightGenerator:
             "question": [question],
             "parsed_question": [parsed_question],
             "gold_answer": [gold_answer],
+            "gold_context_pos": [gold_context_pos],
             "generated_answer": [generated_answer],
             "difficulty": [difficulty],
             "context": [context],

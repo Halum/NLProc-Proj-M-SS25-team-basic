@@ -7,7 +7,7 @@
         "No context available" : "No context is available in the dataset.",
         "No specific context" : "There is no specific context available for this request."
     },
-    "test_case_tagging" : {
+    "tags" : {
         "Metadata" : "The question should retrieve metadata related to the dataset.",
         "Filter parsing" : "The question should parse filters.",
         "Embedding" : "The question should retrieve from embeddings.",

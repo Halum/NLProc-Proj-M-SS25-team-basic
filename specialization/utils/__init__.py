@@ -12,7 +12,9 @@ from .data_utils import (
     parse_json_field,
     safe_numeric_conversion,
     filter_dataframe_by_list_field,
-    sample_dataframe
+    sample_dataframe,
+    get_gold_context_pos,
+    is_answer_correct
 )
 
 __all__ = [
@@ -22,5 +24,7 @@ __all__ = [
     'parse_json_field',
     'safe_numeric_conversion',
     'filter_dataframe_by_list_field',
-    'sample_dataframe'
+    'sample_dataframe',
+    'get_gold_context_pos',
+    'is_answer_correct'
 ]
