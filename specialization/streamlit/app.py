@@ -3,13 +3,6 @@ RAG Performance Metrics Dashboard
 
 This Streamlit application visualizes and analyzes performance metrics for a RAG 
 (Retrieval Augmented Generation) system on a movie dataset.
-
-The app provides visualizations and insights on:
-1. Retrieval performance metrics
-2. Answer accuracy and quality metrics
-3. Detailed analysis of query parsing and filter performance
-4. Comparison of similarity scores across different types of queries
-5. Historical trends in performance metrics over time
 """
 
 import streamlit as st
@@ -23,6 +16,24 @@ if src_path not in sys.path:
 
 # Import utilities for the dashboard
 from specialization.streamlit.utils.data_loader import load_insight_data
+from specialization.streamlit.utils.filtering import filter_insights_data, get_available_filters, style_record_header
+from specialization.streamlit.components.metrics_display import display_overall_metrics
+from specialization.streamlit.components.charts import (
+    plot_answer_correctness, 
+    plot_similarity_distributions,
+    plot_bert_scores,
+    plot_rouge_scores,
+    plot_gold_context_presence
+)
+
+# Add the src directory to the path so we can import specialization package
+src_path = str(Path(__file__).parent.parent.parent)
+if src_path not in sys.path:
+    sys.path.insert(0, src_path)
+
+# Import utilities for the dashboard
+from specialization.streamlit.utils.data_loader import load_insight_data
+from specialization.streamlit.utils.filtering import filter_insights_data, get_available_filters, style_record_header
 from specialization.streamlit.components.metrics_display import display_overall_metrics
 from specialization.streamlit.components.charts import (
     plot_answer_correctness, 
@@ -125,27 +136,76 @@ def main():
         with tab3:
             st.subheader("Evaluation Records")
             
-            # Let users filter by correctness
-            filter_options = ['All', 'Correct Only', 'Incorrect Only']
-            selected_filter = st.selectbox("Filter results:", filter_options)
+            # Get available filter options
+            filter_options = get_available_filters(insights_df)
             
-            filtered_df = insights_df
-            if selected_filter == 'Correct Only':
-                filtered_df = insights_df[insights_df['is_correct']]
-            elif selected_filter == 'Incorrect Only':
-                filtered_df = insights_df[~insights_df['is_correct']]
-                
+            # Create filter section with columns
+            filter_col1, filter_col2, filter_col3 = st.columns(3)
+            
+            with filter_col1:
+                # Correctness filter
+                selected_correctness = st.selectbox(
+                    "Filter by correctness:",
+                    options=filter_options['correctness'],
+                    key='correctness_filter'
+                )
+            
+            with filter_col2:
+                # Difficulty filter
+                if filter_options['difficulty']:
+                    selected_difficulty = st.multiselect(
+                        "Filter by difficulty:",
+                        options=filter_options['difficulty'],
+                        key='difficulty_filter'
+                    )
+                else:
+                    selected_difficulty = None
+                    st.info("No difficulty information available")
+            
+            with filter_col3:
+                # Tags filter
+                if filter_options['tags']:
+                    selected_tags = st.multiselect(
+                        "Filter by tags:",
+                        options=filter_options['tags'],
+                        key='tags_filter'
+                    )
+                else:
+                    selected_tags = None
+                    st.info("No tags information available")
+            
+            # Apply filters
+            filtered_df = filter_insights_data(
+                insights_df,
+                correctness_filter=selected_correctness,
+                difficulty_levels=selected_difficulty,
+                selected_tags=selected_tags
+            )
+            
             # Display paginated records
-            records_per_page = 15
-            total_pages = (len(filtered_df) + records_per_page - 1) // records_per_page
-            page = st.number_input("Page", min_value=1, max_value=max(1, total_pages), value=1)
-            
-            start_idx = (page - 1) * records_per_page
-            end_idx = min(start_idx + records_per_page, len(filtered_df))
+            if len(filtered_df) == 0:
+                st.warning("No records match the selected filters. Try adjusting your filter criteria.")
+            else:
+                records_per_page = 15
+                total_pages = (len(filtered_df) + records_per_page - 1) // records_per_page
+                page = st.number_input("Page", min_value=1, max_value=max(1, total_pages), value=1)
+                
+                start_idx = (page - 1) * records_per_page
+                end_idx = min(start_idx + records_per_page, len(filtered_df))
+                
+                # Show record count
+                st.info(f"Showing {len(filtered_df)} records matching your filters")
             
             for i in range(start_idx, end_idx):
                 record = filtered_df.iloc[i]
-                with st.expander(f"**Query: {record['question']}**"):
+                # Get header info with styling information
+                header_info = style_record_header(record.to_dict())
+                
+                # Create the header text with markdown color syntax
+                color = "green" if header_info['is_correct'] else "red"
+                header_text = f":{color}[{header_info['text']}]"
+                
+                with st.expander(header_text):
                     col1, col2 = st.columns([1, 1], gap="large")
                     
                     with col1:
