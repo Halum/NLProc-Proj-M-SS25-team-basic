@@ -185,31 +185,3 @@ class InsightGenerator:
         }
         
         return metrics
-    
-    def update_insight_from_dict(self, insight_data):
-        """
-        Update the insight DataFrame with data from a dictionary.
-        
-        Args:
-            insight_data (dict): Dictionary containing all insight fields
-            
-        Returns:
-            pd.DataFrame: The updated DataFrame
-        """
-        return self.update_insight(
-            id=insight_data.get('id'),
-            question=insight_data.get('question'),
-            gold_answer=insight_data.get('gold_answer'),
-            generated_answer=insight_data.get('generated_answer'),
-            difficulty=insight_data.get('difficulty'),
-            context=insight_data.get('context'),
-            is_correct=insight_data.get('is_correct'),
-            avg_similarity_score=insight_data.get('avg_similarity_score'),
-            metadata_filters=insight_data.get('metadata_filters'),
-            parsed_question=insight_data.get('parsed_question'),
-            bert_score=insight_data.get('bert_score'),
-            rouge_score=insight_data.get('rouge_score'),
-            gold_context=insight_data.get('gold_context'),
-            tags=insight_data.get('tags'),
-            question_reasoning=insight_data.get('question_reasoning')
-        )

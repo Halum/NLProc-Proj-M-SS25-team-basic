@@ -245,7 +245,7 @@
 
     },
     "parsed_question":"What movies have overviews involving plane crashes or survival stories",
-    "question":"What movies have overviews involving plane crashes or survival stories?",
+    "question":"What movies have overviews involving plane crashes or survival stories where everybody died?",
     "rouge_score":{
       "rouge1_precision":1.0,
       "rouge1_recall":1.0,
