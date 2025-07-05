@@ -1,7 +1,7 @@
 """
 Utility functions for loading and processing historical data from insight files.
 
-This module now uses the centralized data transformation utilities from data_transformation.py
+This module uses the centralized data transformation utilities from the utils package.
 """
 
 import logging
@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 from specialization.config.config import LOG_LEVEL
 
 # Import data transformation utilities
-from specialization.streamlit.utils.data_transformation import prepare_historical_metrics
+from specialization.streamlit.utils import prepare_historical_metrics
 
 # Configure logging
 logging.basicConfig(

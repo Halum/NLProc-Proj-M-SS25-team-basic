@@ -10,7 +10,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # Import data transformation utilities
-from specialization.streamlit.utils.data_transformation import extract_score_distributions
+from specialization.streamlit.utils import extract_score_distributions
 
 def plot_historical_bert_scores(historical_data):
     """

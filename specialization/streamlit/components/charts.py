@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 # Import data transformation utilities
-from specialization.streamlit.utils.data_transformation import (
+from specialization.streamlit.utils import (
     calculate_dynamic_chart_height, 
     prepare_correctness_data,
     prepare_correctness_by_groups_data,

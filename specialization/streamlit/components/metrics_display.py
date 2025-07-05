@@ -5,7 +5,7 @@ Component for displaying overall RAG performance metrics.
 import streamlit as st
 
 # Import data transformation utilities
-from specialization.streamlit.utils.data_transformation import calculate_overall_metrics
+from specialization.streamlit.utils import calculate_overall_metrics
 
 def display_overall_metrics(insights_df):
     """
