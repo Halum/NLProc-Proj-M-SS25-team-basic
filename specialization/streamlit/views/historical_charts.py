@@ -6,13 +6,14 @@ It shows trends in retrieval accuracy, BERT scores, ROUGE scores, and similarity
 """
 
 import streamlit as st
-import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 
 # Import data transformation utilities
-from specialization.streamlit.utils import extract_score_distributions
-from specialization.streamlit.utils.historical_analysis import prepare_historical_bert_scores_by_groups
+from specialization.streamlit.utils.historical_analysis import (
+    prepare_historical_bert_scores_by_groups,
+    prepare_historical_rouge_scores_by_groups
+)
 
 def plot_historical_bert_scores(historical_data):
     """
@@ -248,140 +249,112 @@ def plot_historical_bert_scores_line(historical_data):
 
 def plot_historical_rouge_scores(historical_data):
     """
-    Create box and whisker plots showing the distribution of ROUGE scores by iteration.
-    
-    Args:
-        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    Create line chart showing ROUGE scores trend over time, with optional grouping by difficulty or tags.
     """
-    if historical_data.empty:
-        st.warning("No historical data available for ROUGE scores.")
-        return
+    # Add a toggle for grouping type
+    group_option = st.radio(
+        "View Mode:",
+        ["All", "Difficulty", "Tags"],
+        horizontal=True,
+        key="rouge_trend_group_by"
+    )
     
-    # Check if we have insight_data available for calculating distributions
-    has_insight_data = all('insight_data' in row and isinstance(row['insight_data'], pd.DataFrame) 
-                          for _, row in historical_data.iterrows())
-    
-    if not has_insight_data:
-        # Fall back to line chart if we don't have the raw insight data
-        st.info("Detailed ROUGE score distributions not available. Showing average scores only.")
-        plot_historical_rouge_scores_line(historical_data)
-        return
-    
-    # Extract ROUGE score distributions and iteration labels using the utility function
-    data_arrays, iteration_labels = extract_score_distributions(historical_data, 'rouge')
-    
-    # Unpack the returned data
-    if len(data_arrays) == 3:
-        rouge1_data, rouge2_data, rougeL_data = data_arrays
+    if group_option == "All":
+        group_by = None
     else:
-        # Fallback in case data extraction failed
-        st.info("Could not extract detailed ROUGE score distributions. Showing average scores only.")
-        plot_historical_rouge_scores_line(historical_data)
+        group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
+    scores_by_group, iterations = prepare_historical_rouge_scores_by_groups(historical_data, group_by)
+    
+    if not scores_by_group:
+        st.warning("No ROUGE scores available for visualization.")
         return
     
-    # Check if we have actual data in the arrays (not just empty lists)
-    if all(not any(x) for x in rouge1_data + rouge2_data + rougeL_data):
-        st.info("No detailed ROUGE scores found in the insight data. Showing average scores only.")
-        plot_historical_rouge_scores_line(historical_data)
-        return
-        
-    # Create iterations list for chart building
-    iterations = list(range(1, len(historical_data) + 1))
-    
-    # Create subplots for better organization
     fig = go.Figure()
+    iteration_labels = [f"Iter {i+1}" for i in range(len(iterations))]
+    hover_texts = []
     
-    # Add box plots for ROUGE-1
-    for i, data in enumerate(rouge1_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} ROUGE-1',
-                marker_color='#1f77b4',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=0,
-                customdata=[label] * len(data),
-                hovertemplate='ROUGE-1: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
+    # Generate hover texts with date and sample info
+    for idx, row in historical_data.iterrows():
+        date_str = row.get('timestamp', '').strftime('%Y-%m-%d %H:%M:%S')
+        correct = row.get('correct_answers', 0)
+        total = row.get('total_queries', 0)
+        
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        else:
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        hover_texts.append(hover_text)
     
-    # Add box plots for ROUGE-2
-    for i, data in enumerate(rouge2_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} ROUGE-2',
-                marker_color='#ff7f0e',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=1,
-                customdata=[label] * len(data),
-                hovertemplate='ROUGE-2: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
+    # Color scheme for different groups or metrics
+    colors = px.colors.qualitative.Set3
+    metric_colors = {
+        'rouge1': '#1f77b4',
+        'rouge2': '#ff7f0e',
+        'rougeL': '#2ca02c'
+    }
     
-    # Add box plots for ROUGE-L
-    for i, data in enumerate(rougeL_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} ROUGE-L',
-                marker_color='#2ca02c',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=2,
-                customdata=[label] * len(data),
-                hovertemplate='ROUGE-L: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add average points as markers for comparison
-    # Check if we have avg_rouge metrics
-    has_rouge_metrics = all(col in historical_data.columns for col in 
-                          ['avg_rouge1_f1', 'avg_rouge2_f1', 'avg_rougeL_f1'])
-    
-    if has_rouge_metrics and len(historical_data) == len(iteration_labels):
-        # Add a trace for the mean ROUGE-1 values
+    if group_by is None:
+        # Show overall ROUGE-1, ROUGE-2, and ROUGE-L scores
+        scores = scores_by_group['all']
+        
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_rouge1_f1'],
-            mode='markers+lines',
-            name='Mean ROUGE-1',
-            line=dict(color='#1f77b4', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['rouge1'],
+            mode='lines+markers',
+            name='ROUGE-1',
+            line=dict(color=metric_colors['rouge1'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>ROUGE-1: %{y:.4f}<br>%{text}<extra></extra>'
         ))
         
-        # Add a trace for the mean ROUGE-2 values
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_rouge2_f1'],
-            mode='markers+lines',
-            name='Mean ROUGE-2',
-            line=dict(color='#ff7f0e', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['rouge2'],
+            mode='lines+markers',
+            name='ROUGE-2',
+            line=dict(color=metric_colors['rouge2'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>ROUGE-2: %{y:.4f}<br>%{text}<extra></extra>'
         ))
         
-        # Add a trace for the mean ROUGE-L values
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_rougeL_f1'],
-            mode='markers+lines',
-            name='Mean ROUGE-L',
-            line=dict(color='#2ca02c', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['rougeL'],
+            mode='lines+markers',
+            name='ROUGE-L',
+            line=dict(color=metric_colors['rougeL'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>ROUGE-L: %{y:.4f}<br>%{text}<extra></extra>'
         ))
+        
+    else:
+        # Show ROUGE-1 scores for each group
+        for i, (group, scores) in enumerate(scores_by_group.items()):
+            color = colors[i % len(colors)]
+            
+            fig.add_trace(go.Scatter(
+                x=iteration_labels,
+                y=scores['rouge1'],
+                mode='lines+markers',
+                name=str(group),
+                line=dict(color=color, width=2),
+                marker=dict(size=8),
+                text=hover_texts,
+                hovertemplate=f'%{{x}}<br>{group} ROUGE-1: %{{y:.4f}}<br>%{{text}}<extra></extra>'
+            ))
     
     # Calculate y-axis range for auto-zooming
     all_values = []
-    for data_list in rouge1_data + rouge2_data + rougeL_data:
-        all_values.extend(data_list)
+    for scores in scores_by_group.values():
+        all_values.extend(scores['rouge1'])
+        if group_by is None:
+            all_values.extend(scores['rouge2'])
+            all_values.extend(scores['rougeL'])
     
     if all_values:
         y_min = max(0, min(all_values) - 0.05)  # Add 5% padding below
@@ -390,27 +363,34 @@ def plot_historical_rouge_scores(historical_data):
         y_min, y_max = 0, 1
     
     # Update layout
+    title = "ROUGE Score Trends" if group_by is None else f"ROUGE-1 Score Trends by {group_option}"
+    
     fig.update_layout(
-        title="ROUGE Score Distributions by Iteration",
+        title=title,
         xaxis_title="Evaluation Iteration",
         yaxis_title="Score",
-        boxmode='group',  # Group boxes for each iteration
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="closest",
+        hovermode="x unified",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
-    # Add annotations to indicate what each box represents
-    fig.add_annotation(
-        xref="paper", yref="paper",
-        x=0.01, y=0.99,
-        text="Each box shows score distribution<br>Diamond markers show mean values",
-        showarrow=False,
-        font=dict(size=10),
-        bgcolor="rgba(255,255,255,0.8)",
-        bordercolor="gray",
-        borderwidth=1
+    # Add explanation of ROUGE scores
+    if group_by is None:
+        fig.add_annotation(
+            text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",
+            xref="paper", yref="paper",
+            x=0, y=1.15,
+            showarrow=False,
+            align="left"
+        )
+    
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
