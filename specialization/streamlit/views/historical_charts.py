@@ -39,15 +39,21 @@ def plot_historical_bert_scores(historical_data):
         return
     
     fig = go.Figure()
-    iteration_labels = [f"Iter {i+1}" for i in range(len(iterations))]
+    # Create iteration labels with sample info
+    iteration_labels = []
     hover_texts = []
     
-    # Generate hover texts with date and sample info
-    for idx, row in historical_data.iterrows():
-        date_str = row.get('timestamp', '').strftime('%Y-%m-%d %H:%M:%S')
-        correct = row.get('correct_answers', 0)
-        total = row.get('total_queries', 0)
+    # Generate labels and hover texts with date and sample info
+    for i, (_, row) in enumerate(historical_data.iterrows(), 1):
+        correct = row.get('correct_count', 0)
+        total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
         
+        # Format axis label as "Iteration n (correct/total)"
+        iteration_label = f"Iteration {i} ({correct}/{total})"
+        iteration_labels.append(iteration_label)
+        
+        # Format hover text with additional details
         if total > 0:
             percent_correct = (correct / total) * 100
             hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
@@ -70,7 +76,7 @@ def plot_historical_bert_scores(historical_data):
             line=dict(color='#1f77b4', width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>Precision: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>Precision: %{y:.4f}<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
@@ -81,7 +87,7 @@ def plot_historical_bert_scores(historical_data):
             line=dict(color='#ff7f0e', width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>Recall: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>Recall: %{y:.4f}<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
@@ -92,7 +98,7 @@ def plot_historical_bert_scores(historical_data):
             line=dict(color='#2ca02c', width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>F1: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>F1: %{y:.4f}<extra></extra>'
         ))
         
     else:
@@ -108,7 +114,7 @@ def plot_historical_bert_scores(historical_data):
                 line=dict(color=color, width=2),
                 marker=dict(size=8),
                 text=hover_texts,
-                hovertemplate=f'%{{x}}<br>{group} F1: %{{y:.4f}}<br>%{{text}}<extra></extra>'
+                hovertemplate='%{text}<br>' + str(group) + ' F1: %{y:.4f}<extra></extra>'
             ))
     
     # Calculate y-axis range for auto-zooming
@@ -271,15 +277,21 @@ def plot_historical_rouge_scores(historical_data):
         return
     
     fig = go.Figure()
-    iteration_labels = [f"Iter {i+1}" for i in range(len(iterations))]
+    # Create iteration labels with sample info
+    iteration_labels = []
     hover_texts = []
     
-    # Generate hover texts with date and sample info
-    for idx, row in historical_data.iterrows():
-        date_str = row.get('timestamp', '').strftime('%Y-%m-%d %H:%M:%S')
-        correct = row.get('correct_answers', 0)
-        total = row.get('total_queries', 0)
+    # Generate labels and hover texts with date and sample info
+    for i, (_, row) in enumerate(historical_data.iterrows(), 1):
+        correct = row.get('correct_count', 0)
+        total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
         
+        # Format axis label as "Iteration n (correct/total)"
+        iteration_label = f"Iteration {i} ({correct}/{total})"
+        iteration_labels.append(iteration_label)
+        
+        # Format hover text with additional details
         if total > 0:
             percent_correct = (correct / total) * 100
             hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
@@ -287,13 +299,13 @@ def plot_historical_rouge_scores(historical_data):
             hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
         hover_texts.append(hover_text)
     
-    # Color scheme for different groups or metrics
-    colors = px.colors.qualitative.Set3
+    # Color scheme for different metrics/groups
     metric_colors = {
         'rouge1': '#1f77b4',
         'rouge2': '#ff7f0e',
         'rougeL': '#2ca02c'
     }
+    colors = px.colors.qualitative.Set3
     
     if group_by is None:
         # Show overall ROUGE-1, ROUGE-2, and ROUGE-L scores
@@ -307,7 +319,7 @@ def plot_historical_rouge_scores(historical_data):
             line=dict(color=metric_colors['rouge1'], width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>ROUGE-1: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>ROUGE-1: %{y:.4f}<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
@@ -318,7 +330,7 @@ def plot_historical_rouge_scores(historical_data):
             line=dict(color=metric_colors['rouge2'], width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>ROUGE-2: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>ROUGE-2: %{y:.4f}<extra></extra>'
         ))
         
         fig.add_trace(go.Scatter(
@@ -329,7 +341,7 @@ def plot_historical_rouge_scores(historical_data):
             line=dict(color=metric_colors['rougeL'], width=2),
             marker=dict(size=8),
             text=hover_texts,
-            hovertemplate='%{x}<br>ROUGE-L: %{y:.4f}<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<br>ROUGE-L: %{y:.4f}<extra></extra>'
         ))
         
     else:
@@ -345,7 +357,7 @@ def plot_historical_rouge_scores(historical_data):
                 line=dict(color=color, width=2),
                 marker=dict(size=8),
                 text=hover_texts,
-                hovertemplate=f'%{{x}}<br>{group} ROUGE-1: %{{y:.4f}}<br>%{{text}}<extra></extra>'
+                hovertemplate='%{text}<br>' + str(group) + ' ROUGE-1: %{y:.4f}<extra></extra>'
             ))
     
     # Calculate y-axis range for auto-zooming
@@ -480,8 +492,8 @@ def plot_historical_rouge_scores_line(historical_data):
             y_values.extend(historical_data[col].dropna().tolist())
     
     if y_values:
-        y_min = max(0, min(y_values) - 0.05)  # Add 5% padding below, min 0
-        y_max = min(1, max(y_values) + 0.05)  # Add 5% padding above, max 1
+        y_min = max(0, min(y_values) - 0.05)  # Add 5% padding below
+        y_max = min(1, max(y_values) + 0.05)  # Add 5% padding above, cap at 1.0
     else:
         y_min, y_max = 0, 1
     
@@ -536,7 +548,6 @@ def plot_historical_accuracy(historical_data):
             hover_text_acc = f"Date: {date_str}<br>Accuracy: {percent_correct:.1f}%<br>Correct: {correct}/{total}"
         else:
             hover_text_acc = f"Date: {date_str}<br>Samples: {correct}/{total}"
-        
         hover_texts_accuracy.append(hover_text_acc)
         
         # Format hover text for context found
@@ -550,27 +561,27 @@ def plot_historical_accuracy(historical_data):
     
     # Add trace for accuracy
     fig.add_trace(go.Scatter(
-        x=iterations,
+        x=iteration_labels,
         y=historical_data['accuracy_percent'],
         mode='lines+markers',
         name='Answer Accuracy',
         line=dict(color='#1f77b4', width=3),
         marker=dict(size=10),
         text=hover_texts_accuracy,
-        hovertemplate='Iteration %{x}<br>Accuracy: %{y:.1f}%<br>%{text}<extra></extra>'
+        hovertemplate='%{text}<extra></extra>'
     ))
     
     # Add trace for context found percentage if available
     if has_context_metrics:
         fig.add_trace(go.Scatter(
-            x=iterations,
+            x=iteration_labels,
             y=historical_data['context_found_percent'],
             mode='lines+markers',
             name='Context Found %',
             line=dict(color='#2ca02c', width=3),
             marker=dict(size=10),
             text=hover_texts_context,
-            hovertemplate='Iteration %{x}<br>Found: %{y:.1f}%<br>%{text}<extra></extra>'
+            hovertemplate='%{text}<extra></extra>'
         ))
     
     # Calculate y-axis range for auto-zooming with padding
@@ -590,16 +601,18 @@ def plot_historical_accuracy(historical_data):
         title="Answer Accuracy & Context Coverage Trend",
         xaxis_title="Evaluation Iteration",
         yaxis_title="Percentage (%)",
-        xaxis=dict(
-            tickmode='array',
-            tickvals=iterations,
-            ticktext=iteration_labels,
-            tickangle=45 if len(iterations) > 5 else 0
-        ),
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode="closest",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
+    )
+    
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
@@ -632,9 +645,9 @@ def plot_historical_context_metrics(historical_data):
         avg_position = row.get('avg_context_distance', None)
         
         if avg_position is not None:
-            hover_text = f"Date: {date_str}<br>Avg Position: {avg_position:.2f}<br>Found in: {context_found:.1f}%"
+            hover_text = f"Date: {date_str}<br>Avg Position: {avg_position:.2f}<br>Found in: {context_found:.1f}%<br>Samples: {correct}/{total}"
         else:
-            hover_text = f"Date: {date_str}<br>Avg Position: N/A<br>Found in: {context_found:.1f}%"
+            hover_text = f"Date: {date_str}<br>Avg Position: N/A<br>Found in: {context_found:.1f}%<br>Samples: {correct}/{total}"
         
         hover_texts.append(hover_text)
     
@@ -643,14 +656,14 @@ def plot_historical_context_metrics(historical_data):
     
     # Add trace for average context distance (lower is better)
     fig.add_trace(go.Scatter(
-        x=iterations,
+        x=iteration_labels,
         y=historical_data['avg_context_distance'],
         mode='lines+markers',
         name='Avg Position',
         line=dict(color='#1f77b4', width=3),
         marker=dict(size=10),
         text=hover_texts,
-        hovertemplate='Iteration %{x}<br>Avg Position: %{y:.2f}<br>%{text}<extra></extra>'
+        hovertemplate='%{text}<extra></extra>'
     ))
     
     # Calculate y-axis range for auto-zooming
@@ -672,7 +685,7 @@ def plot_historical_context_metrics(historical_data):
         ),
         xaxis=dict(
             tickmode='array',
-            tickvals=iterations,
+            tickvals=list(range(len(iteration_labels))),
             ticktext=iteration_labels,
             tickangle=45 if len(iterations) > 5 else 0
         ),
