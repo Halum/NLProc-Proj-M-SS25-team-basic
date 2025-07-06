@@ -8,11 +8,13 @@ It shows trends in retrieval accuracy, BERT scores, ROUGE scores, and similarity
 import streamlit as st
 import plotly.graph_objects as go
 import plotly.express as px
+import pandas as pd
 
 # Import data transformation utilities
 from specialization.streamlit.utils.historical_analysis import (
     prepare_historical_bert_scores_by_groups,
-    prepare_historical_rouge_scores_by_groups
+    prepare_historical_rouge_scores_by_groups,
+    prepare_question_correctness_across_iterations
 )
 
 def plot_historical_bert_scores(historical_data):
@@ -516,6 +518,129 @@ def plot_historical_rouge_scores_line(historical_data):
     
     st.plotly_chart(fig, use_container_width=True)
 
+def plot_question_correctness_across_iterations(historical_data):
+    """
+    Create a stacked bar chart showing correctness of each question across iterations.
+    
+    Args:
+        historical_data (pd.DataFrame): DataFrame containing historical metrics
+    """
+    
+    # Get the prepared data using the utility function
+    chart_data = prepare_question_correctness_across_iterations(historical_data)
+    
+    # Extract the data components
+    question_ids = chart_data['question_ids']
+    iteration_data = chart_data['iteration_data']
+    iterations = chart_data['iterations']
+    
+    # If no data is available, simply return
+    if not question_ids or not iteration_data:
+        st.warning("No question correctness data available for visualization.")
+        return
+    
+    # Show stats about the data
+    st.write(f"Found {len(question_ids)} unique questions across {len(iterations)} iterations")
+    
+    # Create figure
+    fig = go.Figure()
+    
+    # Color scheme for correct/incorrect
+    color_correct = '#2ca02c'    # Green
+    color_incorrect = '#d62728'  # Red
+    
+    # For each iteration, add a trace for correct and incorrect answers
+    for i, iteration_questions in enumerate(iteration_data):
+        # Prepare data for this iteration
+        correct_counts = []
+        incorrect_counts = []
+        
+        # For each question, check if it was answered correctly in this iteration
+        for q_id in question_ids:
+            if q_id in iteration_questions:
+                if iteration_questions[q_id]:
+                    correct_counts.append(1)  # Correct
+                    incorrect_counts.append(0)
+                else:
+                    correct_counts.append(0)
+                    incorrect_counts.append(1)  # Incorrect
+            else:
+                # Question not present in this iteration
+                correct_counts.append(0)
+                incorrect_counts.append(0)
+        
+        # Add trace for correct answers (bottom of stack)
+        fig.add_trace(go.Bar(
+            x=question_ids,
+            y=correct_counts,
+            name=f"{iterations[i]} - Correct",
+            marker_color=color_correct,
+            opacity=0.9 - (i * 0.1) if i < 5 else 0.4,  # Decrease opacity for older iterations
+            customdata=[[iterations[i]] * len(question_ids)],
+            hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Correct<extra></extra>'
+        ))
+        
+        # Add trace for incorrect answers (top of stack)
+        fig.add_trace(go.Bar(
+            x=question_ids,
+            y=incorrect_counts,
+            name=f"{iterations[i]} - Incorrect",
+            marker_color=color_incorrect,
+            opacity=0.9 - (i * 0.1) if i < 5 else 0.4,  # Decrease opacity for older iterations
+            customdata=[[iterations[i]] * len(question_ids)],
+            hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Incorrect<extra></extra>'
+        ))
+    
+    # Update layout
+    fig.update_layout(
+        title="Question Correctness Across Iterations",
+        xaxis_title="Question ID",
+        yaxis_title="Result by Iteration",
+        barmode='stack',
+        hovermode="closest",
+        margin=dict(l=50, r=50, t=80, b=100),  # Add more bottom margin for question ID labels
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        # Set y-axis to only show integer values since iterations are discrete
+        yaxis=dict(
+            dtick=1,  # Set tick interval to 1
+            tick0=0,  # Start ticks at 0
+            tickmode='linear',  # Use linear tick mode for even spacing
+            tickformat='d'  # Display as integers
+        )
+    )
+    
+    # Adjust bar width based on the number of questions
+    if len(question_ids) > 5:
+        # Calculate width based on number of questions, with thicker bars
+        # Increase minimum width from 0.3 to 0.5 and adjust the scaling factor
+        bar_width = max(0.5, 2.0 / (len(question_ids) / 20))
+        fig.update_traces(width=bar_width)
+    
+    # Handle x-axis display based on number of questions
+    fig.update_xaxes(
+        tickangle=90,
+        tickmode='array',
+        tickvals=question_ids,  # Use actual question IDs as tick values
+        ticktext=question_ids,  # And as tick labels
+        # Force the category order to follow our sorted question IDs
+        categoryorder='array',
+        categoryarray=question_ids
+    )
+    
+    # If there are many questions, limit the number of ticks to avoid crowding
+    if len(question_ids) > 30:
+        fig.update_xaxes(
+            nticks=30
+        )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
 def plot_historical_accuracy(historical_data):
     """
     Create a line chart showing accuracy trends and context found percentage over time.
@@ -796,6 +921,25 @@ def display_historical_charts(historical_data):
     
     st.markdown("---")
     
+    # Question Correctness Section
+    st.subheader("Question Correctness Across Iterations")
+    st.write("This chart shows the correctness of each question across different evaluation iterations. Each bar represents a question, stacked by iteration results.")
+    
+    # Check if we have insight data with id and is_correct fields
+    has_question_data = any('insight_data' in row and 
+                           isinstance(row['insight_data'], pd.DataFrame) and 
+                           not row['insight_data'].empty and
+                           'id' in row['insight_data'].columns and 
+                           'is_correct' in row['insight_data'].columns
+                           for _, row in historical_data.iterrows())
+    
+    if has_question_data:
+        plot_question_correctness_across_iterations(historical_data)
+    else:
+        st.warning("No detailed question data available for visualization.")
+    
+    st.markdown("---")
+    
     # Accuracy Section
     st.subheader("Answer Accuracy & Context Coverage Trend")
     st.write("This chart shows how the overall accuracy of the RAG system and the percentage of queries where gold context was found have changed over time.")
@@ -824,4 +968,14 @@ def display_historical_charts(historical_data):
     
     st.markdown("---")
     
-    # Customer requested to remove detailed context position distribution charts
+    # Question Correctness Section
+    st.subheader("Question Correctness Across Iterations")
+    st.write("This chart shows the correctness of each question across different evaluation iterations.")
+    
+    # Check if we have question correctness data
+    has_question_correctness = 'question_ids' in historical_data.columns and not historical_data['question_ids'].isnull().all()
+    
+    if has_question_correctness:
+        plot_question_correctness_across_iterations(historical_data)
+    else:
+        st.warning("No question correctness data available in historical data.")

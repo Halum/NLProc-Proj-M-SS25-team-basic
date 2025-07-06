@@ -138,3 +138,83 @@ def prepare_historical_rouge_scores_by_groups(
             result[group]['rougeL'].append(scores['rougeL'])
             
     return result, iterations
+
+def prepare_question_correctness_across_iterations(historical_data):
+    """
+    Prepare data for a stacked bar chart showing question correctness across iterations.
+    
+    Args:
+        historical_data: DataFrame containing historical metrics with insight_data
+        
+    Returns:
+        A dictionary with:
+            - question_ids: List of all question IDs
+            - iteration_data: List of dictionaries, each containing correct/incorrect counts by question_id
+            - iterations: List of iteration labels
+    """
+    if historical_data.empty:
+        return {'question_ids': [], 'iteration_data': [], 'iterations': []}
+    
+    # Create a set to collect all question IDs across all iterations
+    all_question_ids = set()
+    iteration_data = []
+    iterations = []
+    
+    # Process each iteration (insight file)
+    for idx, row in historical_data.iterrows():
+        # Skip if no insight data available
+        if 'insight_data' not in row or not isinstance(row['insight_data'], pd.DataFrame):
+            continue
+            
+        insight_df = row['insight_data']
+        
+        # Skip if no id or is_correct columns
+        if 'id' not in insight_df.columns or 'is_correct' not in insight_df.columns:
+            continue
+            
+        # Create iteration label
+        correct = row.get('correct_count', 0)
+        total = row.get('total_samples', 0)
+        iteration = f"Iter {idx + 1} ({correct}/{total})"
+        iterations.append(iteration)
+        
+        # Get the correctness by question_id for this iteration
+        question_data = {}
+        for _, record in insight_df.iterrows():
+            # Store the ID as both string (for dict keys) and integer (for sorting)
+            try:
+                numeric_id = int(record['id'])
+                q_id = str(numeric_id)  # Store string version for dictionary keys
+            except (ValueError, TypeError):
+                q_id = str(record['id'])  # Fallback to string if conversion fails
+                
+            is_correct = bool(record['is_correct'])
+            
+            # Add to the set of all question IDs
+            all_question_ids.add(q_id)
+            
+            # Store the correctness status
+            question_data[q_id] = is_correct
+            
+        iteration_data.append(question_data)
+    
+    # Convert all question IDs to integers for proper numeric sorting
+    numeric_ids = []
+    for q_id in all_question_ids:
+        try:
+            numeric_ids.append(int(q_id))
+        except (ValueError, TypeError):
+            # Skip non-integer IDs for this chart
+            pass
+    
+    # Sort numerically
+    numeric_ids.sort()
+    
+    # Convert back to strings for consistency with the rest of the code
+    question_ids = [str(num_id) for num_id in numeric_ids]
+    
+    return {
+        'question_ids': question_ids,
+        'iteration_data': iteration_data,
+        'iterations': iterations
+    }

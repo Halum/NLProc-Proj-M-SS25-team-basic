@@ -18,5 +18,9 @@
         "Long" : "The question size is long.",
         "Short" : "The question size is short.",
         "Stability test" : "The question is used to test the stability of the solution. (Same question in different paraphrases should yield the same answer.)"
+    },
+    "iteration_notes": {
+        "evaluation_insights_20250705_163146": "First run with updated gold input set (84 questions).",
+        "evaluation_insights_20250706_035505": "Improved answer generation prompt to be more strict on instructions."
     }
 }
