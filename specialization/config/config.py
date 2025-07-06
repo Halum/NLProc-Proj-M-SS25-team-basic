@@ -98,7 +98,7 @@ TEST_QUESTIONS_PATH = "specialization/data/tests/test_input.json"
 # Specialized model configurations - OpenAI only
 # OpenAI API configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_EMBEDDING_MODEL = "text-embedding-ada-002"  # OpenAI's embedding model
+OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"  # OpenAI's embedding model
 OPENAI_CHAT_MODEL = "gpt-4.1-nano"  # OpenAI's chat model
 
 # Knowledge Graph settings
