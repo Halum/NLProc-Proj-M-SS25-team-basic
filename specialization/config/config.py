@@ -125,6 +125,9 @@ APPEND_INSIGHTS = (
     False  # When False, replaces existing insights file; when True, appends to it
 )
 
+# Path for result interpretation data (containing iteration notes and other metadata)
+RESULT_INTERPRETATION_PATH = str(Path(__file__).parent.parent / "data" / "tests" / "result_interpretation.json")
+
 # Cache settings for visualizations
 CACHE_DIR_PATH = "specialization/data/processed/cache/"
 

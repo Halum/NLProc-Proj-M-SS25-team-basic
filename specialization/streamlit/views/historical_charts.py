@@ -966,16 +966,5 @@ def display_historical_charts(historical_data):
     else:
         st.warning("No context retrieval metrics available in historical data.")
     
+    # End of charts
     st.markdown("---")
-    
-    # Question Correctness Section
-    st.subheader("Question Correctness Across Iterations")
-    st.write("This chart shows the correctness of each question across different evaluation iterations.")
-    
-    # Check if we have question correctness data
-    has_question_correctness = 'question_ids' in historical_data.columns and not historical_data['question_ids'].isnull().all()
-    
-    if has_question_correctness:
-        plot_question_correctness_across_iterations(historical_data)
-    else:
-        st.warning("No question correctness data available in historical data.")
