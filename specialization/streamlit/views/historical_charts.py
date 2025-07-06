@@ -8,141 +8,115 @@ It shows trends in retrieval accuracy, BERT scores, ROUGE scores, and similarity
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 
 # Import data transformation utilities
 from specialization.streamlit.utils import extract_score_distributions
+from specialization.streamlit.utils.historical_analysis import prepare_historical_bert_scores_by_groups
 
 def plot_historical_bert_scores(historical_data):
     """
-    Create box and whisker plots showing the distribution of BERT scores by iteration.
-    
-    Args:
-        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    Create line chart showing BERT scores trend over time, with optional grouping by difficulty or tags.
     """
-    if historical_data.empty:
-        st.warning("No historical data available for BERT scores.")
-        return
+    # Add a toggle for grouping type
+    group_option = st.radio(
+        "View Mode:",
+        ["All", "Difficulty", "Tags"],
+        horizontal=True,
+        key="bert_trend_group_by"
+    )
     
-    # Check if we have insight_data available for calculating distributions
-    has_insight_data = all('insight_data' in row and isinstance(row['insight_data'], pd.DataFrame) 
-                          for _, row in historical_data.iterrows())
-    
-    if not has_insight_data:
-        # Fall back to line chart if we don't have the raw insight data
-        st.info("Detailed score distributions not available. Showing average scores only.")
-        plot_historical_bert_scores_line(historical_data)
-        return
-    
-    # Extract BERT score distributions and iteration labels using the utility function
-    data_arrays, iteration_labels = extract_score_distributions(historical_data, 'bert')
-    
-    # Unpack the returned data
-    if len(data_arrays) == 3:
-        precision_data, recall_data, f1_data = data_arrays
+    if group_option == "All":
+        group_by = None
     else:
-        # Fallback in case data extraction failed
-        precision_data, recall_data, f1_data = [], [], []
-        
-    # Create iterations list for chart building
-    iterations = list(range(1, len(historical_data) + 1))
+        group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
     
-    # Create subplots for better organization
+    scores_by_group, iterations = prepare_historical_bert_scores_by_groups(historical_data, group_by)
+    
+    if not scores_by_group:
+        st.warning("No BERT scores available for visualization.")
+        return
+    
     fig = go.Figure()
+    iteration_labels = [f"Iter {i+1}" for i in range(len(iterations))]
+    hover_texts = []
     
-    # Add box plots for precision
-    for i, data in enumerate(precision_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} Precision',
-                marker_color='#1f77b4',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=0,
-                customdata=[label] * len(data),
-                hovertemplate='Precision: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
+    # Generate hover texts with date and sample info
+    for idx, row in historical_data.iterrows():
+        date_str = row.get('timestamp', '').strftime('%Y-%m-%d %H:%M:%S')
+        correct = row.get('correct_answers', 0)
+        total = row.get('total_queries', 0)
+        
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        else:
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        hover_texts.append(hover_text)
     
-    # Add box plots for recall
-    for i, data in enumerate(recall_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} Recall',
-                marker_color='#ff7f0e',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=1,
-                customdata=[label] * len(data),
-                hovertemplate='Recall: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
+    # Color scheme for different groups
+    colors = px.colors.qualitative.Set3
     
-    # Add box plots for F1
-    for i, data in enumerate(f1_data):
-        if data and i < len(iteration_labels):  # Check both data and index
-            label = iteration_labels[i]
-            fig.add_trace(go.Box(
-                y=data,
-                x=[label] * len(data),
-                name=f'Iter {i+1} F1',
-                marker_color='#2ca02c',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=2,
-                customdata=[label] * len(data),
-                hovertemplate='F1: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add average points as markers for comparison
-    # Check if we have avg_bert metrics
-    has_bert_metrics = all(col in historical_data.columns for col in ['avg_bert_precision', 'avg_bert_recall', 'avg_bert_f1'])
-    
-    if has_bert_metrics and len(historical_data) == len(iteration_labels):
-        # Add a trace for the mean precision values
+    if group_by is None:
+        # Show overall precision, recall, and F1 scores
+        scores = scores_by_group['all']
+        
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_bert_precision'],
-            mode='markers+lines',
-            name='Mean Precision',
-            line=dict(color='#1f77b4', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['precision'],
+            mode='lines+markers',
+            name='Precision',
+            line=dict(color='#1f77b4', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>Precision: %{y:.4f}<br>%{text}<extra></extra>'
         ))
         
-        # Add a trace for the mean recall values
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_bert_recall'],
-            mode='markers+lines',
-            name='Mean Recall',
-            line=dict(color='#ff7f0e', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['recall'],
+            mode='lines+markers',
+            name='Recall',
+            line=dict(color='#ff7f0e', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>Recall: %{y:.4f}<br>%{text}<extra></extra>'
         ))
         
-        # Add a trace for the mean F1 values  
         fig.add_trace(go.Scatter(
             x=iteration_labels,
-            y=historical_data['avg_bert_f1'],
-            mode='markers+lines',
-            name='Mean F1',
-            line=dict(color='#2ca02c', width=2, dash='dash'),
-            marker=dict(size=10, symbol='diamond'),
-            legendgroup='mean',
+            y=scores['f1'],
+            mode='lines+markers',
+            name='F1',
+            line=dict(color='#2ca02c', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{x}<br>F1: %{y:.4f}<br>%{text}<extra></extra>'
         ))
-    elif len(historical_data) != len(iteration_labels):
-        st.warning(f"Mismatch between historical data length ({len(historical_data)}) and iteration labels ({len(iteration_labels)})")
-    elif not has_bert_metrics:
-        st.info("Average BERT metrics not available in historical data")
+        
+    else:
+        # Show F1 scores for each group
+        for i, (group, scores) in enumerate(scores_by_group.items()):
+            color = colors[i % len(colors)]
+            
+            fig.add_trace(go.Scatter(
+                x=iteration_labels,
+                y=scores['f1'],
+                mode='lines+markers',
+                name=str(group),
+                line=dict(color=color, width=2),
+                marker=dict(size=8),
+                text=hover_texts,
+                hovertemplate=f'%{{x}}<br>{group} F1: %{{y:.4f}}<br>%{{text}}<extra></extra>'
+            ))
     
     # Calculate y-axis range for auto-zooming
     all_values = []
-    for data_list in precision_data + recall_data + f1_data:
-        all_values.extend(data_list)
+    for scores in scores_by_group.values():
+        all_values.extend(scores['f1'])
+        if group_by is None:
+            all_values.extend(scores['precision'])
+            all_values.extend(scores['recall'])
     
     if all_values:
         y_min = max(0, min(all_values) - 0.05)  # Add 5% padding below
@@ -151,27 +125,24 @@ def plot_historical_bert_scores(historical_data):
         y_min, y_max = 0, 1
     
     # Update layout
+    title = "BERT Score Trends" if group_by is None else f"BERT F1 Score Trends by {group_option}"
+    
     fig.update_layout(
-        title="BERT Score Distributions by Iteration",
+        title=title,
         xaxis_title="Evaluation Iteration",
         yaxis_title="Score",
-        boxmode='group',  # Group boxes for each iteration
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="closest",
-        margin=dict(b=100 if iterations and len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
+        hovermode="x unified",
+        margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
-    # Add annotations to indicate what each box represents
-    fig.add_annotation(
-        xref="paper", yref="paper",
-        x=0.01, y=0.99,
-        text="Each box shows score distribution<br>Diamond markers show mean values",
-        showarrow=False,
-        font=dict(size=10),
-        bgcolor="rgba(255,255,255,0.8)",
-        bordercolor="gray",
-        borderwidth=1
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
