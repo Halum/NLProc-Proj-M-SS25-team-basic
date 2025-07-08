@@ -24,6 +24,7 @@
         "evaluation_insights_20250706_035505": "Stricter prompt instructions.",
         "evaluation_insights_20250706_195056": "From **text-embedding-ada-002** to **text-embedding-3-small**",
         "evaluation_insights_20250708_145536": "Update **Any** answer interpretation and **empty context** handling.",
-        "evaluation_insights_20250708_173559": "Remove **title** filter and add **metadata in context** for llm"
+        "evaluation_insights_20250708_173559": "Remove **title** filter and add **metadata in context** for llm",
+        "evaluation_insights_20250708_185755": "Update **gold_input** set according to updated 1000+ movie sample"
     }
 }
