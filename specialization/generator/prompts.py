@@ -32,7 +32,6 @@ def get_movie_rag_prompt() -> PromptTemplate:
         - Do **not** change the wording, do **not** paraphrase it.
         - Do **not** include both an answer and "No Data Found".
         - Do **not** guess or use any information not present in the context.
-
         ---
         
         **Examples**:
@@ -73,7 +72,6 @@ def get_query_parsing_prompt() -> ChatPromptTemplate:
         1. Identify any filterable movie metadata:
             - revenue (min_revenue, max_revenue)
             - runtime (min_runtime, max_runtime)
-            - title text (title_contains)
             - release date (release_date, min_release_date, max_release_date)
             - vote average/rating (min_vote_average, max_vote_average)
             - budget (min_budget, max_budget)
@@ -102,7 +100,6 @@ def get_query_parsing_prompt() -> ChatPromptTemplate:
         Return structured output for:
             - min_revenue (float)
             - max_revenue (float)
-            - title_contains (string)
             - min_runtime (int)
             - max_runtime (int)
             - release_date (int)

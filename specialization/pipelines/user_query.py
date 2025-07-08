@@ -20,6 +20,7 @@ Features:
 """
 
 import os
+import re
 import sys
 import logging
 from typing import List, Dict, Any, Optional
@@ -34,7 +35,8 @@ from specialization.generator.query_parser import QueryParser
 from specialization.generator.prompts import get_movie_rag_prompt
 from specialization.config.config import (
     CHUNK_SIZE,
-    LOG_LEVEL
+    LOG_LEVEL,
+    METADATA_COLUMNS
 )
 
 # Setup logging
@@ -95,6 +97,14 @@ class UserQueryPipeline:
             # Create a nice format with metadata
             title = metadata.get('title', 'Unknown Movie')
             context_part = f"Movie: {title}\nContent: {content}"
+            
+            # Add metadata fields from config
+            for field in METADATA_COLUMNS:
+                if field in metadata and metadata[field] is not None:
+                    # Format the field name to be more readable
+                    field_display = field.replace('_', ' ').title()
+                    context_part += f"\n{field_display}: {metadata[field]}"
+            
             context_parts.append(context_part)
         
         return "\n\n---\n\n".join(context_parts)
@@ -115,21 +125,17 @@ class UserQueryPipeline:
         # Retrieve relevant documents with metadata filtering
         retrieved_docs = self.retriever.query(query, k=k, filter_dict=filter_dict)
         
-        if not retrieved_docs:
-            return {
-                'answer': "I couldn't find any relevant information to answer your question.",
-                'context': [],
-                'query': query,
-                'filter_applied': filter_dict,
-                'num_retrieved': 0
-            }
-        
         # Format context
         context = self._format_context(retrieved_docs)
-        
-        # Generate answer using LLM with the original question for context
-        prompt = self.rag_prompt.format(context=context, question=query)
-        answer = self.llm.invoke(prompt).content
+
+        if len(context) == 0:
+            # If no context is available, return a default message, no need to use LLM
+            # @TODO use result_interpretation.json to check to do this logically
+            answer = 'No Data Found'
+        else:
+            # Generate answer using LLM with the original question for context
+            prompt = self.rag_prompt.format(context=context, question=query)
+            answer = self.llm.invoke(prompt).content
         
         return {
             'answer': answer,
@@ -221,7 +227,7 @@ class UserQueryPipeline:
                 show_context = True
                 
                 parsed_query, parsed_filters = self.query_parser.parse_with_chroma_filters(query)
-                result = self.run_single_query(parsed_query, filter_dict=parsed_filters, show_context=show_context)
+                self.run_single_query(parsed_query, filter_dict=parsed_filters, show_context=show_context)
                 
             except KeyboardInterrupt:
                 print("\n\n👋 Goodbye!")
@@ -243,6 +249,7 @@ class UserQueryPipeline:
         Returns:
             Dict: Query result
         """
+        logger.info('Running single query...')
         result = self.query_basic_rag(query, k=5, filter_dict=filter_dict)
         
         if show_context:

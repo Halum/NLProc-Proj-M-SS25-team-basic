@@ -88,7 +88,7 @@
     {
         "id": 7,
         "question": "Movies related to 'Alien' and less than 100 minutes",
-        "answer": "Short Question Circuit",
+        "answer": "Short Circuit",
         "context": "After a lightning bolt zaps a robot named Number 5, the lovable machine starts to think he's human and escapes the lab. Hot on his trail is his designer, Newton, who hopes to get to Number 5 before the military does. In the meantime, a spunky animal lover mistakes the robot for an alien and takes him in, teaching her new guest about life on Earth.",
         "difficulty": "Easy",
         "tags": [
@@ -484,8 +484,8 @@
     {
         "id": 35,
         "question": "Suggest me a historical event based film",
-        "answer": "Savannah",
-        "context": "Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.",
+        "answer": ["Savannah", "september dawn"],
+        "context": ["Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.", "A story set against the Mountain Meadows Massacre, the film is based upon the tragedy which occurred in Utah in 1857. A group of settlers, traveling on wagons, was murdered by the native Mormons. All together, about 140 souls of men, women and children, were taken."],
         "difficulty": "Easy",
         "tags": [
             "Metadata",
@@ -499,8 +499,8 @@
     {
         "id": 36,
         "question": "Could you recommend a film that intricately portrays a significant historical event, ideally one that not only dramatizes the occurrence itself but also delves into the broader social, political, or human implications surrounding it?",
-        "answer": "Savannah",
-        "context": "Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.",
+        "answer": ["Savannah", "i as in icarus"],
+        "context": ["Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.", "The film's plot is based on the Kennedy assassination and subsequent investigation. The film begins with the assassination of President Marc Jarry, who is about to be inaugurated for a second six-year term of office. Henri Volney, state attorney and member of the commission charged with investigating the assassination (based on the Warren Commission) refuses to agree to the commission's final findings. The film portrays the initial controversy about this, as well as Volney and his staff's reopening of the investigation."],
         "difficulty": "Easy",
         "tags": [
             "Metadata",
@@ -618,8 +618,8 @@
     {
         "id": 45,
         "question": "Movies with characters navigating multiple identities or secret lives.",
-        "answer": "The Return of Martin Guerre",
-        "context": "During the medieval times, Martin Guerre returns to his hometown in the middle of France, after being away in the war since he was a child. Nobody recognise him, and the people who knew him suspect he is not Martin, but he knows all about his family and friends, even the most unusual things. Is this man really Martin Guerre?",
+        "answer": ["The Return of Martin Guerre", "Possible Worlds"],
+        "context": ["During the medieval times, Martin Guerre returns to his hometown in the middle of France, after being away in the war since he was a child. Nobody recognise him, and the people who knew him suspect he is not Martin, but he knows all about his family and friends, even the most unusual things. Is this man really Martin Guerre?", "The same man lives out several parallel lives in different \"worlds\" and in different relationships at the same time."],
         "difficulty": "Easy",
         "tags": [
             "Metadata",
@@ -694,8 +694,8 @@
     {
         "id": 50,
         "question": "Suggest me a movie on the theme of journalism ",
-        "answer": "The Pelican Brief",
-        "context": "Features an investigative journalist uncovering the truth about Supreme Court assassinations, involving media frenzy and legal intrigue.",
+        "answer": ["The Pelican Brief", "Shock Corridor"],
+        "context": ["Features an investigative journalist uncovering the truth about Supreme Court assassinations, involving media frenzy and legal intrigue.", "Determined to pull in the Pulitzer Prize, reporter Johnny Barrett will go to any length necessary to win the coveted award. When he learns of an unsolved murder committed at a mental institution, Barrett devises a scheme to solve it and earn himself recognition. With the assistance of a psychiatrist and his girlfriend, Barrett convinces the doctors at the institution to commit him. Once inside, he begins his investigation -- and gradually loses his mind."],
         "difficulty": "Easy",
         "tags": [
             "Metadata",
@@ -870,7 +870,7 @@
     {
         "id": 63,
         "question": "Realease date for An Extremely Goofy Movie? ",
-        "answer": "2000-02-29 00:00:00",
+        "answer": "2000-02-29",
         "context": "It's all extreme sports and a life of freedom as Max sets off for college -- but Goofy misses Max so much he loses his job and goes to finish college alongside Max and his friends. But as Goofy tries to get closer to Max, both must go to the extreme to learn how to live their own lives together.",
         "difficulty": "Easy",
         "tags": [
@@ -909,8 +909,8 @@
     },
     {
         "id": 66,
-        "question": "Hukkle realease date?",
-        "answer": "2002-10-24 00:00:00",
+        "question": "Hukkle release date?",
+        "answer": "2002-10-24",
         "context": "Using almost no dialogue, the film follows a number of residents (both human and animal) of a small rural community in Hungary - an old man with hiccups, a shepherdess and her sheep, an old woman who may or may not be up to no good, some folk-singers at a wedding, etc. While most of the film is a series of vignettes, there is a sinister and often barely perceptible subplot involving murder.",
         "difficulty": "Easy",
         "tags": [
@@ -975,7 +975,7 @@
         "id": 71,
         "question": "What is the plot for Deux hommes dans Manhattan?",
         "answer": "Criminal Plot",
-        "context": "Two French journalists become embroiled in a criminal plot in New York City involving a disappeared United Nations diplomat.",
+        "context": "Two French journalists become embroiled in a criminal plot in New York City involving a disappeared United Nations diplomat. Starring with Pierre Grasset, Christiane Eudes, Ginger Hall, Jean-Pierre Melville. The movie belongs to genres like Crime, Drama, Mystery, Thriller. The movie has keywords like new york, french noir. The movie is available in languages like English, Français. Produced in countries like France",
         "difficulty": "Easy",
         "tags": [
             "Metadata"
@@ -1008,7 +1008,7 @@
     },
     {
         "id": 74,
-        "question": "Is there any movie over 5 hours runtime?",
+        "question": "Is there any movie over 8 hours runtime?",
         "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",

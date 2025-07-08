@@ -3,7 +3,7 @@
 Query Parser Module for User Query Pipeline
 
 This module provides intelligent parsing of user queries to extract:
-1. Filterable metadata (revenue, cast, title)
+1. Filterable metadata (revenue, runtime, ratings, etc.)
 2. Clean question text for semantic search
 3. Structured filters for vector store metadata filtering
 
@@ -33,7 +33,6 @@ class FiltersInput(TypedDict, total=False):
 
     min_revenue: Optional[float]
     max_revenue: Optional[float]
-    title_contains: Optional[str]
     min_runtime: Optional[int]
     max_runtime: Optional[int]
     release_date: Optional[int]
@@ -58,7 +57,6 @@ class ParsedQuery(BaseModel):
 def extract_metadata_filters(
     min_revenue: Optional[float] = None,
     max_revenue: Optional[float] = None,
-    title_contains: Optional[str] = None,
     min_runtime: Optional[int] = None,
     max_runtime: Optional[int] = None,
     release_date: Optional[int] = None,
@@ -75,7 +73,6 @@ def extract_metadata_filters(
     Args:
         min_revenue: Minimum revenue filter (e.g., 1000000 for $1M)
         max_revenue: Maximum revenue filter
-        title_contains: Text that should be in the movie title
         question: The core question about movies after removing filter criteria
 
     Returns:
@@ -84,7 +81,6 @@ def extract_metadata_filters(
     return {
         "min_revenue": min_revenue,
         "max_revenue": max_revenue,
-        "title_contains": title_contains,
         "min_runtime": min_runtime,
         "max_runtime": max_runtime,
         "release_date": release_date,
@@ -103,7 +99,7 @@ class QueryParser:
     Intelligent query parser that extracts metadata filters from natural language.
 
     Uses OpenAI's function calling capabilities to identify filterable movie metadata
-    like revenue, and titles from user queries while preserving the core question.
+    like revenue from user queries while preserving the core question.
     """
 
     def __init__(self):
@@ -188,10 +184,7 @@ class QueryParser:
 
         for key, value in filters.items():
             print(f"Processing filter: {key} = {value}")
-            if key == "title_contains" and value:
-                chroma_conditions.append({"title": {"$eq": value.lower()}})
-
-            elif key == "min_revenue" and value is not None:
+            if key == "min_revenue" and value is not None:
                 chroma_conditions.append({"revenue": {"$gte": float(value)}})
 
             elif key == "max_revenue" and value is not None:
@@ -261,7 +254,7 @@ if __name__ == "__main__":
         "Action movies from 2020 with revenue under 50 million",
         "Films starring Brad Pitt and Leonardo DiCaprio",
         "What are the best comedy movies?",
-        "Movies with titles containing 'Dark' that made more than 200M",
+        "Movies that made more than 200M",
     ]
 
     for query in test_queries:

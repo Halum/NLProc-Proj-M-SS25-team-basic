@@ -72,12 +72,14 @@ DATA_COLUMNS_TYPE_MAPPING = (
 )
 METADATA_COLUMNS = ["title", "revenue", "runtime", "release_date", "vote_average", "budget"]
 ADD_TO_CHUNKING_COLUMN = [
-    {"column": "cast", "prefix": "Starring with "},
-    {"column": "genres", "prefix": "The movie belongs to genres like "},
-    {"column": "keywords", "prefix": "The movie has keywords like "},
-    {"column": "production_companies", "prefix": "Produced by "},
-    {"column": "spoken_languages", "prefix": "The movie is available in languages like "},
-    {"column": "production_countries", "prefix": "Produced in countries like "},
+    {"column": "title", "prefix": "Movie Title: "},
+    {"column": "release_date", "prefix": "Release Date: "},
+    {"column": "cast", "prefix": "Starring with: "},
+    {"column": "genres", "prefix": "Genres: "},
+    {"column": "keywords", "prefix": "Keywords: "},
+    {"column": "production_companies", "prefix": "Produced by: "},
+    {"column": "spoken_languages", "prefix": "Available in languages: "},
+    {"column": "production_countries", "prefix": "Produced in countries: "},
 ]
 CHUNKING_COLUMN = "overview"
 
