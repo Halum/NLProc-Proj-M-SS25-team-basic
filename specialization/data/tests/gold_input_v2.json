@@ -458,7 +458,7 @@
     },
     {
         "id": 33,
-        "question": "Name some movies about pandemics, viruses, or global disease outbreaks?",
+        "question": "ame some movies about pandemics like covid 19.",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -541,7 +541,7 @@
     },
     {
         "id": 39,
-        "question": "Find highly rated movies with plots describing mental health issues.",
+        "question": "Find highly rated movies with plots describing mental health issues after 2010.",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -578,7 +578,7 @@
     },
     {
         "id": 42,
-        "question": "List science fiction films with high ratings and themes of space exploration.",
+        "question": "List science fiction films with high ratings and themes of black hole.",
         "answer": "No Data Found",
         "context": "No context available",
         "difficulty": "Negative",
@@ -882,7 +882,7 @@
     },
     {
         "id": 64,
-        "question": "Why should I watch Last of the Comanches?",
+        "question": "Movies like Last of the Comanches after 20s?",
         "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",
@@ -895,7 +895,7 @@
     },
     {
         "id": 65,
-        "question": "Any Sharon Stone movie after 2000?",
+        "question": "Any Sharon Stone movie before 90s?",
         "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",
@@ -1035,7 +1035,7 @@
     },
     {
         "id": 76,
-        "question": "How many movies like Freelancer released in 2012?",
+        "question": "How many movies like Freelancer released after 2012?",
         "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",
