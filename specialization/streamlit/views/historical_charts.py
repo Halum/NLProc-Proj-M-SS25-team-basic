@@ -574,8 +574,7 @@ def plot_question_correctness_across_iterations(historical_data):
             x=question_ids,
             y=correct_counts,
             name=f"{iterations[i]} - Correct",
-            marker_color=color_correct,
-            opacity=0.9 - (i * 0.1) if i < 5 else 0.4,  # Decrease opacity for older iterations
+            marker_color=color_correct,  # Consistent green color for all correct answers
             customdata=[[iterations[i]] * len(question_ids)],
             hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Correct<extra></extra>'
         ))
@@ -585,8 +584,7 @@ def plot_question_correctness_across_iterations(historical_data):
             x=question_ids,
             y=incorrect_counts,
             name=f"{iterations[i]} - Incorrect",
-            marker_color=color_incorrect,
-            opacity=0.9 - (i * 0.1) if i < 5 else 0.4,  # Decrease opacity for older iterations
+            marker_color=color_incorrect,  # Consistent red color for all incorrect answers
             customdata=[[iterations[i]] * len(question_ids)],
             hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Incorrect<extra></extra>'
         ))
@@ -599,13 +597,7 @@ def plot_question_correctness_across_iterations(historical_data):
         barmode='stack',
         hovermode="closest",
         margin=dict(l=50, r=50, t=80, b=100),  # Add more bottom margin for question ID labels
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
+        showlegend=False,  # Remove legends from the chart
         # Set y-axis to only show integer values since iterations are discrete
         yaxis=dict(
             dtick=1,  # Set tick interval to 1
