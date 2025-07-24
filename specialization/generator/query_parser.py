@@ -42,14 +42,14 @@ class FiltersInput(TypedDict, total=False):
     max_vote_average: Optional[float]
     min_budget: Optional[float]
     max_budget: Optional[float]
-    question: str
+    normalized_question: str
 
 
 class ParsedQuery(BaseModel):
     """Structured representation of a parsed user query."""
 
     filters: Dict[str, Any]
-    question: str
+    normalized_question: str
     original_query: str
 
 
@@ -66,17 +66,17 @@ def extract_metadata_filters(
     max_vote_average: Optional[float] = None,
     min_budget: Optional[float] = None,
     max_budget: Optional[float] = None,
-    question: str = "",
+    normalized_question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
 
     Args:
         min_revenue: Minimum revenue filter (e.g., 1000000 for $1M)
         max_revenue: Maximum revenue filter
-        question: The core question about movies after removing filter criteria
+        normalized_question: A standardized version of the question optimized for semantic search
 
     Returns:
-        FiltersInput: Extracted filters and clean question
+        FiltersInput: Extracted filters and normalized question
     """
     return {
         "min_revenue": min_revenue,
@@ -90,7 +90,7 @@ def extract_metadata_filters(
         "max_vote_average": max_vote_average,
         "min_budget": min_budget,
         "max_budget": max_budget,
-        "question": question,
+        "normalized_question": normalized_question,
     }
 
 
@@ -140,29 +140,41 @@ class QueryParser:
                 # Create filter dictionary (excluding None values and question)
                 filters = {}
                 for key, value in tool_result.items():
-                    if key != "question" and value is not None:
+                    if key not in ["question", "normalized_question"] and value is not None:
                         filters[key] = value
 
-                # Get the cleaned question
-                question = tool_result.get("question", query)
-                if not question.strip():
-                    question = query
+                # Get the normalized question from the tool result
+                normalized_question = tool_result.get("normalized_question", "")
+                if not normalized_question.strip():
+                    normalized_question = query.lower()
 
                 logger.info(f"Extracted filters: {filters}")
-                logger.info(f"Cleaned question: {question}")
+                logger.info(f"Normalized question: {normalized_question}")
 
                 return ParsedQuery(
-                    filters=filters, question=question, original_query=query
+                    filters=filters, 
+                    normalized_question=normalized_question,
+                    original_query=query
                 )
             else:
-                # No tool calls made, return original query as question
+                # No tool calls made, return original query as normalized question
                 logger.info("No metadata filters detected")
-                return ParsedQuery(filters={}, question=query, original_query=query)
+                normalized_question = query.lower()
+                return ParsedQuery(
+                    filters={}, 
+                    normalized_question=normalized_question, 
+                    original_query=query
+                )
 
         except Exception as e:
             logger.error(f"Error parsing query: {e}")
             # Return original query as fallback
-            return ParsedQuery(filters={}, question=query, original_query=query)
+            normalized_question = query.lower()
+            return ParsedQuery(
+                filters={}, 
+                normalized_question=normalized_question, 
+                original_query=query
+            )
 
     def _convert_filters_to_chroma_format(
         self, filters: Dict[str, Any]
@@ -228,20 +240,21 @@ class QueryParser:
 
     def parse_with_chroma_filters(self, query: str) -> tuple[str, Dict[str, Any]]:
         """
-        Parse query and return both cleaned question and ChromaDB-compatible filters.
+        Parse query and return both normalized question and ChromaDB-compatible filters.
 
         Args:
             query (str): Original user query
 
         Returns:
-            tuple[str, Dict[str, Any]]: (cleaned_question, chroma_filters)
+            tuple[str, Dict[str, Any]]: (normalized_question, chroma_filters)
         """
         parsed = self.parse(query)
         logger.info(f"Parsed query: {parsed}")
         chroma_filters = self._convert_filters_to_chroma_format(parsed.filters)
         logger.info(f"ChromaDB filters: {chroma_filters}")
 
-        return parsed.question, chroma_filters
+        return parsed.normalized_question, chroma_filters
+
 
 
 # Example usage and testing
@@ -255,13 +268,16 @@ if __name__ == "__main__":
         "Films starring Brad Pitt and Leonardo DiCaprio",
         "What are the best comedy movies?",
         "Movies that made more than 200M",
+        "Can you tell me about thriller films from the 90s?",
+        "Show me some romantic flicks with high ratings",
+        "What's a good movie about superheroes?"
     ]
 
     for query in test_queries:
         print(f"\nQuery: {query}")
         parsed = parser.parse(query)
         print(f"Filters: {parsed.filters}")
-        print(f"Question: {parsed.question}")
+        print(f"Normalized: {parsed.normalized_question}")
 
         question, chroma_filters = parser.parse_with_chroma_filters(query)
         print(f"ChromaDB filters: {chroma_filters}")

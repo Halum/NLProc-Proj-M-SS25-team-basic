@@ -169,7 +169,7 @@
     {
         "id": 13,
         "question": "Movies related to vampires or werewolves.",
-        "answer": "White Skin",
+        "answer": ["White Skin", "hotel transylvania", "hotel transylvania 2", "open season: scared silly"],
         "context": "Two roommates discover that the family of one of their girlfriends is populated with vampires.",
         "difficulty": "Easy",
         "tags": [
@@ -195,8 +195,8 @@
     },
     {
         "id": 15,
-        "question": "I have heard about the movie named 'Pinocchio'. What is the plot behind this movie? ",
-        "answer": "Pinocchio",
+        "question": "I have heard about the movie named 'Pinocchio'. Who is the producer?",
+        "answer": ["Miramax Films", "Cecchi Gori Group", "Buena Vista International"],
         "context": "Roberto Benigni adapts the classic children's tale by Carlo Collodi for the big-budget family-oriented comedy Pinocchio.",
         "difficulty": "Easy",
         "tags": [
@@ -484,7 +484,7 @@
     {
         "id": 35,
         "question": "Suggest me a historical event based film",
-        "answer": ["Savannah", "september dawn"],
+        "answer": ["Savannah", "september dawn", "geronimo: an american legend"],
         "context": ["Savannah is the true story of Ward Allen, a romantic and bombastic character who rejects his plantation heritage for the freedom of life on a river. Ward navigates the change of early 20th century America on the wrong side of the law and society, his long-time friend, a freed slave named Christmas Moultrie, at his side. Master of Shakespeare, and the shotgun that provides Savannah's markets with fowl, Ward fights for his rights as a hunter. His charisma and eloquent rhetoric win the heart of a society woman who defies her father to marry him. An elderly Moultrie tells the story of life on the river with his friend to a little boy, who passes the legendary Ward Allen down to the next generation.", "A story set against the Mountain Meadows Massacre, the film is based upon the tragedy which occurred in Utah in 1857. A group of settlers, traveling on wagons, was murdered by the native Mormons. All together, about 140 souls of men, women and children, were taken."],
         "difficulty": "Easy",
         "tags": [
@@ -693,7 +693,7 @@
     },
     {
         "id": 50,
-        "question": "Suggest me a movie on the theme of journalism ",
+        "question": "Suggest me a movie on the theme of journalism",
         "answer": ["The Pelican Brief", "Shock Corridor"],
         "context": ["Features an investigative journalist uncovering the truth about Supreme Court assassinations, involving media frenzy and legal intrigue.", "Determined to pull in the Pulitzer Prize, reporter Johnny Barrett will go to any length necessary to win the coveted award. When he learns of an unsolved murder committed at a mental institution, Barrett devises a scheme to solve it and earn himself recognition. With the assistance of a psychiatrist and his girlfriend, Barrett convinces the doctors at the institution to commit him. Once inside, he begins his investigation -- and gradually loses his mind."],
         "difficulty": "Easy",
@@ -895,7 +895,7 @@
     },
     {
         "id": 65,
-        "question": "Any Sharon Stone movie before 90s?",
+        "question": "Any Sharon Stone movie before 70s?",
         "answer": "No Data Found",
         "context": "No specific context",
         "difficulty": "Negative",
