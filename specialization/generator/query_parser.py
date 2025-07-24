@@ -3,7 +3,7 @@
 Query Parser Module for User Query Pipeline
 
 This module provides intelligent parsing of user queries to extract:
-1. Filterable metadata (revenue, cast, title)
+1. Filterable metadata (revenue, runtime, ratings, etc.)
 2. Clean question text for semantic search
 3. Structured filters for vector store metadata filtering
 
@@ -16,11 +16,10 @@ from typing import Dict, Any, Optional, TypedDict
 from pydantic import BaseModel
 
 from langchain_core.tools import tool
-from langchain.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_openai import ChatOpenAI
 
 from specialization.generator.enhanced_llm import EnhancedLLM
+from specialization.generator.prompts import get_query_parsing_prompt
 
 # Setup logging
 logging.basicConfig(
@@ -34,7 +33,6 @@ class FiltersInput(TypedDict, total=False):
 
     min_revenue: Optional[float]
     max_revenue: Optional[float]
-    title_contains: Optional[str]
     min_runtime: Optional[int]
     max_runtime: Optional[int]
     release_date: Optional[int]
@@ -42,6 +40,8 @@ class FiltersInput(TypedDict, total=False):
     max_release_date: Optional[int]
     min_vote_average: Optional[float]
     max_vote_average: Optional[float]
+    min_budget: Optional[float]
+    max_budget: Optional[float]
     question: str
 
 
@@ -57,7 +57,6 @@ class ParsedQuery(BaseModel):
 def extract_metadata_filters(
     min_revenue: Optional[float] = None,
     max_revenue: Optional[float] = None,
-    title_contains: Optional[str] = None,
     min_runtime: Optional[int] = None,
     max_runtime: Optional[int] = None,
     release_date: Optional[int] = None,
@@ -65,6 +64,8 @@ def extract_metadata_filters(
     max_release_date: Optional[int] = None,
     min_vote_average: Optional[float] = None,
     max_vote_average: Optional[float] = None,
+    min_budget: Optional[float] = None,
+    max_budget: Optional[float] = None,
     question: str = "",
 ) -> FiltersInput:
     """Extract movie metadata filters and question from user query.
@@ -72,7 +73,6 @@ def extract_metadata_filters(
     Args:
         min_revenue: Minimum revenue filter (e.g., 1000000 for $1M)
         max_revenue: Maximum revenue filter
-        title_contains: Text that should be in the movie title
         question: The core question about movies after removing filter criteria
 
     Returns:
@@ -81,7 +81,6 @@ def extract_metadata_filters(
     return {
         "min_revenue": min_revenue,
         "max_revenue": max_revenue,
-        "title_contains": title_contains,
         "min_runtime": min_runtime,
         "max_runtime": max_runtime,
         "release_date": release_date,
@@ -89,6 +88,8 @@ def extract_metadata_filters(
         "max_release_date": max_release_date,
         "min_vote_average": min_vote_average,
         "max_vote_average": max_vote_average,
+        "min_budget": min_budget,
+        "max_budget": max_budget,
         "question": question,
     }
 
@@ -98,7 +99,7 @@ class QueryParser:
     Intelligent query parser that extracts metadata filters from natural language.
 
     Uses OpenAI's function calling capabilities to identify filterable movie metadata
-    like revenue, and titles from user queries while preserving the core question.
+    like revenue from user queries while preserving the core question.
     """
 
     def __init__(self):
@@ -108,118 +109,8 @@ class QueryParser:
         llm = EnhancedLLM.chat_model()
         self.llm = llm.bind_tools([extract_metadata_filters])
 
-        # Create prompt template for query parsing
-        self.prompt = ChatPromptTemplate.from_messages(
-            [
-                (
-                    "system",
-                    """You are a helpful assistant that extracts filterable metadata from natural-language movie queries, and separates it from the main information need.
-
-            Your task is to:
-            1. Identify any filterable movie metadata:
-                - revenue (min_revenue, max_revenue)
-                - runtime (min_runtime, max_runtime)
-                - title text (title_contains)
-                - release date (release_date, min_release_date, max_release_date)
-                - vote average/rating (min_vote_average, max_vote_average)
-            2. Extract the **core question** about movies. Do not remove the user's intent or thematic language (e.g., "with firefighter", "involving fate", "about survival").
-            3. Preserve the user’s natural-language question to be used in semantic search or reasoning.
-            
-            Guidelines:
-            - Revenue should be in dollars (e.g., "5 million" = 5000000)
-            - Runtime should be in minutes (e.g., "over 2 hours" = min_runtime: 120)
-            - Release date should be handled as:
-                • "from 2020" → release_year: 2020
-                • "before 2000" → max_release_year: 1999
-                • "after 1990" → min_release_year: 1991
-                • "in the 90s" → min_release_year: 1990, max_release_year: 1999
-                • "before the 90s" → max_release_year: 1989
-                • "after the 80s" → min_release_year: 1990
-                • "in the 80s" → min_release_year: 1980, max_release_year: 1989
-            - vote_average (range: 1.0 to 10.0):
-                • "rated above or over 8" → min_vote_average: 8.0
-                • "with rating below 5" → max_vote_average: 5.0
-                • "highly rated", "top rated", or "high ratings" → min_vote_average: 7.0
-                • "critically acclaimed", "great reviews" → min_vote_average: 8.0
-            - The question should be the core information need about movies
-
-            Return structured output for:
-                - min_revenue (float)
-                - max_revenue (float)
-                - title_contains (string)
-                - min_runtime (int)
-                - max_runtime (int)
-                - release_date (int)
-                - min_release_date (int)
-                - max_release_date (int)
-                - min_vote_average (float)
-                - max_vote_average (float)
-                - question (string)
-            
-            Examples:
-            "Movies with Tom Hanks that made over 100 million" →
-            {{ 
-            "min_revenue": 100000000,
-            "question": "Movies with Tom Hanks" 
-            }}
-
-            "A movie with rating over 7 and has firefighter in the movie plot" →
-            {{ 
-            "min_vote_average": 7.0,
-            "question": "A movie with firefighter in the plot" 
-            }}
-            
-            "Suspenseful movies rated over 8 made before 1995" →
-            {{ 
-            "min_vote_average": 8.0,
-            "max_release_date": 1994,
-            "question": "Suspenseful movies" 
-            }}
-
-            "Are there movies involving destiny versus making your own choices?" →
-            {{ 
-            "question": "Movies involving destiny versus making your own choices" 
-            }}
-
-            "Action movies from 2020 starring Brad Pitt with revenue under 50M with high ratings" →
-            {{ 
-            "release_date": 2020,
-            "max_revenue": 50000000,
-            "min_vote_average": 7.0,
-            "question": "Action movies starring Brad Pitt" 
-            }}
-
-            "Top rated movies from the 90s" →
-            {{ 
-            "min_vote_average": 8.0,
-            "min_release_date": 1990,
-            "max_release_date": 1999,
-            "question": "Top rated movies" 
-            }}
-
-            "Movies before 1980 with short runtime" →
-            {{ 
-            "max_release_date": 1979,
-            "question": "Movies with short runtime" 
-            }}
-
-            "Comedy films rated above 7" →
-            {{ 
-            "min_vote_average": 7.0,
-            "question": "Comedy films" 
-            }}
-
-            "Romantic movies with rating between 7 and 9" →
-            {{ 
-            "min_vote_average": 7.0,
-            "max_vote_average": 9.0,
-            "question": "Romantic movies" 
-            }}
-            """,
-                ),
-                ("user", "{query}"),
-            ]
-        )
+        # Get prompt template for query parsing
+        self.prompt = get_query_parsing_prompt()
 
         # Build the parsing chain
         self.chain: Runnable = self.prompt | self.llm
@@ -293,10 +184,7 @@ class QueryParser:
 
         for key, value in filters.items():
             print(f"Processing filter: {key} = {value}")
-            if key == "title_contains" and value:
-                chroma_conditions.append({"title": {"$eq": value.lower()}})
-
-            elif key == "min_revenue" and value is not None:
+            if key == "min_revenue" and value is not None:
                 chroma_conditions.append({"revenue": {"$gte": float(value)}})
 
             elif key == "max_revenue" and value is not None:
@@ -322,6 +210,12 @@ class QueryParser:
 
             elif key == "max_vote_average" and value is not None:
                 chroma_conditions.append({"vote_average": {"$lte": float(value)}})
+            
+            elif key == "min_budget" and value is not None:
+                chroma_conditions.append({"budget": {"$gte": float(value)}})
+
+            elif key == "max_budget" and value is not None:
+                chroma_conditions.append({"budget": {"$lte": float(value)}})
 
         # Wrap with $and if there are multiple conditions
         print(f"Final ChromaDB filters: {chroma_conditions}")
@@ -360,7 +254,7 @@ if __name__ == "__main__":
         "Action movies from 2020 with revenue under 50 million",
         "Films starring Brad Pitt and Leonardo DiCaprio",
         "What are the best comedy movies?",
-        "Movies with titles containing 'Dark' that made more than 200M",
+        "Movies that made more than 200M",
     ]
 
     for query in test_queries:

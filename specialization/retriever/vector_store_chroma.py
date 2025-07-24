@@ -27,20 +27,18 @@ class VectorStoreChroma:
     adding enhanced features like metadata storage and filtering.
     """
     
-    def __init__(self, embedding_dim: int, collection_name: str = "default_collection", 
+    def __init__(self, collection_name: str = "default_collection", 
                  persist_directory: str = "chroma_db"):
         """
-        Initialize the ChromaDB vector store with specified embedding dimensions.
-        
+        Initialize the ChromaDB vector store.
+
         Args:
-            embedding_dim (int): Dimensionality of the embedding vectors.
             collection_name (str): Name of the ChromaDB collection.
             persist_directory (str): Directory to persist the database.
         """
-        self.embedding_dim = embedding_dim
         self.collection_name = collection_name
         self.persist_directory = persist_directory
-        self.embedding_model = EnhancedLLM.embedding_model()
+        self.embedding_function = EnhancedLLM.embedding_function()
         
         # Create directory if it doesn't exist
         os.makedirs(persist_directory, exist_ok=True)
@@ -48,7 +46,7 @@ class VectorStoreChroma:
         # Initialize LangChain Chroma vector store (handles persistence automatically)
         self.__db = Chroma(
             collection_name=collection_name,
-            embedding_function=self.embedding_model,
+            embedding_function=self.embedding_function,
             persist_directory=persist_directory
         )
 
@@ -77,7 +75,7 @@ class VectorStoreChroma:
             # Recreate the collection with a fresh start
             self.__db = Chroma(
                 collection_name=self.collection_name,
-                embedding_function=self.embedding_model,
+                embedding_function=self.embedding_function,
                 persist_directory=self.persist_directory
             )
             
@@ -87,7 +85,7 @@ class VectorStoreChroma:
             try:
                 self.__db = Chroma(
                     collection_name=self.collection_name,
-                    embedding_function=self.embedding_model,
+                    embedding_function=self.embedding_function,
                     persist_directory=self.persist_directory
                 )
             except Exception as e2:

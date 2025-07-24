@@ -6,156 +6,126 @@ It shows trends in retrieval accuracy, BERT scores, ROUGE scores, and similarity
 """
 
 import streamlit as st
-import pandas as pd
 import plotly.graph_objects as go
-from datetime import datetime
+import plotly.express as px
+import pandas as pd
+
+# Import data transformation utilities
+from specialization.streamlit.utils.historical_analysis import (
+    prepare_historical_bert_scores_by_groups,
+    prepare_historical_rouge_scores_by_groups,
+    prepare_question_correctness_across_iterations
+)
 
 def plot_historical_bert_scores(historical_data):
     """
-    Create box and whisker plots showing the distribution of BERT scores by iteration.
-    
-    Args:
-        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    Create line chart showing BERT scores trend over time, with optional grouping by difficulty or tags.
     """
-    if historical_data.empty:
-        st.warning("No historical data available for BERT scores.")
+    # Add a toggle for grouping type
+    group_option = st.radio(
+        "View Mode:",
+        ["All", "Difficulty", "Tags"],
+        horizontal=True,
+        key="bert_trend_group_by"
+    )
+    
+    if group_option == "All":
+        group_by = None
+    else:
+        group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
+    scores_by_group, iterations = prepare_historical_bert_scores_by_groups(historical_data, group_by)
+    
+    if not scores_by_group:
+        st.warning("No BERT scores available for visualization.")
         return
     
-    # Check if we have insight_data available for calculating distributions
-    has_insight_data = all('insight_data' in row and isinstance(row['insight_data'], pd.DataFrame) 
-                          for _, row in historical_data.iterrows())
-    
-    if not has_insight_data:
-        # Fall back to line chart if we don't have the raw insight data
-        st.info("Detailed score distributions not available. Showing average scores only.")
-        plot_historical_bert_scores_line(historical_data)
-        return
-    
+    fig = go.Figure()
     # Create iteration labels with sample info
-    iterations = list(range(1, len(historical_data) + 1))
     iteration_labels = []
+    hover_texts = []
     
-    # Create labels for iterations
+    # Generate labels and hover texts with date and sample info
     for i, (_, row) in enumerate(historical_data.iterrows(), 1):
         correct = row.get('correct_count', 0)
         total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
         
         # Format axis label as "Iteration n (correct/total)"
         iteration_label = f"Iteration {i} ({correct}/{total})"
         iteration_labels.append(iteration_label)
-    
-    # Prepare data for box plots
-    precision_data = []
-    recall_data = []
-    f1_data = []
-    
-    for _, row in historical_data.iterrows():
-        insightdf = row['insight_data']
         
-        # Extract BERT scores from each insight
-        iter_precision = []
-        iter_recall = []
-        iter_f1 = []
+        # Format hover text with additional details
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        else:
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        hover_texts.append(hover_text)
+    
+    # Color scheme for different groups
+    colors = px.colors.qualitative.Set3
+    
+    if group_by is None:
+        # Show overall precision, recall, and F1 scores
+        scores = scores_by_group['all']
         
-        for _, insight in insightdf.iterrows():
-            if 'bert_score' in insight and isinstance(insight['bert_score'], dict):
-                if 'bert_precision' in insight['bert_score']:
-                    iter_precision.append(insight['bert_score']['bert_precision'])
-                if 'bert_recall' in insight['bert_score']:
-                    iter_recall.append(insight['bert_score']['bert_recall'])
-                if 'bert_f1' in insight['bert_score']:
-                    iter_f1.append(insight['bert_score']['bert_f1'])
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['precision'],
+            mode='lines+markers',
+            name='Precision',
+            line=dict(color='#1f77b4', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>Precision: %{y:.4f}<extra></extra>'
+        ))
         
-        precision_data.append(iter_precision)
-        recall_data.append(iter_recall)
-        f1_data.append(iter_f1)
-    
-    # Create subplots for better organization
-    fig = go.Figure()
-    
-    # Add box plots for precision
-    for i, data in enumerate(precision_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} Precision',
-                marker_color='#1f77b4',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=0,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='Precision: %{y:.4f}<br>%{customdata}<extra></extra>'
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['recall'],
+            mode='lines+markers',
+            name='Recall',
+            line=dict(color='#ff7f0e', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>Recall: %{y:.4f}<extra></extra>'
+        ))
+        
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['f1'],
+            mode='lines+markers',
+            name='F1',
+            line=dict(color='#2ca02c', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>F1: %{y:.4f}<extra></extra>'
+        ))
+        
+    else:
+        # Show F1 scores for each group
+        for i, (group, scores) in enumerate(scores_by_group.items()):
+            color = colors[i % len(colors)]
+            
+            fig.add_trace(go.Scatter(
+                x=iteration_labels,
+                y=scores['f1'],
+                mode='lines+markers',
+                name=str(group),
+                line=dict(color=color, width=2),
+                marker=dict(size=8),
+                text=hover_texts,
+                hovertemplate='%{text}<br>' + str(group) + ' F1: %{y:.4f}<extra></extra>'
             ))
-    
-    # Add box plots for recall
-    for i, data in enumerate(recall_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} Recall',
-                marker_color='#ff7f0e',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=1,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='Recall: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add box plots for F1
-    for i, data in enumerate(f1_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} F1',
-                marker_color='#2ca02c',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=2,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='F1: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add average points as markers for comparison
-    # Add a trace for the mean precision values
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_bert_precision'],
-        mode='markers+lines',
-        name='Mean Precision',
-        line=dict(color='#1f77b4', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
-    
-    # Add a trace for the mean recall values
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_bert_recall'],
-        mode='markers+lines',
-        name='Mean Recall',
-        line=dict(color='#ff7f0e', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
-    
-    # Add a trace for the mean F1 values  
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_bert_f1'],
-        mode='markers+lines',
-        name='Mean F1',
-        line=dict(color='#2ca02c', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
     
     # Calculate y-axis range for auto-zooming
     all_values = []
-    for data_list in precision_data + recall_data + f1_data:
-        all_values.extend(data_list)
+    for scores in scores_by_group.values():
+        all_values.extend(scores['f1'])
+        if group_by is None:
+            all_values.extend(scores['precision'])
+            all_values.extend(scores['recall'])
     
     if all_values:
         y_min = max(0, min(all_values) - 0.05)  # Add 5% padding below
@@ -164,27 +134,24 @@ def plot_historical_bert_scores(historical_data):
         y_min, y_max = 0, 1
     
     # Update layout
+    title = "BERT Score Trends" if group_by is None else f"BERT F1 Score Trends by {group_option}"
+    
     fig.update_layout(
-        title="BERT Score Distributions by Iteration",
+        title=title,
         xaxis_title="Evaluation Iteration",
         yaxis_title="Score",
-        boxmode='group',  # Group boxes for each iteration
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="closest",
+        hovermode="x unified",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
-    # Add annotations to indicate what each box represents
-    fig.add_annotation(
-        xref="paper", yref="paper",
-        x=0.01, y=0.99,
-        text="Each box shows score distribution<br>Diamond markers show mean values",
-        showarrow=False,
-        font=dict(size=10),
-        bgcolor="rgba(255,255,255,0.8)",
-        bordercolor="gray",
-        borderwidth=1
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
@@ -278,162 +245,130 @@ def plot_historical_bert_scores_line(historical_data):
             tickmode='array',
             tickvals=iterations,
             ticktext=iteration_labels,
-            tickangle=0 if len(iterations) <= 5 else 45
+            tickangle=0 if iterations and len(iterations) <= 5 else 45
         ),
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode="x unified",
-        margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
+        margin=dict(b=100 if iterations and len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
 
 def plot_historical_rouge_scores(historical_data):
     """
-    Create box and whisker plots showing the distribution of ROUGE scores by iteration.
-    
-    Args:
-        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    Create line chart showing ROUGE scores trend over time, with optional grouping by difficulty or tags.
     """
-    if historical_data.empty:
-        st.warning("No historical data available for ROUGE scores.")
+    # Add a toggle for grouping type
+    group_option = st.radio(
+        "View Mode:",
+        ["All", "Difficulty", "Tags"],
+        horizontal=True,
+        key="rouge_trend_group_by"
+    )
+    
+    if group_option == "All":
+        group_by = None
+    else:
+        group_by = 'difficulty' if group_option == "Difficulty" else 'tags'
+    
+    scores_by_group, iterations = prepare_historical_rouge_scores_by_groups(historical_data, group_by)
+    
+    if not scores_by_group:
+        st.warning("No ROUGE scores available for visualization.")
         return
     
-    # Check if we have insight_data available for calculating distributions
-    has_insight_data = all('insight_data' in row and isinstance(row['insight_data'], pd.DataFrame) 
-                          for _, row in historical_data.iterrows())
-    
-    if not has_insight_data:
-        # Fall back to line chart if we don't have the raw insight data
-        st.info("Detailed ROUGE score distributions not available. Showing average scores only.")
-        plot_historical_rouge_scores_line(historical_data)
-        return
-    
+    fig = go.Figure()
     # Create iteration labels with sample info
-    iterations = list(range(1, len(historical_data) + 1))
     iteration_labels = []
+    hover_texts = []
     
-    # Create labels for iterations
+    # Generate labels and hover texts with date and sample info
     for i, (_, row) in enumerate(historical_data.iterrows(), 1):
         correct = row.get('correct_count', 0)
         total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
         
         # Format axis label as "Iteration n (correct/total)"
         iteration_label = f"Iteration {i} ({correct}/{total})"
         iteration_labels.append(iteration_label)
-    
-    # Prepare data for box plots
-    rouge1_data = []
-    rouge2_data = []
-    rougeL_data = []
-    
-    for _, row in historical_data.iterrows():
-        insightdf = row['insight_data']
         
-        # Extract ROUGE scores from each insight
-        iter_rouge1 = []
-        iter_rouge2 = []
-        iter_rougeL = []
+        # Format hover text with additional details
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        else:
+            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        hover_texts.append(hover_text)
+    
+    # Color scheme for different metrics/groups
+    metric_colors = {
+        'rouge1': '#1f77b4',
+        'rouge2': '#ff7f0e',
+        'rougeL': '#2ca02c'
+    }
+    colors = px.colors.qualitative.Set3
+    
+    if group_by is None:
+        # Show overall ROUGE-1, ROUGE-2, and ROUGE-L scores
+        scores = scores_by_group['all']
         
-        for _, insight in insightdf.iterrows():
-            if 'rouge_score' in insight and isinstance(insight['rouge_score'], dict):
-                if 'rouge1_fmeasure' in insight['rouge_score']:
-                    iter_rouge1.append(insight['rouge_score']['rouge1_fmeasure'])
-                if 'rouge2_fmeasure' in insight['rouge_score']:
-                    iter_rouge2.append(insight['rouge_score']['rouge2_fmeasure'])
-                if 'rougeL_fmeasure' in insight['rouge_score']:
-                    iter_rougeL.append(insight['rouge_score']['rougeL_fmeasure'])
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['rouge1'],
+            mode='lines+markers',
+            name='ROUGE-1',
+            line=dict(color=metric_colors['rouge1'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>ROUGE-1: %{y:.4f}<extra></extra>'
+        ))
         
-        rouge1_data.append(iter_rouge1)
-        rouge2_data.append(iter_rouge2)
-        rougeL_data.append(iter_rougeL)
-    
-    # Create figure
-    fig = go.Figure()
-    
-    # Add box plots for ROUGE-1
-    for i, data in enumerate(rouge1_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} ROUGE-1',
-                marker_color='#d62728',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=0,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='ROUGE-1: %{y:.4f}<br>%{customdata}<extra></extra>'
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['rouge2'],
+            mode='lines+markers',
+            name='ROUGE-2',
+            line=dict(color=metric_colors['rouge2'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>ROUGE-2: %{y:.4f}<extra></extra>'
+        ))
+        
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=scores['rougeL'],
+            mode='lines+markers',
+            name='ROUGE-L',
+            line=dict(color=metric_colors['rougeL'], width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='%{text}<br>ROUGE-L: %{y:.4f}<extra></extra>'
+        ))
+        
+    else:
+        # Show ROUGE-1 scores for each group
+        for i, (group, scores) in enumerate(scores_by_group.items()):
+            color = colors[i % len(colors)]
+            
+            fig.add_trace(go.Scatter(
+                x=iteration_labels,
+                y=scores['rouge1'],
+                mode='lines+markers',
+                name=str(group),
+                line=dict(color=color, width=2),
+                marker=dict(size=8),
+                text=hover_texts,
+                hovertemplate='%{text}<br>' + str(group) + ' ROUGE-1: %{y:.4f}<extra></extra>'
             ))
-    
-    # Add box plots for ROUGE-2
-    for i, data in enumerate(rouge2_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} ROUGE-2',
-                marker_color='#9467bd',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=1,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='ROUGE-2: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add box plots for ROUGE-L
-    for i, data in enumerate(rougeL_data):
-        if data:  # Only add if we have data
-            fig.add_trace(go.Box(
-                y=data,
-                x=[iteration_labels[i]] * len(data),
-                name=f'Iter {i+1} ROUGE-L',
-                marker_color='#8c564b',
-                boxmean=True,  # Show mean as a dashed line
-                showlegend=False,
-                offsetgroup=2,
-                customdata=[iteration_labels[i]] * len(data),
-                hovertemplate='ROUGE-L: %{y:.4f}<br>%{customdata}<extra></extra>'
-            ))
-    
-    # Add average points as markers for comparison
-    # Add a trace for the mean ROUGE-1 values
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_rouge1_f1'],
-        mode='markers+lines',
-        name='Mean ROUGE-1',
-        line=dict(color='#d62728', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
-    
-    # Add a trace for the mean ROUGE-2 values
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_rouge2_f1'],
-        mode='markers+lines',
-        name='Mean ROUGE-2',
-        line=dict(color='#9467bd', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
-    
-    # Add a trace for the mean ROUGE-L values  
-    fig.add_trace(go.Scatter(
-        x=iteration_labels,
-        y=historical_data['avg_rougeL_f1'],
-        mode='markers+lines',
-        name='Mean ROUGE-L',
-        line=dict(color='#8c564b', width=2, dash='dash'),
-        marker=dict(size=10, symbol='diamond'),
-        legendgroup='mean',
-    ))
     
     # Calculate y-axis range for auto-zooming
     all_values = []
-    for data_list in rouge1_data + rouge2_data + rougeL_data:
-        all_values.extend(data_list)
+    for scores in scores_by_group.values():
+        all_values.extend(scores['rouge1'])
+        if group_by is None:
+            all_values.extend(scores['rouge2'])
+            all_values.extend(scores['rougeL'])
     
     if all_values:
         y_min = max(0, min(all_values) - 0.05)  # Add 5% padding below
@@ -442,27 +377,34 @@ def plot_historical_rouge_scores(historical_data):
         y_min, y_max = 0, 1
     
     # Update layout
+    title = "ROUGE Score Trends" if group_by is None else f"ROUGE-1 Score Trends by {group_option}"
+    
     fig.update_layout(
-        title="ROUGE Score Distributions by Iteration",
+        title=title,
         xaxis_title="Evaluation Iteration",
         yaxis_title="Score",
-        boxmode='group',  # Group boxes for each iteration
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="closest",
+        hovermode="x unified",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
-    # Add annotations to indicate what each box represents
-    fig.add_annotation(
-        xref="paper", yref="paper",
-        x=0.01, y=0.99,
-        text="Each box shows score distribution<br>Diamond markers show mean values",
-        showarrow=False,
-        font=dict(size=10),
-        bgcolor="rgba(255,255,255,0.8)",
-        bordercolor="gray",
-        borderwidth=1
+    # Add explanation of ROUGE scores
+    if group_by is None:
+        fig.add_annotation(
+            text="ROUGE-1: Word overlap<br>ROUGE-2: Two-word phrase overlap<br>ROUGE-L: Longest common sequence",
+            xref="paper", yref="paper",
+            x=0, y=1.15,
+            showarrow=False,
+            align="left"
+        )
+    
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
@@ -501,44 +443,54 @@ def plot_historical_rouge_scores_line(historical_data):
     
     fig = go.Figure()
     
-    # Add traces for each ROUGE F1 metric
-    fig.add_trace(go.Scatter(
-        x=iterations,
-        y=historical_data['avg_rouge1_f1'],
-        mode='lines+markers',
-        name='ROUGE-1 F1',
-        line=dict(color='#d62728', width=2),
-        marker=dict(size=8),
-        text=hover_texts,
-        hovertemplate='Iteration %{x}<br>ROUGE-1 F1: %{y:.4f}<br>%{text}<extra></extra>'
-    ))
+    # Check if we have ROUGE metrics available
+    has_rouge1 = 'avg_rouge1_f1' in historical_data.columns and not historical_data['avg_rouge1_f1'].isnull().all()
+    has_rouge2 = 'avg_rouge2_f1' in historical_data.columns and not historical_data['avg_rouge2_f1'].isnull().all()
+    has_rougeL = 'avg_rougeL_f1' in historical_data.columns and not historical_data['avg_rougeL_f1'].isnull().all()
     
-    fig.add_trace(go.Scatter(
-        x=iterations,
-        y=historical_data['avg_rouge2_f1'],
-        mode='lines+markers',
-        name='ROUGE-2 F1',
-        line=dict(color='#9467bd', width=2),
-        marker=dict(size=8),
-        text=hover_texts,
-        hovertemplate='Iteration %{x}<br>ROUGE-2 F1: %{y:.4f}<br>%{text}<extra></extra>'
-    ))
+    if has_rouge1:
+        # Add trace for ROUGE-1
+        fig.add_trace(go.Scatter(
+            x=iterations,
+            y=historical_data['avg_rouge1_f1'],
+            mode='lines+markers',
+            name='ROUGE-1',
+            line=dict(color='#1f77b4', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='Iteration %{x}<br>ROUGE-1: %{y:.4f}<br>%{text}<extra></extra>'
+        ))
     
-    fig.add_trace(go.Scatter(
-        x=iterations,
-        y=historical_data['avg_rougeL_f1'],
-        mode='lines+markers',
-        name='ROUGE-L F1',
-        line=dict(color='#8c564b', width=2),
-        marker=dict(size=8),
-        text=hover_texts,
-        hovertemplate='Iteration %{x}<br>ROUGE-L F1: %{y:.4f}<br>%{text}<extra></extra>'
-    ))
+    if has_rouge2:
+        # Add trace for ROUGE-2
+        fig.add_trace(go.Scatter(
+            x=iterations,
+            y=historical_data['avg_rouge2_f1'],
+            mode='lines+markers',
+            name='ROUGE-2',
+            line=dict(color='#ff7f0e', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='Iteration %{x}<br>ROUGE-2: %{y:.4f}<br>%{text}<extra></extra>'
+        ))
+    
+    if has_rougeL:
+        # Add trace for ROUGE-L
+        fig.add_trace(go.Scatter(
+            x=iterations,
+            y=historical_data['avg_rougeL_f1'],
+            mode='lines+markers',
+            name='ROUGE-L',
+            line=dict(color='#2ca02c', width=2),
+            marker=dict(size=8),
+            text=hover_texts,
+            hovertemplate='Iteration %{x}<br>ROUGE-L: %{y:.4f}<br>%{text}<extra></extra>'
+        ))
     
     # Calculate y-axis range for auto-zooming
     y_values = []
     for col in ['avg_rouge1_f1', 'avg_rouge2_f1', 'avg_rougeL_f1']:
-        if col in historical_data.columns:
+        if col in historical_data.columns and not historical_data[col].isnull().all():
             y_values.extend(historical_data[col].dropna().tolist())
     
     if y_values:
@@ -549,35 +501,248 @@ def plot_historical_rouge_scores_line(historical_data):
     
     # Update layout
     fig.update_layout(
-        title="Historical ROUGE F1 Scores Trend (Average Values)",
-        xaxis_title="Evaluation Iteration (correct/total)",
-        yaxis_title="Average Score",
+        title="ROUGE Scores by Iteration",
+        xaxis_title="Evaluation Iteration",
+        yaxis_title="F1 Score",
         xaxis=dict(
             tickmode='array',
             tickvals=iterations,
             ticktext=iteration_labels,
-            tickangle=0 if len(iterations) <= 5 else 45
+            tickangle=45 if len(iterations) > 5 else 0
         ),
         yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x unified",
+        hovermode="closest",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
     st.plotly_chart(fig, use_container_width=True)
 
-def plot_historical_similarity_scores(historical_data):
+def plot_question_correctness_across_iterations(historical_data):
     """
-    Create a line chart showing average similarity scores by iteration.
+    Create a stacked bar chart showing correctness of each question across iterations.
+    
+    Args:
+        historical_data (pd.DataFrame): DataFrame containing historical metrics
+    """
+    
+    # Get the prepared data using the utility function
+    chart_data = prepare_question_correctness_across_iterations(historical_data)
+    
+    # Extract the data components
+    question_ids = chart_data['question_ids']
+    iteration_data = chart_data['iteration_data']
+    iterations = chart_data['iterations']
+    
+    # If no data is available, simply return
+    if not question_ids or not iteration_data:
+        st.warning("No question correctness data available for visualization.")
+        return
+    
+    # Show stats about the data
+    st.write(f"Found {len(question_ids)} unique questions across {len(iterations)} iterations")
+    
+    # Create figure
+    fig = go.Figure()
+    
+    # Color scheme for correct/incorrect
+    color_correct = '#2ca02c'    # Green
+    color_incorrect = '#d62728'  # Red
+    
+    # For each iteration, add a trace for correct and incorrect answers
+    for i, iteration_questions in enumerate(iteration_data):
+        # Prepare data for this iteration
+        correct_counts = []
+        incorrect_counts = []
+        
+        # For each question, check if it was answered correctly in this iteration
+        for q_id in question_ids:
+            if q_id in iteration_questions:
+                if iteration_questions[q_id]:
+                    correct_counts.append(1)  # Correct
+                    incorrect_counts.append(0)
+                else:
+                    correct_counts.append(0)
+                    incorrect_counts.append(1)  # Incorrect
+            else:
+                # Question not present in this iteration
+                correct_counts.append(0)
+                incorrect_counts.append(0)
+        
+        # Add trace for correct answers (bottom of stack)
+        fig.add_trace(go.Bar(
+            x=question_ids,
+            y=correct_counts,
+            name=f"{iterations[i]} - Correct",
+            marker_color=color_correct,  # Consistent green color for all correct answers
+            customdata=[[iterations[i]] * len(question_ids)],
+            hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Correct<extra></extra>'
+        ))
+        
+        # Add trace for incorrect answers (top of stack)
+        fig.add_trace(go.Bar(
+            x=question_ids,
+            y=incorrect_counts,
+            name=f"{iterations[i]} - Incorrect",
+            marker_color=color_incorrect,  # Consistent red color for all incorrect answers
+            customdata=[[iterations[i]] * len(question_ids)],
+            hovertemplate='Question: %{x}<br>Iteration: %{customdata[0]}<br>Status: Incorrect<extra></extra>'
+        ))
+    
+    # Update layout
+    fig.update_layout(
+        title="Question Correctness Across Iterations",
+        xaxis_title="Question ID",
+        yaxis_title="Result by Iteration",
+        barmode='stack',
+        hovermode="closest",
+        margin=dict(l=50, r=50, t=80, b=100),  # Add more bottom margin for question ID labels
+        showlegend=False,  # Remove legends from the chart
+        # Set y-axis to only show integer values since iterations are discrete
+        yaxis=dict(
+            dtick=1,  # Set tick interval to 1
+            tick0=0,  # Start ticks at 0
+            tickmode='linear',  # Use linear tick mode for even spacing
+            tickformat='d'  # Display as integers
+        )
+    )
+    
+    # Adjust bar width based on the number of questions
+    if len(question_ids) > 5:
+        # Calculate width based on number of questions, with thicker bars
+        # Increase minimum width from 0.3 to 0.5 and adjust the scaling factor
+        bar_width = max(0.5, 2.0 / (len(question_ids) / 20))
+        fig.update_traces(width=bar_width)
+    
+    # Handle x-axis display based on number of questions
+    fig.update_xaxes(
+        tickangle=90,
+        tickmode='array',
+        tickvals=question_ids,  # Use actual question IDs as tick values
+        ticktext=question_ids,  # And as tick labels
+        # Force the category order to follow our sorted question IDs
+        categoryorder='array',
+        categoryarray=question_ids
+    )
+    
+    # If there are many questions, limit the number of ticks to avoid crowding
+    if len(question_ids) > 30:
+        fig.update_xaxes(
+            nticks=30
+        )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+def plot_historical_accuracy(historical_data):
+    """
+    Create a line chart showing accuracy trends and context found percentage over time.
     
     Args:
         historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
     """
-    if historical_data.empty:
-        st.warning("No historical data available for similarity scores.")
-        return
+    # Create iterations for x-axis
+    iterations = list(range(1, len(historical_data) + 1))
+    iteration_labels = []
+    hover_texts_accuracy = []
+    hover_texts_context = []
+    
+    # Check if we have context metrics available
+    has_context_metrics = 'context_found_percent' in historical_data.columns and not historical_data['context_found_percent'].isnull().all()
+    
+    # Create both axis labels and hover text
+    for i, (_, row) in enumerate(historical_data.iterrows(), 1):
+        correct = row.get('correct_count', 0)
+        total = row.get('total_samples', 0)
+        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
         
-    # Create iteration labels with sample info
+        # Format axis label as "Iteration n (correct/total)"
+        iteration_label = f"Iteration {i} ({correct}/{total})"
+        iteration_labels.append(iteration_label)
+        
+        # Format hover text for accuracy
+        if total > 0:
+            percent_correct = (correct / total) * 100
+            hover_text_acc = f"Date: {date_str}<br>Accuracy: {percent_correct:.1f}%<br>Correct: {correct}/{total}"
+        else:
+            hover_text_acc = f"Date: {date_str}<br>Samples: {correct}/{total}"
+        hover_texts_accuracy.append(hover_text_acc)
+        
+        # Format hover text for context found
+        if has_context_metrics:
+            context_found = row.get('context_found_percent', 0)
+            hover_text_ctx = f"Date: {date_str}<br>Context Found: {context_found:.1f}%<br>Samples: {correct}/{total}"
+            hover_texts_context.append(hover_text_ctx)
+    
+    # Create the figure
+    fig = go.Figure()
+    
+    # Add trace for accuracy
+    fig.add_trace(go.Scatter(
+        x=iteration_labels,
+        y=historical_data['accuracy_percent'],
+        mode='lines+markers',
+        name='Answer Accuracy',
+        line=dict(color='#1f77b4', width=3),
+        marker=dict(size=10),
+        text=hover_texts_accuracy,
+        hovertemplate='%{text}<extra></extra>'
+    ))
+    
+    # Add trace for context found percentage if available
+    if has_context_metrics:
+        fig.add_trace(go.Scatter(
+            x=iteration_labels,
+            y=historical_data['context_found_percent'],
+            mode='lines+markers',
+            name='Context Found %',
+            line=dict(color='#2ca02c', width=3),
+            marker=dict(size=10),
+            text=hover_texts_context,
+            hovertemplate='%{text}<extra></extra>'
+        ))
+    
+    # Calculate y-axis range for auto-zooming with padding
+    y_values = historical_data['accuracy_percent'].dropna().tolist()
+    
+    if has_context_metrics:
+        y_values.extend(historical_data['context_found_percent'].dropna().tolist())
+    
+    if y_values:
+        y_min = max(0, min(y_values) - 5)  # Subtract 5 percentage points, min 0
+        y_max = min(100, max(y_values) + 5)  # Add 5 percentage points, max 100
+    else:
+        y_min, y_max = 0, 100
+    
+    # Update layout
+    fig.update_layout(
+        title="Answer Accuracy & Context Coverage Trend",
+        xaxis_title="Evaluation Iteration",
+        yaxis_title="Percentage (%)",
+        yaxis=dict(range=[y_min, y_max]),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        hovermode="closest",
+        margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
+    )
+    
+    # Update x-axis labels
+    fig.update_xaxes(
+        tickangle=45 if len(iterations) > 5 else 0,
+        tickmode='array',
+        tickvals=list(range(len(iteration_labels))),
+        ticktext=iteration_labels
+    )
+    
+    st.plotly_chart(fig, use_container_width=True)
+
+def plot_historical_context_metrics(historical_data):
+    """
+    Create a chart showing context retrieval position metrics over time:
+    Average position of gold context in retrieval results
+    
+    Args:
+        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
+    """
+    # Create iterations for x-axis
     iterations = list(range(1, len(historical_data) + 1))
     iteration_labels = []
     hover_texts = []
@@ -593,137 +758,56 @@ def plot_historical_similarity_scores(historical_data):
         iteration_labels.append(iteration_label)
         
         # Format hover text with additional details
-        if total > 0:
-            percent_correct = (correct / total) * 100
-            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
+        context_found = row.get('context_found_percent', 0)
+        avg_position = row.get('avg_context_distance', None)
+        
+        if avg_position is not None:
+            hover_text = f"Date: {date_str}<br>Avg Position: {avg_position:.2f}<br>Found in: {context_found:.1f}%<br>Samples: {correct}/{total}"
         else:
-            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
+            hover_text = f"Date: {date_str}<br>Avg Position: N/A<br>Found in: {context_found:.1f}%<br>Samples: {correct}/{total}"
         
         hover_texts.append(hover_text)
     
+    # Create the figure
     fig = go.Figure()
     
-    # Add trace for similarity scores
+    # Add trace for average context distance (lower is better)
     fig.add_trace(go.Scatter(
-        x=iterations,
-        y=historical_data['avg_similarity'],
+        x=iteration_labels,
+        y=historical_data['avg_context_distance'],
         mode='lines+markers',
-        name='Avg Similarity',
-        line=dict(color='#17becf', width=2),
+        name='Avg Position',
+        line=dict(color='#1f77b4', width=3),
         marker=dict(size=10),
         text=hover_texts,
-        hovertemplate='Iteration %{x}<br>Avg Similarity: %{y:.4f}<br>%{text}<extra></extra>'
+        hovertemplate='%{text}<extra></extra>'
     ))
     
     # Calculate y-axis range for auto-zooming
-    y_values = historical_data['avg_similarity'].dropna().tolist()
+    position_values = historical_data['avg_context_distance'].dropna().tolist()
     
-    if y_values:
-        y_min = max(0, min(y_values) - 0.05)  # Add 5% padding below
-        y_max = min(1, max(y_values) + 0.05)  # Add 5% padding above, cap at 1.0
+    if position_values:
+        y_min = max(0, min(position_values) - 0.5)  # Subtract 0.5, min 0
+        y_max = max(position_values) + 0.5  # Add 0.5
     else:
-        y_min, y_max = 0, 1
+        y_min, y_max = 0, 5
     
     # Update layout
     fig.update_layout(
-        title="Historical Similarity Scores Trend",
-        xaxis_title="Evaluation Iteration (correct/total)",
-        yaxis_title="Average Similarity Score",
+        title="Context Retrieval Position Trend",
+        xaxis_title="Evaluation Iteration",
+        yaxis=dict(
+            title="Avg Gold Context Position (lower is better)",
+            range=[y_min, y_max]
+        ),
         xaxis=dict(
             tickmode='array',
-            tickvals=iterations,
+            tickvals=list(range(len(iteration_labels))),
             ticktext=iteration_labels,
-            tickangle=0 if len(iterations) <= 5 else 45
+            tickangle=45 if len(iterations) > 5 else 0
         ),
-        yaxis=dict(range=[y_min, y_max]),
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x",
-        margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
-    )
-    
-    st.plotly_chart(fig, use_container_width=True)
-
-def plot_historical_retrieval_accuracy(historical_data):
-    """
-    Create a line chart showing average context distance (retrieval accuracy) by iteration.
-    Lower values indicate better retrieval accuracy as context was found closer to the top.
-    
-    Args:
-        historical_data (pd.DataFrame): DataFrame containing historical metrics with timestamps
-    """
-    if historical_data.empty:
-        st.warning("No historical data available for retrieval accuracy.")
-        return
-    
-    # Make a copy to avoid modifying the original DataFrame
-    data_for_chart = historical_data.copy()
-    
-    # Check if we have context distance data
-    if 'avg_context_distance' not in data_for_chart.columns or data_for_chart['avg_context_distance'].isnull().all():
-        st.warning("No context distance data is available in the historical metrics. This means the gold context wasn't found in the retrieved contexts list.")
-        return
-    
-    # Create iteration labels with sample info
-    iterations = list(range(1, len(data_for_chart) + 1))
-    iteration_labels = []
-    hover_texts = []
-    
-    # Create both axis labels and hover text
-    for i, (_, row) in enumerate(data_for_chart.iterrows(), 1):
-        correct = row.get('correct_count', 0)
-        total = row.get('total_samples', 0)
-        date_str = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
-        
-        # Format axis label as "Iteration n (correct/total)"
-        iteration_label = f"Iteration {i} ({correct}/{total})"
-        iteration_labels.append(iteration_label)
-        
-        # Format hover text with additional details
-        if total > 0:
-            percent_correct = (correct / total) * 100
-            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total} ({percent_correct:.1f}% correct)"
-        else:
-            hover_text = f"Date: {date_str}<br>Samples: {correct}/{total}"
-        
-        hover_texts.append(hover_text)
-    
-    fig = go.Figure()
-    
-    # Add trace for retrieval accuracy (context distance)
-    fig.add_trace(go.Scatter(
-        x=iterations,
-        y=data_for_chart['avg_context_distance'],
-        mode='lines+markers',
-        name='Avg Context Distance',
-        line=dict(color='#e377c2', width=2),
-        marker=dict(size=10),
-        text=hover_texts,
-        hovertemplate='Iteration %{x}<br>Avg Context Distance: %{y:.2f}<br>%{text}<extra></extra>'
-    ))
-    
-    # Calculate y-axis range for auto-zooming - start from 0, but we'll set a reasonable upper limit
-    y_values = data_for_chart['avg_context_distance'].dropna().tolist()
-    
-    if y_values:
-        y_min = 0  # Always start from 0
-        y_max = max(y_values) * 1.2  # Add 20% padding above
-    else:
-        y_min, y_max = 0, 5  # Default range if no data
-    
-    # Update layout
-    fig.update_layout(
-        title="Historical Retrieval Accuracy Trend (Gold Context Position)",
-        xaxis_title="Evaluation Iteration (correct/total)",
-        yaxis_title="Average Gold Context Position (lower is better)",
-        xaxis=dict(
-            tickmode='array',
-            tickvals=iterations,
-            ticktext=iteration_labels,
-            tickangle=0 if len(iterations) <= 5 else 45
-        ),
-        yaxis=dict(range=[y_min, y_max]),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-        hovermode="x",
+        hovermode="closest",
         margin=dict(b=100 if len(iterations) > 5 else 80)  # Add more bottom margin for angled labels
     )
     
@@ -740,8 +824,7 @@ def plot_historical_retrieval_accuracy(historical_data):
             color="green",
             width=1,
             dash="dash",
-        ),
-        name="Perfect Retrieval"
+        )
     )
     
     # Add annotation for the reference line
@@ -750,7 +833,7 @@ def plot_historical_retrieval_accuracy(historical_data):
         yref="y",
         x=0.01,
         y=1,
-        text="Ideal (position 1)",
+        text="Ideal position (1)",
         showarrow=False,
         font=dict(
             color="green",
@@ -760,8 +843,6 @@ def plot_historical_retrieval_accuracy(historical_data):
     )
     
     st.plotly_chart(fig, use_container_width=True)
-
-
 
 def display_historical_charts(historical_data):
     """
@@ -780,7 +861,7 @@ def display_historical_charts(historical_data):
     if not historical_data.empty:
         earliest = historical_data['timestamp'].min().strftime('%Y-%m-%d %H:%M:%S')
         latest = historical_data['timestamp'].max().strftime('%Y-%m-%d %H:%M:%S')
-        st.info(f"� {len(historical_data)} evaluation iterations (from {earliest} to {latest})")
+        st.info(f"📊 {len(historical_data)} evaluation iterations (from {earliest} to {latest})")
     
     # Display the raw data table if there's data
     if not historical_data.empty:
@@ -801,30 +882,81 @@ def display_historical_charts(historical_data):
     
     # Display each chart section sequentially
     st.markdown("---")
-    st.subheader("Retrieval Accuracy by Iteration")
-    st.write("This chart shows the average position where the gold context was found in the retrieved contexts list. Lower values indicate better retrieval accuracy, with 1.0 being ideal (gold context found as the first result).")
     
-    # Check if we have at least some context distance data
-    has_distance_data = ('avg_context_distance' in historical_data.columns and 
-                         not historical_data['avg_context_distance'].isnull().all())
+    # BERT Scores Section
+    st.subheader("BERT Scores Trend")
+    st.write("These charts show how BERT scores (precision, recall, and F1) have evolved across evaluation runs.")
     
-    if not has_distance_data:
-        st.warning("No context distance data is available. This metric requires finding 'gold_context' within the list of retrieved contexts.")
-        st.info("To resolve this: ensure your evaluation pipeline includes both 'gold_context' and 'context' (list of retrieved contexts) in the evaluation insights.")
+    # Check if we have BERT metrics
+    has_bert_metrics = all(col in historical_data.columns for col in ['avg_bert_precision', 'avg_bert_recall', 'avg_bert_f1'])
+    
+    if has_bert_metrics:
+        plot_historical_bert_scores(historical_data)
     else:
-        plot_historical_retrieval_accuracy(historical_data)
+        st.warning("No BERT score metrics available in historical data.")
     
     st.markdown("---")
-    st.subheader("BERT Scores by Iteration")
-    st.write("This chart shows the average BERT precision, recall, and F1 scores across all evaluation iterations.")
-    plot_historical_bert_scores(historical_data)
+    
+    # ROUGE Scores Section
+    st.subheader("ROUGE Scores Trend")
+    st.write("These charts show how ROUGE scores (measuring text overlap) have evolved across evaluation runs.")
+    
+    # Check if we have ROUGE metrics - any of the average metrics
+    has_rouge_metrics = any(col in historical_data.columns and not historical_data[col].isnull().all() 
+                          for col in ['avg_rouge1_f1', 'avg_rouge2_f1', 'avg_rougeL_f1'])
+    
+    if has_rouge_metrics:
+        # Try to use the box plot visualization first, it will fall back to line chart if needed
+        plot_historical_rouge_scores(historical_data)
+    else:
+        st.warning("No ROUGE score metrics available in historical data.")
     
     st.markdown("---")
-    st.subheader("ROUGE Scores by Iteration")
-    st.write("This chart shows the average ROUGE F1 scores across all evaluation iterations.")
-    plot_historical_rouge_scores(historical_data)
+    
+    # Question Correctness Section
+    st.subheader("Question Correctness Across Iterations")
+    st.write("This chart shows the correctness of each question across different evaluation iterations. Each bar represents a question, stacked by iteration results.")
+    
+    # Check if we have insight data with id and is_correct fields
+    has_question_data = any('insight_data' in row and 
+                           isinstance(row['insight_data'], pd.DataFrame) and 
+                           not row['insight_data'].empty and
+                           'id' in row['insight_data'].columns and 
+                           'is_correct' in row['insight_data'].columns
+                           for _, row in historical_data.iterrows())
+    
+    if has_question_data:
+        plot_question_correctness_across_iterations(historical_data)
+    else:
+        st.warning("No detailed question data available for visualization.")
     
     st.markdown("---")
-    st.subheader("Similarity Scores by Iteration")
-    st.write("This chart shows the average similarity scores across all evaluation iterations.")
-    plot_historical_similarity_scores(historical_data)
+    
+    # Accuracy Section
+    st.subheader("Answer Accuracy & Context Coverage Trend")
+    st.write("This chart shows how the overall accuracy of the RAG system and the percentage of queries where gold context was found have changed over time.")
+    
+    # Check if we have accuracy metrics
+    has_accuracy = 'accuracy_percent' in historical_data.columns and not historical_data['accuracy_percent'].isnull().all()
+    
+    if has_accuracy:
+        plot_historical_accuracy(historical_data)
+    else:
+        st.warning("No accuracy metrics available in historical data.")
+    
+    st.markdown("---")
+    
+    # Context Retrieval Section
+    st.subheader("Context Position Trend")
+    st.write("This chart shows how the average position of gold context in retrieval results has changed over time (lower is better).")
+    
+    # Check if we have context metrics
+    has_context_metrics = all(col in historical_data.columns for col in ['avg_context_distance', 'context_found_percent'])
+    
+    if has_context_metrics:
+        plot_historical_context_metrics(historical_data)
+    else:
+        st.warning("No context retrieval metrics available in historical data.")
+    
+    # End of charts
+    st.markdown("---")
