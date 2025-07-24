@@ -29,8 +29,6 @@ class MetricsGenerator:
             'bert_recall': R.item(),
             'bert_f1': F1.item()
         }
-        
-        print(f"BERT scores calculated: {bert_scores}")
 
         return bert_scores
     
@@ -42,6 +40,7 @@ class MetricsGenerator:
         Returns:
             dict: Dictionary with ROUGE scores
         """
+        print(f'Calculating ROUGE score for generated answers: {generated_answers} against gold answers: {gold_answers}')
         scorer = rouge_scorer.RougeScorer(['rouge1', 'rouge2', 'rougeL'], use_stemmer=True)
         scores = scorer.score(gold_answers, generated_answers)
         

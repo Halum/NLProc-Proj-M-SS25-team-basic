@@ -15,7 +15,7 @@ from datetime import datetime
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 # Import project configuration
-from specialization.config.config import EVALUATION_INSIGHTS_PATH, LOG_LEVEL
+from specialization.config.config import EVALUATION_INSIGHTS_PATH, RESULT_INTERPRETATION_PATH, LOG_LEVEL
 
 # Configure logging
 logging.basicConfig(
@@ -117,3 +117,55 @@ def load_insight_data(file_path=None):
     except Exception as e:
         logging.error(f"Error loading insights data: {e}")
         return None
+
+def load_result_interpretation():
+    """
+    Loads the result interpretation JSON file that contains metadata about evaluation iterations.
+    
+    Returns:
+        dict: Dictionary containing result interpretation data, including iteration notes
+    """
+    try:
+        with open(RESULT_INTERPRETATION_PATH, 'r') as f:
+            data = json.load(f)
+        return data
+    except FileNotFoundError:
+        logging.error(f"Result interpretation file not found at {RESULT_INTERPRETATION_PATH}")
+        return None
+    except json.JSONDecodeError:
+        logging.error(f"Error parsing result interpretation file at {RESULT_INTERPRETATION_PATH}")
+        return None
+    except Exception as e:
+        logging.error(f"Unexpected error loading result interpretation file: {str(e)}")
+        return None
+
+def get_sorted_iteration_notes():
+    """
+    Load and sort the iteration notes from the result interpretation file.
+    Notes are sorted by timestamp in chronological order.
+    
+    Returns:
+        list: List of tuples containing (iteration_id, note, datetime) sorted by datetime
+    """
+    result_interpretation = load_result_interpretation()
+    sorted_notes = []
+    
+    if result_interpretation and 'iteration_notes' in result_interpretation:
+        iteration_notes = result_interpretation['iteration_notes']
+        
+        for iteration_id, note in iteration_notes.items():
+            try:
+                # Try to extract timestamp from iteration ID (expected format: evaluation_insights_YYYYMMDD_HHMMSS)
+                match = re.search(r'(\d{8})_(\d{6})', iteration_id)
+                if match:
+                    date_str = match.group(1)
+                    time_str = match.group(2)
+                    timestamp = datetime.strptime(f"{date_str}_{time_str}", "%Y%m%d_%H%M%S")
+                    sorted_notes.append((iteration_id, note, timestamp))
+            except Exception:
+                # If parsing fails, add the note without a timestamp (will be added at the end)
+                sorted_notes.append((iteration_id, note, datetime(1900, 1, 1)))
+    
+    # Sort notes by timestamp (oldest first)
+    sorted_notes.sort(key=lambda x: x[2])
+    return sorted_notes

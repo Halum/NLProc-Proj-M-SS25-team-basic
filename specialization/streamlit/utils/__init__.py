@@ -1,0 +1,45 @@
+"""
+RAG Evaluation Dashboard utilities.
+
+This package provides utilities for transforming and analyzing RAG system
+evaluation data for visualization in the Streamlit dashboard.
+"""
+
+from .basic_metrics import (
+    calculate_dynamic_chart_height,
+    extract_nested_score,
+    prepare_correctness_by_groups_data,
+    prepare_bert_score_by_groups_data,
+    prepare_rouge_score_by_groups_data,
+    calculate_overall_metrics
+)
+
+from .retrieval_analysis import (
+    prepare_gold_context_presence_by_groups,
+    prepare_position_distribution_by_groups,
+    prepare_presence_by_correctness_groups
+)
+
+from .historical_metrics import (
+    load_all_insight_files,
+    calculate_average_metrics,
+    prepare_historical_metrics,
+    extract_score_distributions
+)
+
+__all__ = [
+    'calculate_dynamic_chart_height',
+    'extract_nested_score',
+    'prepare_correctness_by_groups_data',
+    'prepare_similarity_distribution_data',
+    'prepare_bert_score_by_groups_data',
+    'prepare_rouge_score_by_groups_data',
+    'calculate_overall_metrics',
+    'prepare_gold_context_presence_by_groups',
+    'prepare_position_distribution_by_groups',
+    'prepare_presence_by_correctness_groups',
+    'load_all_insight_files',
+    'calculate_average_metrics',
+    'prepare_historical_metrics',
+    'extract_score_distributions'
+]

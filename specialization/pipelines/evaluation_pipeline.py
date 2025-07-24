@@ -27,6 +27,7 @@ import json
 import logging
 from typing import List, Dict, Any
 
+
 # Add parent directories to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -34,6 +35,7 @@ from specialization.pipelines.user_query import UserQueryPipeline
 from specialization.evaluation import InsightGenerator
 from specialization.evaluation import MetricsGenerator
 from specialization.generator.query_parser import QueryParser
+from specialization.utils.data_utils import get_gold_context_pos, is_answer_correct
 from specialization.config.config import (
     GOLD_INPUT_PATH, 
     EVALUATION_INSIGHTS_PATH,
@@ -113,6 +115,7 @@ class EvaluationPipeline:
         """
         question = gold_item['question']
         gold_answer = gold_item['answer']
+        gold_answer = gold_answer if isinstance(gold_answer, list) else [gold_answer]
         gold_context = gold_item['context']  # Optional gold context
 
         logger.info(f"Evaluating question: {question}")
@@ -135,25 +138,35 @@ class EvaluationPipeline:
         
         # Determine if answer is correct through automatic evaluation
         # Simple substring match - could be enhanced with NLP techniques
-        is_correct = gold_answer.lower() in generated_answer.lower()
-        
+        is_correct, gold_answer_pos = is_answer_correct(gold_answer, generated_answer)
+        gold_context_pos = get_gold_context_pos(gold_context, context)
+
+        gold_answer_for_metrics = gold_answer[0] if gold_answer_pos == -1 else gold_answer[gold_answer_pos]
+
         # Extract the average similarity score from the context if available
         avg_similarity_score = None
         if context and len(context) > 0 and all('score' in doc for doc in context):
             avg_similarity_score = sum(doc['score'] for doc in context) / len(context)
+        
+        
         # Create insight data dictionary
         insight_data = {
+            "id": gold_item['id'],
             "question": question,
             "gold_answer": gold_answer,
+            "gold_context_pos": gold_context_pos,
             "generated_answer": generated_answer,
+            "difficulty": gold_item['difficulty'],
             "context": context,
             "is_correct": is_correct,
             "avg_similarity_score": avg_similarity_score,
             "metadata_filters": parsed_filters,
             "parsed_question": parsed_question,
-            "bert_score": MetricsGenerator.calculate_bert_score(gold_answer, generated_answer),
-            "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer, generated_answer),
-            "gold_context": gold_context
+            "bert_score": MetricsGenerator.calculate_bert_score(gold_answer_for_metrics, generated_answer),
+            "rouge_score": MetricsGenerator.calculate_rouge_score(gold_answer_for_metrics, generated_answer),
+            "gold_context": gold_context,
+            "tags": gold_item['tags'],
+            "question_reasoning": gold_item['question_reasoning']
         }
         # Add to insights
         self.insight_generator.update_insight(**insight_data)

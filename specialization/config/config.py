@@ -17,7 +17,7 @@ RAW_DOCUMENT_DIR_PATH = "specialization/data/raw/"
 PROCESSED_DOCUMENT_DIR_PATH = "specialization/data/processed/"
 
 # Processing pipeline configurations
-DATA_SAMPLE_SIZE = 100  # Number of rows to sample from each CSV file for processing
+DATA_SAMPLE_SIZE = 1000  # Number of rows to sample from each CSV file for processing
 RAW_DATA_FILES = [
     "movies_metadata.csv",
     "credits.csv",
@@ -57,6 +57,9 @@ DATA_COLUMNS_TO_KEEP = [
     "genres",
     "keywords",
     "production_companies",
+    "budget",
+    "spoken_languages",
+    "production_countries"
 ]
 DATA_COLUMNS_TYPE_MAPPING = (
     [  # accepted types : int | float | str | bool | year (special)
@@ -64,14 +67,19 @@ DATA_COLUMNS_TYPE_MAPPING = (
         {"column": "runtime", "type": "int"},
         {"column": "release_date", "type": "year"},
         {"column": "vote_average", "type": "float"},
+        {"column": "budget", "type": "float"},
     ]
 )
-METADATA_COLUMNS = ["title", "revenue", "runtime", "release_date", "vote_average"]
+METADATA_COLUMNS = ["title", "revenue", "runtime", "release_date", "vote_average", "budget"]
 ADD_TO_CHUNKING_COLUMN = [
-    {"column": "cast", "prefix": "Starring with "},
-    {"column": "genres", "prefix": "The movie belongs to genres like "},
-    {"column": "keywords", "prefix": "The movie has keywords like "},
-    {"column": "production_companies", "prefix": "Produced by "},
+    {"column": "title", "prefix": "Movie Title: "},
+    {"column": "release_date", "prefix": "Release Date: "},
+    {"column": "cast", "prefix": "Starring with: "},
+    {"column": "genres", "prefix": "Genres: "},
+    {"column": "keywords", "prefix": "Keywords: "},
+    {"column": "production_companies", "prefix": "Produced by: "},
+    {"column": "spoken_languages", "prefix": "Available in languages: "},
+    {"column": "production_countries", "prefix": "Produced in countries: "},
 ]
 CHUNKING_COLUMN = "overview"
 
@@ -92,7 +100,7 @@ TEST_QUESTIONS_PATH = "specialization/data/tests/test_input.json"
 # Specialized model configurations - OpenAI only
 # OpenAI API configuration
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_EMBEDDING_MODEL = "text-embedding-ada-002"  # OpenAI's embedding model
+OPENAI_EMBEDDING_MODEL = "text-embedding-3-small"  # OpenAI's embedding model
 OPENAI_CHAT_MODEL = "gpt-4.1-nano"  # OpenAI's chat model
 
 # Knowledge Graph settings
@@ -112,12 +120,18 @@ VECTOR_STORE_TYPE = "faiss"  # or 'chromadb'
 
 # Evaluation settings
 EVALUATION_METRICS = ["precision", "recall", "f1", "bleu", "rouge"]
-GOLD_INPUT_PATH = "specialization/data/tests/gold_input.json"
+GOLD_INPUT_PATH = "specialization/data/tests/gold_input_v2.json"
 # Base path for insights - actual files will be saved with timestamps (format: evaluation_insights_YYYYMMDD_HHMMSS.json)
-EVALUATION_INSIGHTS_PATH = "specialization/data/insight/evaluation_insights.json"
+EVALUATION_INSIGHTS_PATH = str(Path(__file__).parent.parent / "data" / "insight" / "evaluation_insights.json")
 APPEND_INSIGHTS = (
     False  # When False, replaces existing insights file; when True, appends to it
 )
+
+# Path for result interpretation data (containing iteration notes and other metadata)
+RESULT_INTERPRETATION_PATH = str(Path(__file__).parent.parent / "data" / "tests" / "result_interpretation.json")
+
+# Cache settings for visualizations
+CACHE_DIR_PATH = "specialization/data/processed/cache/"
 
 # Logging
 LOG_LEVEL = "INFO"
