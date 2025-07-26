@@ -1,0 +1,29 @@
+% Custom TikZ styles for our diagrams
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tikzstyles}[2025/07/25 v1.0 Custom TikZ styles]
+
+% Make sure TikZ is loaded
+\RequirePackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows,positioning,shapes.symbols}
+
+% Define our custom styles
+\tikzstyle{process} = [rectangle, draw=black, fill=blue!20, rounded corners, minimum height=2em, minimum width=2.2cm, align=center, font=\scriptsize]
+\tikzstyle{storage} = [cylinder, draw=black, fill=green!20, shape border rotate=90, aspect=0.25, minimum height=1.5em, minimum width=2.2cm, align=center, font=\scriptsize]
+\tikzstyle{io} = [rectangle, draw=black, fill=orange!20, rounded corners, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\scriptsize]
+\tikzstyle{data} = [rectangle, draw=black, thick, minimum width=2.2cm, minimum height=0.9cm, align=center, fill=green!15, font=\scriptsize]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{note} = [rectangle, draw=gray, dashed, fill=gray!5, font=\tiny, text width=1.8cm, align=center]
+
+% Define custom pics
+\tikzset{
+  retrievedchunks/.pic={
+    % Stack rectangles
+    \fill[green!15, draw=black] (0,0) rectangle (1,0.6);
+    \fill[green!15, draw=black] (0.1,0.1) rectangle (1.1,0.7);
+    \fill[green!15, draw=black] (0.2,0.2) rectangle (1.2,0.8);
+    % Text lines
+    \draw[gray] (0.3,0.6) -- (0.9,0.6);
+    \draw[gray] (0.3,0.5) -- (0.9,0.5);
+    \draw[gray] (0.3,0.4) -- (0.8,0.4);
+  }
+}
