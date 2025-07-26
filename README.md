@@ -75,6 +75,16 @@ The suggestion generation pipeline manages the retrieval and generation process,
   - `streamlit/`: Specialized Streamlit interface
   - `main.py`: Interactive CLI for running specialized pipelines
 
+## 📄 Research Paper
+
+The complete research paper documenting our MovieQA-RAG system is available in LaTeX format:
+
+- **Paper**: [project-report/report.pdf](project-report/report.pdf)
+- **Title**: "MovieQA-RAG: A Modular RAG Framework with Metadata-Guided Retrieval and Explainable Evaluation"
+- **Format**: ACL 2023 conference format
+- **Source**: [project-report/report.tex](project-report/report.tex)
+
+The paper covers our enhanced RAG system with metadata filtering, query normalization, and comprehensive evaluation across 84 gold-standard questions. For editing and compilation instructions, see [project-report/README.md](project-report/README.md).
 
 ## Environment Setup with Conda
 
